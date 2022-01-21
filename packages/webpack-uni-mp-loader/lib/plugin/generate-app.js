@@ -85,13 +85,18 @@ module.exports = function generateApp (compilation) {
   if (Object.keys(specialMethods).length) {
     beforeCode = `${getPlatformGlobal()}.specialMethods = ${JSON.stringify(specialMethods)}`
   }
-
+  let modCode = ''
+  if(process.UNI_SUBMODULES.length){
+    const modCodeArr = process.UNI_SUBMODULES.map(i=>`require('./${i.path}.js')`)
+    modCode = modCodeArr.join('\n')
+  }
   return [{
     file: 'app.js',
     source: `${beforeCode}
 require('./common/runtime.js')
 require('./common/vendor.js')
-require('./common/main.js')`
+require('./common/main.js')
+${modCode}`
   }, {
     file: 'app' + ext,
     source: `${importMainCss}

@@ -113,6 +113,15 @@ module.exports = function getSplitChunks () {
     }
     return true
   }
+  function findSubModules(module, key){
+    if (module.resource) {
+      const resource = normalizePath(module.resource)
+      const includeArr =  key ? process.UNI_SUBMODULES.find(i=>i.path == key).include : process.UNI_SUBMODULES.map(i=>i.include).flat()
+      
+      return includeArr.find(i => resource.indexOf(i)!== -1)
+    }
+    return false
+  }
   // TODO 独立分包
 
   const cacheGroups = {
@@ -121,6 +130,9 @@ module.exports = function getSplitChunks () {
     commons: {
       test (module, chunks) {
         if (!baseTest(module)) {
+          return false
+        }
+        if(findSubModules(module)){
           return false
         }
         const matchSubPackages = findSubPackages(chunks)
@@ -146,6 +158,19 @@ module.exports = function getSplitChunks () {
       minChunks: 1,
       name: 'common/vendor',
       chunks: 'all'
+    }
+  }
+  if(process.UNI_SUBMODULES.length){
+    for (const item of process.UNI_SUBMODULES) {
+      cacheGroups['modules'] = {
+        test (module, chunks) {
+          return findSubModules(module, item.path)
+        },
+        minSize: 0,
+        minChunks: 1,
+        name: item.path,
+        chunks: 'all'
+      }
     }
   }
 

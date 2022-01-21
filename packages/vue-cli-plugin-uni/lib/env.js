@@ -142,6 +142,10 @@ if (Array.isArray(pagesJsonObj.subPackages)) {
     }
   })
 }
+process.UNI_SUBMODULES = []
+if (Array.isArray(pagesJsonObj.subModules)) {
+  process.UNI_SUBMODULES = pagesJsonObj.subModules
+}
 
 process.UNI_PAGES = pagesJsonObj
 
