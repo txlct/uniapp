@@ -87,7 +87,7 @@ module.exports = function generateApp (compilation) {
   }
   let modCode = ''
   if(process.UNI_SUBMODULES.length){
-    const modCodeArr = process.UNI_SUBMODULES.map(i=>`require('./${i.path}.js')`)
+    const modCodeArr = process.UNI_SUBMODULES.map(i=>`require.async('./${i.path}.js')`)
     modCode = modCodeArr.join('\n')
   }
   return [{
