@@ -4,7 +4,8 @@ const webpack = require('webpack')
 
 const {
   getMainEntry,
-  getH5Options
+  getH5Options,
+  getSubPagesWithEntry,
 } = require('@dcloudio/uni-cli-shared')
 
 const {
@@ -60,26 +61,61 @@ if (process.env.NODE_ENV !== 'production') {
   ))
 }
 
+/**
+ * @description 获取页面应用的pages 对象，支持MPA模式的pages对象组装；默认兜底获取单页面应用pages对象
+ * 1. 使用 subPackages 里面提供的`root` 作为相关的pages key
+ * 2. 若root 对应的pages下面存在main.ts/main.js 则使用作为入口文件，否则使用 src/main.ts or src/main.js
+ *
+ * @return {*}
+ */
+function getPagesConfig () {
+  const pagesConfig = {}
+
+  const basePagesConfigWithoutEntry = {
+    // 模板来源
+    template,
+    // 在 dist/index.html 的输出
+    filename: 'index.html',
+    // 当使用 title 选项时，
+    // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
+    title,
+    // 在这个页面中包含的块，默认情况下会包含
+    // 提取出来的通用 chunk 和 vendor chunk。
+    chunks: ['chunk-vendors', 'chunk-common', 'index'],
+    baseUrl: publicPath
+  }
+
+  // 定义默认的单页面应用的pages配置
+  pagesConfig.index = {
+    // page 的入口
+    entry: path.resolve(process.env.UNI_INPUT_DIR, getMainEntry()),
+    ...basePagesConfigWithoutEntry
+  }
+
+  // 返回 subPackages 的页面config
+  const subPagesEntryConfig = getSubPagesWithEntry()
+
+  // 填充pages 的base config
+  if (subPagesEntryConfig && Object.keys(subPagesEntryConfig).length) {
+    Object.keys(subPagesEntryConfig).forEach(pageItem => {
+      pageItem = {
+        ...pageItem,
+        ...basePagesConfigWithoutEntry
+      }
+    })
+  }
+
+  return {
+    ...pagesConfig,
+    ...subPagesEntryConfig
+  }
+}
+
 const vueConfig = {
   parallel: false, // 因为传入了自定义 compiler，避免参数丢失，禁用parallel
   publicPath,
-  pages: {
-    index: {
-      // page 的入口
-      entry: path.resolve(process.env.UNI_INPUT_DIR, getMainEntry()),
-      // 模板来源
-      template,
-      // 在 dist/index.html 的输出
-      filename: 'index.html',
-      // 当使用 title 选项时，
-      // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
-      title,
-      // 在这个页面中包含的块，默认情况下会包含
-      // 提取出来的通用 chunk 和 vendor chunk。
-      chunks: ['chunk-vendors', 'chunk-common', 'index'],
-      baseUrl: publicPath
-    }
-  }
+  // TODO: 修改并支持MPA 模式 by finleyliang
+  pages: getPagesConfig()
 }
 
 if (devServer && Object.keys(devServer).length) {
