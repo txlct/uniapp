@@ -5,7 +5,7 @@ const webpack = require('webpack')
 const {
   getMainEntry,
   getH5Options,
-  getSubPagesWithEntry,
+  getSubPagesWithEntry
 } = require('@dcloudio/uni-cli-shared')
 
 const {
