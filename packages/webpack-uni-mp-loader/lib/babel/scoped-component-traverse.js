@@ -51,11 +51,24 @@ function handleObjectExpression (declaration, path, state) {
   if (componentsProperty && t.isObjectExpression(componentsProperty.value)) {
     handleComponentsObjectExpression(componentsProperty.value, path, state)
   }
+
+  const componentPlaceholder = declaration.properties.find(prop => (
+    t.isObjectProperty(prop)
+    && t.isIdentifier(prop.key)
+    && prop.key.name === 'componentPlaceholder'
+  ));
+
+  console.log('--------- componentPlaceholder:>>>', componentPlaceholder);
+
+  componentPlaceholder && t.isObjectExpression(componentPlaceholder.value) && handlePlaceholderExpression(componentPlaceholder.value, path, state)
+}
+
+function getProperty (obj) {
+  return obj.properties.filter(prop => t.isObjectProperty(prop) && t.isIdentifier(prop.value))
 }
 
 function handleComponentsObjectExpression (componentsObjExpr, path, state, prepend) {
-  const properties = componentsObjExpr.properties
-    .filter(prop => t.isObjectProperty(prop) && t.isIdentifier(prop.value))
+  const properties = getProperty(componentsObjExpr);
   const components = parseComponents(properties.map(prop => {
     return {
       name: prop.key.name || prop.key.value,
@@ -63,6 +76,22 @@ function handleComponentsObjectExpression (componentsObjExpr, path, state, prepe
     }
   }), path.scope.bindings, path)
   state.components = prepend ? components.concat(state.components) : components
+}
+
+function handlePlaceholderExpression (componentsObjExpr, path, state) {
+  const properties = getProperty(componentsObjExpr);
+  console.log('--------- properties:>>>', properties);
+  const placeholder = properties.map(({ key: { name = '', value: val = '' } = {}, value = {} }) => { 
+    const proppertyKey = name || val;
+    const propertyValue = t.isIdentifier(value) ? value.name : value.value;
+
+    return {
+      name: proppertyKey,
+      value: propertyValue,
+    };
+  });
+
+  state.componentPlaceholder = [...(state?.componentPlaceholder || []), ...placeholder];
 }
 
 function handleIdentifier ({
@@ -105,6 +134,7 @@ function handleIdentifier ({
 module.exports = function (ast, state = {
   type: 'Component',
   components: [],
+  componentPlaceholder: [],
   options: {}
 }) {
   babelTraverse(ast, {
