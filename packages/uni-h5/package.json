@@ -11,6 +11,11 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "files": [
+    "dist",
+    "lib",
+    "src"
+  ],
   "author": "fxy060608",
   "license": "Apache-2.0",
   "dependencies": {
