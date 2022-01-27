@@ -95,8 +95,6 @@ function getPagesConfig () {
   // 返回 subPackages 的页面config
   const subPagesEntryConfig = getSubPagesWithEntry()
 
-  console.log('>> subPagesEntryConfig', subPagesEntryConfig)
-
   // 填充pages 的base config
   if (subPagesEntryConfig && Object.keys(subPagesEntryConfig).length) {
     Object.keys(subPagesEntryConfig).forEach(pageItem => {
@@ -107,22 +105,11 @@ function getPagesConfig () {
     })
   }
 
-  const extConfig = {
-    ...pagesConfig,
-    ...subPagesEntryConfig
-  }
-
-  console.log('>>> getPagesConfig extConfig', extConfig)
-
   return {
     ...pagesConfig,
     ...subPagesEntryConfig
   }
 }
-
-const pages = getPagesConfig()
-
-console.log('>>> pages', pages)
 
 const vueConfig = {
   parallel: false, // 因为传入了自定义 compiler，避免参数丢失，禁用parallel
