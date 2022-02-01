@@ -103,7 +103,7 @@ export default function parseBaseComponent (vueComponentOptions, {
   }
 
   if (vueOptions.componentPlaceholder) {
-    componentOptions.componentPlaceholder = vueOptions.componentPlaceholder;
+    componentOptions.componentPlaceholder = vueOptions.componentPlaceholder
   }
 
   if (Array.isArray(vueOptions.wxsCallMethods)) {
