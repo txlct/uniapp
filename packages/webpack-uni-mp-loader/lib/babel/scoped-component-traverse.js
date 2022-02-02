@@ -42,33 +42,24 @@ function handleObjectExpression (declaration, path, state) {
     })
   }
 
-  const componentsProperty = declaration.properties.filter(prop => {
-    return t.isObjectProperty(prop) &&
-      t.isIdentifier(prop.key) &&
-      prop.key.name === 'components'
-  })[0]
+  const isMatchProperty = (prop, name) => (
+    t.isObjectProperty(prop) &&
+    t.isIdentifier(prop.key) &&
+    prop.key.name === name
+  )
 
-  if (componentsProperty && t.isObjectExpression(componentsProperty.value)) {
-    handleComponentsObjectExpression(componentsProperty.value, path, state)
-  }
+  const componentsProperty = declaration.properties.find(prop => isMatchProperty(prop, 'components'))
 
-  const componentPlaceholder = declaration.properties.find(prop => (
-    t.isObjectProperty(prop)
-    && t.isIdentifier(prop.key)
-    && prop.key.name === 'componentPlaceholder'
-  ));
+  componentsProperty && t.isObjectExpression(componentsProperty.value) && handleComponentsObjectExpression(componentsProperty.value, path, state)
 
-  console.log('--------- componentPlaceholder:>>>', componentPlaceholder);
+  const componentPlaceholder = declaration.properties.find(prop => isMatchProperty(prop, 'componentPlaceholder'))
 
-  componentPlaceholder && t.isObjectExpression(componentPlaceholder.value) && handlePlaceholderExpression(componentPlaceholder.value, path, state)
-}
-
-function getProperty (obj) {
-  return obj.properties.filter(prop => t.isObjectProperty(prop) && t.isIdentifier(prop.value))
+  componentPlaceholder && t.isObjectExpression(componentPlaceholder.value) && handlePlaceholderExpression(componentPlaceholder.value, state)
 }
 
 function handleComponentsObjectExpression (componentsObjExpr, path, state, prepend) {
-  const properties = getProperty(componentsObjExpr);
+  const properties = componentsObjExpr.properties
+    .filter(prop => t.isObjectProperty(prop) && t.isIdentifier(prop.value))
   const components = parseComponents(properties.map(prop => {
     return {
       name: prop.key.name || prop.key.value,
@@ -78,20 +69,20 @@ function handleComponentsObjectExpression (componentsObjExpr, path, state, prepe
   state.components = prepend ? components.concat(state.components) : components
 }
 
-function handlePlaceholderExpression (componentsObjExpr, path, state) {
-  const properties = getProperty(componentsObjExpr);
-  console.log('--------- properties:>>>', properties);
-  const placeholder = properties.map(({ key: { name = '', value: val = '' } = {}, value = {} }) => { 
-    const proppertyKey = name || val;
-    const propertyValue = t.isIdentifier(value) ? value.name : value.value;
+function handlePlaceholderExpression (objExpr, state) {
+  const placeholder = objExpr.properties
+    .filter(prop => t.isObjectProperty(prop) && (t.isStringLiteral(prop.value) || t.isIdentifier(prop.value)))
+    .reduce((acc, { key: { name = '', value = '' } = {}, value: { name: valName = '' } = {} }) => {
+      const key = name || value
 
-    return {
-      name: proppertyKey,
-      value: propertyValue,
-    };
-  });
+      if (key) {
+        acc[key] = valName
+      }
 
-  state.componentPlaceholder = [...(state?.componentPlaceholder || []), ...placeholder];
+      return acc
+    }, {})
+
+  state.componentPlaceholder = { ...state?.componentPlaceholder, ...placeholder }
 }
 
 function handleIdentifier ({

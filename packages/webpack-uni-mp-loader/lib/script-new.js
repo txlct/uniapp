@@ -134,8 +134,7 @@ module.exports = function (content, map) {
 
       updateUsingComponents(resourcePath, usingComponents, type)
 
-      console.log('--------- componentPlaceholder:>>>', componentPlaceholder);
-      componentPlaceholder.length && updateComponentGenerics(resourcePath, componentPlaceholder, 'componentPlaceholder');
+      componentPlaceholder && updateComponentGenerics(resourcePath, componentPlaceholder, 'componentPlaceholder');
 
       callback(null, content, map)
     }
