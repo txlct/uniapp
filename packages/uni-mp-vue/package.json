@@ -16,7 +16,7 @@
   "sideEffects": false,
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dcloudio/uni-app.git",
+    "url": "https://github.com/txlct/uniapp.git",
     "directory": "packages/uni-mp-vue"
   },
   "license": "Apache-2.0",

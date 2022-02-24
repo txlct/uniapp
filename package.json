@@ -1,6 +1,6 @@
 {
   "name": "uni-app",
-  "version": "0.0.1",
+  "version": "0.1.1",
   "scripts": {
     "lint": "eslint --fix --config package.json --ext .js --ext .vue --ignore-path .eslintignore build src",
     "lint:cli": "eslint  --fix --config package.json --ext .js --ext .vue --ignore-path .eslintignore packages/uni-cli-shared packages/uni-template-compiler \"packages/uni-*/lib/*.js\" \"packages/vue-cli-*/**/*.js\" \"packages/webpack-uni-*/**/*.js\"",
@@ -31,7 +31,9 @@
     "release": "npm run lint:cli && lerna publish --force-publish=*",
     "release:alpha": "npm run lint:cli && lerna publish --force-publish=* --npm-tag=alpha",
     "release:next": "npm run lint:cli && lerna publish --force-publish=* --npm-tag=next",
-    "release:v3": "npm run lint:cli && lerna publish --no-git-tag-version --force-publish=* --npm-tag=v3"
+    "release:v3": "npm run lint:cli && lerna publish --no-git-tag-version --force-publish=* --npm-tag=v3",
+    "version:auto": "standard-version",
+    "postversion:auto": "git push --follow-tags"
   },
   "dependencies": {
     "base64-arraybuffer": "^0.2.0",
@@ -79,6 +81,7 @@
     "rollup-plugin-babel": "^4.4.0",
     "rollup-plugin-terser": "^5.3.0",
     "shell-exec": "^1.0.2",
+    "standard-version": "^9.3.2",
     "stricter-htmlparser2": "^3.9.6",
     "strip-json-comments": "^3.1.0",
     "vue": "^2.6.11",

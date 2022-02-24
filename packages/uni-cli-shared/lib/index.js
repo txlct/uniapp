@@ -17,6 +17,7 @@ const {
   getNVueMainEntry,
   parseEntry,
   parsePages,
+  getSubPagesWithEntry,
   getPagesJson,
   parsePagesJson
 } = require('./pages')
@@ -77,6 +78,7 @@ module.exports = {
   getH5Options,
   getMainEntry,
   getNVueMainEntry,
+  getSubPagesWithEntry,
   getPagesJson,
   getManifestJson,
   getNetworkTimeout,

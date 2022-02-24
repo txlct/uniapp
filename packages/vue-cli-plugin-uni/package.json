@@ -5,7 +5,7 @@
   "main": "index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dcloudio/uni-app.git",
+    "url": "https://github.com/txlct/uniapp.git",
     "directory": "packages/vue-cli-plugin-uni"
   },
   "scripts": {
