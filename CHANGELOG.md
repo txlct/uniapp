@@ -1,6 +1,8 @@
 # Changelog(lct-client-platform) 
 
 
+### 0.1.6 (2022-02-24)
+
 ### 0.1.5 (2022-02-24)
 
 
