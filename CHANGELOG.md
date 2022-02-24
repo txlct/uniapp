@@ -1,6 +1,13 @@
 # Changelog(lct-client-platform) 
 
 
+### 0.1.5 (2022-02-24)
+
+
+### 🚀 Chore | 构建/工程依赖/工具
+
+* upgrade workflows config ([70318f0](https://github.com/txlct/uniapp/commit/70318f02e6215ad284e67f6b56ec0bdd4af74fd2))
+
 ### [0.1.4](https://github.com/txlct/uniapp/compare/v0.1.3...v0.1.4) (2022-02-24)
 
 
