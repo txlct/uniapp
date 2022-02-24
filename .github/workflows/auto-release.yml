@@ -1,5 +1,5 @@
 # workflows which will automatically triggered when event matched
-name: GitHub Auto Release
+name: Auto Release
 # on:
 #   push:
 #     branches: [ master ]
@@ -13,7 +13,6 @@ on:
   pull_request:
     branches:
       - stable
-      - master
     types: [closed]
 jobs:
   Auto-Release:
