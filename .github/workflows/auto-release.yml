@@ -1,5 +1,5 @@
 # workflows which will automatically triggered when event matched
-name: GitHub Actions Auto
+name: GitHub Auto Release
 # on:
 #   push:
 #     branches: [ master ]
@@ -8,7 +8,13 @@ name: GitHub Actions Auto
 # on: [push]
 on:
   push:
-    branches: [ finley_v2.0.0-31920210709003_lib_action_auto ]
+    branches:
+      - '**'
+  pull_request:
+    branches:
+      - stable
+      - master
+    types: [closed]
 jobs:
   Auto-Release:
     runs-on: ubuntu-latest
@@ -53,9 +59,13 @@ jobs:
 
       # Before publish
       - name: Install Dependencies
+        id: install_deps
+        if: github.event.pull_request.merged == true
         run: yarn
 
       - name: Auto run standard-version
+        id: auto_version
+        if: github.event.pull_request.merged == true
         run: yarn version:auto
 
       # Define ${CURRENT_VERSION}
@@ -92,10 +102,11 @@ jobs:
       #     git_commit_sha: ${{ github.sha }}
       #     git_tag_prefix: "v"
 
-      # After publish
+      # Create release if event is PR
       - name: Create Release
         id: create_release
         # if: steps.tag_check.outputs.exists_tag == 'false'
+        if: startsWith( env.commitmsg , 'chore(release):' ) && github.event.pull_request.merged == true
         uses: actions/create-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -107,3 +118,16 @@ jobs:
             ${{ github.event.pull_request.body }}
           draft: false
           prerelease: false
+      
+      # Create PR page comment when event is PR
+      - uses: actions/github-script@0.8.0
+        if: startsWith( env.commitmsg , 'chore(release):' ) && github.event.pull_request.merged == true
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: 'https://github.com/${{ github.repository }}/releases/tag/v${{ env.CURRENT_VERSION }} is released 🎉'
+            })
