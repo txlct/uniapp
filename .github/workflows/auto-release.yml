@@ -58,10 +58,12 @@ jobs:
         run: yarn
 
       # merge codes and auto tag
-      - name: Auto run standard-version
+      - name: Auto version bump
         id: auto_version
         # if: github.event.pull_request.merged == true
-        run: yarn version:auto
+        run: npx semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       # Define ${CURRENT_VERSION}
       - name: Set Current Version
