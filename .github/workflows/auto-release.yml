@@ -7,9 +7,6 @@ name: Auto Release
 #     branches: [ master ]
 # on: [push]
 on:
-  push:
-    branches:
-      - '**'
   pull_request:
     branches:
       - stable
