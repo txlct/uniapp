@@ -1,5 +1,5 @@
 {
-    "header":"# Changelog(lct-client-platform) \n\n",
+    "header":"# Changelog(txlct/uniapp) \n\n",
     "types": [
         {"type": "feat", "section": "✨ Features | 新功能"},
         {"type": "fix", "section": "🐛 Bug Fixes | Bug 修复"},
