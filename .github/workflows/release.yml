@@ -4,10 +4,9 @@ name: release
 on:
   push:
     branches:
-      - '**'
+      - main
   pull_request:
     branches:
-      - stable
       - main
     types: [closed]
 jobs:
