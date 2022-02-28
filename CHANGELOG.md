@@ -1,6 +1,13 @@
 # Changelog(txlct/uniapp) 
 
 
+### 0.1.12 (2022-02-28)
+
+
+### 🚀 Chore | 构建/工程依赖/工具
+
+* using main branch as the stable branch ([7edd4e5](https://github.com/txlct/uniapp/commit/7edd4e5966dd80fdb28d70554cb160ebcd1b64c3))
+
 ### 0.1.11 (2022-02-28)
 
 
