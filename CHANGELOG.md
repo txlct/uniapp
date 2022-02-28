@@ -1,6 +1,13 @@
 # Changelog(txlct/uniapp) 
 
 
+### 0.1.10 (2022-02-28)
+
+
+### 🚀 Chore | 构建/工程依赖/工具
+
+* upgrade pkg version ([6afc186](https://github.com/txlct/uniapp/commit/6afc1868b5fd944cefdccf3793dea9c2173d18c9))
+
 ### 0.1.3 (2022-02-28)
 
 ### 0.1.2 (2022-02-28)
