@@ -6,7 +6,6 @@ Fork from [uni-app](https://github.com/dcloudio/uni-app), and with custom codeba
 ## 定制化功能
 
 - 支持MPA(多页面应用)模式
-<!-- - 移除无用的多语言包`@dcloudio/uni-cli-i18n`，精简包大小 -->
 
 
 ## 快速开始
