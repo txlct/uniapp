@@ -1,6 +1,13 @@
 # Changelog(txlct/uniapp) 
 
 
+### 0.1.2 (2022-02-28)
+
+
+### ✨ Features | 新功能
+
+* add mpa mode support for uniapp ([7c01f9b](https://github.com/txlct/uniapp/commit/7c01f9b9c852a4552387cf4dcdbbaa4bfa06d590))
+
 ### [0.1.1](https://github.com/txlct/uniapp/compare/v2.0.0-31920210709003...v0.1.1) (2022-02-28)
 
 
