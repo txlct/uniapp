@@ -176,18 +176,18 @@ function updateUsingComponents (name, usingComponents, type) {
   }
 }
 
-function updateComponentGenerics (name, componentGenerics) {
+function updateComponentGenerics (name, componentGenerics, key = 'componentGenerics') {
   const oldJsonStr = getJsonFile(name)
   if (oldJsonStr) { // update
     const jsonObj = JSON.parse(oldJsonStr)
-    jsonObj.componentGenerics = componentGenerics
+    jsonObj[key] = componentGenerics
     const newJsonStr = JSON.stringify(jsonObj, null, 2)
     if (newJsonStr !== oldJsonStr) {
       updateJsonFile(name, newJsonStr)
     }
   } else { // add
     const jsonObj = {
-      componentGenerics
+      [key]: componentGenerics
     }
     updateJsonFile(name, jsonObj)
   }

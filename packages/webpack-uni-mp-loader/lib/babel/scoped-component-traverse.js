@@ -42,15 +42,19 @@ function handleObjectExpression (declaration, path, state) {
     })
   }
 
-  const componentsProperty = declaration.properties.filter(prop => {
-    return t.isObjectProperty(prop) &&
-      t.isIdentifier(prop.key) &&
-      prop.key.name === 'components'
-  })[0]
+  const isMatchProperty = (prop, name) => (
+    t.isObjectProperty(prop) &&
+    t.isIdentifier(prop.key) &&
+    prop.key.name === name
+  )
 
-  if (componentsProperty && t.isObjectExpression(componentsProperty.value)) {
-    handleComponentsObjectExpression(componentsProperty.value, path, state)
-  }
+  const componentsProperty = declaration.properties.find(prop => isMatchProperty(prop, 'components'))
+
+  componentsProperty && t.isObjectExpression(componentsProperty.value) && handleComponentsObjectExpression(componentsProperty.value, path, state)
+
+  const componentPlaceholder = declaration.properties.find(prop => isMatchProperty(prop, 'componentPlaceholder'))
+
+  componentPlaceholder && t.isObjectExpression(componentPlaceholder.value) && handlePlaceholderExpression(componentPlaceholder.value, state)
 }
 
 function handleComponentsObjectExpression (componentsObjExpr, path, state, prepend) {
@@ -63,6 +67,22 @@ function handleComponentsObjectExpression (componentsObjExpr, path, state, prepe
     }
   }), path.scope.bindings, path)
   state.components = prepend ? components.concat(state.components) : components
+}
+
+function handlePlaceholderExpression (objExpr, state) {
+  const placeholder = objExpr.properties
+    .filter(prop => t.isObjectProperty(prop) && (t.isStringLiteral(prop.value) || t.isIdentifier(prop.value)))
+    .reduce((acc, { key: { name = '', value = '' } = {}, value: { name: valName = '' } = {} }) => {
+      const key = name || value
+
+      if (key) {
+        acc[key] = valName
+      }
+
+      return acc
+    }, {})
+
+  state.componentPlaceholder = { ...state?.componentPlaceholder, ...placeholder }
 }
 
 function handleIdentifier ({
@@ -105,6 +125,7 @@ function handleIdentifier ({
 module.exports = function (ast, state = {
   type: 'Component',
   components: [],
+  componentPlaceholder: [],
   options: {}
 }) {
   babelTraverse(ast, {

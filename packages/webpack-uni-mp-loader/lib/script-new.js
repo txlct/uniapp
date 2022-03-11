@@ -19,7 +19,8 @@ const {
 } = require('@dcloudio/uni-cli-shared/lib/pages')
 
 const {
-  updateUsingComponents
+  updateUsingComponents,
+  updateComponentGenerics
 } = require('@dcloudio/uni-cli-shared/lib/cache')
 
 const preprocessor = require('@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader/preprocess')
@@ -77,11 +78,13 @@ module.exports = function (content, map) {
 
   const {
     state: {
-      components
+      components,
+      componentPlaceholder,
     }
   } = traverse(parser.parse(content, getBabelParserOptions()), {
     type,
-    components: []
+    components: [],
+    componentPlaceholder: []
   })
 
   const callback = this.async()
@@ -115,6 +118,7 @@ module.exports = function (content, map) {
     })
   })).then(() => {
     const usingComponents = Object.create(null)
+
     components.forEach(({
       name,
       source
@@ -129,6 +133,9 @@ module.exports = function (content, map) {
       addDynamicImport(babelLoader, resourcePath, dynamicImports)
 
       updateUsingComponents(resourcePath, usingComponents, type)
+
+      componentPlaceholder && updateComponentGenerics(resourcePath, componentPlaceholder, 'componentPlaceholder');
+
       callback(null, content, map)
     }
   }, err => {

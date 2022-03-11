@@ -102,6 +102,10 @@ export default function parseBaseComponent (vueComponentOptions, {
     componentOptions.externalClasses = vueOptions.externalClasses
   }
 
+  if (vueOptions.componentPlaceholder) {
+    componentOptions.componentPlaceholder = vueOptions.componentPlaceholder
+  }
+
   if (Array.isArray(vueOptions.wxsCallMethods)) {
     vueOptions.wxsCallMethods.forEach(callMethod => {
       componentOptions.methods[callMethod] = function (args) {
