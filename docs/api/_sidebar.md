@@ -5,6 +5,8 @@
   * [uni.arrayBufferToBase64](api/arrayBufferToBase64?id=arraybuffertobase64)
   * [生命周期](api/lifecycle.md)
   * [应用级事件](api/application.md)
+  * [拦截器](api/interceptor.md)
+  * [全局API](api/global.md)
 * 网络
   * [发起请求](api/request/request.md)
   * [上传、下载](api/request/network-file.md)
@@ -114,7 +116,9 @@
 * 广告
   * [激励视频广告](api/a-d/rewarded-video.md)
   * [全屏视频广告](api/a-d/full-screen-video.md)
+  * [内容联盟广告](api/a-d/content-page.md)
   * [插屏广告](api/a-d/interstitial.md)
+  * [互动游戏](api/a-d/interactive.md)
 * 第三方服务
   * [获取服务供应商](api/plugins/provider.md)
   * [登录](api/plugins/login.md)
@@ -122,6 +126,7 @@
   * [支付](api/plugins/payment.md)
   * [推送](api/plugins/push.md)
   * [语音](api/plugins/voice.md)
+  * [一键生成iOS通用链接](api/plugins/universal-links.md)
 * [uniCloud](api/uniCloud.md)
 * 平台扩展
   * [App原生插件](api/extend/native-plugin.md)
@@ -143,31 +148,31 @@
 <li></li>
 <div class="contact-box">
   <a href="//unicloud.dcloud.net.cn" target="_blank" class="contact-item">
-  	<img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/7962e8e0-4f2d-11eb-a16f-5b3e54966275.jpg" width="20" height="20"/>
+  	<img src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/7962e8e0-4f2d-11eb-a16f-5b3e54966275.jpg" width="20" height="20"/>
   	<div class="contact-smg">
   		<div>uniCloud Web控制台</div>
   	</div>
   </a>
   <a href="//ask.dcloud.net.cn/explore/" target="_blank" class="contact-item">
-  	<img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/73fc4f90-4f2d-11eb-a16f-5b3e54966275.png" width="20" height="20"/>
+  	<img src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/73fc4f90-4f2d-11eb-a16f-5b3e54966275.png" width="20" height="20"/>
   	<div class="contact-smg">
   		<div>论坛</div>
   	</div>
   </a>
   <a href="https://uniad.dcloud.net.cn" target="_blank" class="contact-item">
-    <img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/765d9820-4f2d-11eb-bd01-97bc1429a9ff.png" width="20" height="20"/>
+    <img src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/765d9820-4f2d-11eb-bd01-97bc1429a9ff.png" width="20" height="20"/>
     <div class="contact-smg">
       <div>uniAD</div>
     </div>
   </a>
   <a href="https://tongji.dcloud.net.cn/" target="_blank" class="contact-item">
-    <img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/77159d80-4f2d-11eb-a16f-5b3e54966275.png" width="20" height="20"/>
+    <img src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/77159d80-4f2d-11eb-a16f-5b3e54966275.png" width="20" height="20"/>
     <div class="contact-smg">
       <div>uni统计</div>
     </div>
   </a>
 	<div class="contact-item">
-		<img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/74cda950-4f2d-11eb-a16f-5b3e54966275.png" width="20" height="20"/>
+		<img src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/74cda950-4f2d-11eb-a16f-5b3e54966275.png" width="20" height="20"/>
 		<div class="contact-smg">
 			<div>
 	      代码仓库：<a href="https://gitee.com/dcloud/uni-app" target="_blank">码云</a>、<a href="http://github.com/dcloudio/uni-app" target="_blank">GitHub</a>
@@ -175,10 +180,10 @@
 		</div>
 	</div>
 	<div class="contact-item">
-	  <img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/759713d0-4f2d-11eb-a16f-5b3e54966275.png" width="20" height="20"/>
+	  <img src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/759713d0-4f2d-11eb-a16f-5b3e54966275.png" width="20" height="20"/>
 	  <div class="contact-smg">
 	     <div>官方QQ交流群</div>
-	  <div>群21：717019120 &nbsp;<a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=cAFnn6RGFBhYzBeF6iYllRW5BCMF-9EC&jump_from=webapi">点此加入</a></div>
+	  <div>群23：599958679 &nbsp;<a target="_blank" href="https://qm.qq.com/cgi-bin/qm/qr?k=YDAuvwgiE1Bss5uBA67GSIwfKbDRLuuE&jump_from=webapi">点此加入</a></div>
 		<div>群35：713420817（2000人已满）</div>
 		<div>群34：530305531（2000人已满）</div>
 		<div>群33：498071674（2000人已满）</div>
@@ -191,9 +196,9 @@
 		<div>群26：147867597（2000人已满）</div>
 		<div>群25：165297000（2000人已满）</div>
 		<div>群24：672494800（2000人已满）</div>
-		<div>群23：599958679（2000人已满）</div>
+		<!-- <div>群23：599958679（2000人已满）</div> -->
 		<div>群22：687186952（2000人已满）</div>
-		<!-- <div>群21：717019120（2000人已满）</div> -->
+		<div>群21：717019120（2000人已满）</div>
 		<div>群20：165796402（2000人已满）</div>
 		<div>群19：165657124（2000人已满）</div>
 		<div>群18：698592271（2000人已满）</div>
@@ -217,10 +222,10 @@
 	  </div>
 	</div>
   <div class="contact-item">
-  	<img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/77df7d30-4f2d-11eb-bd01-97bc1429a9ff.png" width="20" height="20"/>
+  	<img src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/77df7d30-4f2d-11eb-bd01-97bc1429a9ff.png" width="20" height="20"/>
   	<div class="contact-smg">
   		<div>关注微信公众号</div>
-  		<img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/78a8e7b0-4f2d-11eb-8ff1-d5dcf8779628.jpg" width="90" height="90"/>
+  		<img src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/78a8e7b0-4f2d-11eb-8ff1-d5dcf8779628.jpg" width="90" height="90"/>
   	</div>
   </div>
 </div>

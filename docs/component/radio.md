@@ -85,7 +85,7 @@ export default {
     methods: {
         radioChange: function(evt) {
             for (let i = 0; i < this.items.length; i++) {
-                if (this.items[i].value === evt.target.value) {
+                if (this.items[i].value === evt.detail.value) {
                     this.current = i;
                     break;
                 }
@@ -95,7 +95,7 @@ export default {
 }
 ```
  
-![uniapp](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/44bec6b0-4f30-11eb-a16f-5b3e54966275.png)
+![uniapp](https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/44bec6b0-4f30-11eb-a16f-5b3e54966275.png)
 
 
 **注意**

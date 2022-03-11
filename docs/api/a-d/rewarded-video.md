@@ -6,7 +6,7 @@
 
 手机用户观看几十秒视频广告，在广告播放完毕后可获得应用开发商提供的奖励，而应用开发商则可以从广告平台获取不菲的广告收入。
 
-![](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/23fcff30-441f-11eb-b680-7980c8a877b8.png)
+![](https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/23fcff30-441f-11eb-b680-7980c8a877b8.png)
 
 与开屏、信息流等广告变现方式不同，激励视频收益高、但场景设计和编程工作量也较高。
 
@@ -124,28 +124,42 @@ options 为 object 类型，属性如下：
 推荐使用此方案
 
 ```html
+<template>
+  <view>
+    <button type="primary" class="btn" @click="showRewardedVideoAd">显示激励视频广告</button>
+    <button type="primary" class="btn" @click="showFullScreenVideoAd">显示全屏视频广告</button>
+  </view>
+</template>
+
 <script>
-  import AD from "ad.js"
+  import AD from "../ad.js"
 
   export default {
     data() {
       return {
-        title: '激励视频广告'
+        title: '视频广告'
       }
     },
     onReady() {
-      // HBuilderX标准基座真机运行测试激励视频广告位标识（adpid）为：1507000689
-      // adpid: 1507000689 仅用于测试，发布时需要改为广告后台（https://uniad.dcloud.net.cn/）申请的 adpid
-      // 广告后台申请的广告位(adpid)需要自定义基座/云打包/本地打包后生效
-      this._adpid = 1507000689
+      // 可选预载广告数据
 
-      // 可选预加载数据, 减少加载等待时间，调用此 API 不会显示loading，不影响业务
-      // AD.load(this._adpid)
+      // AD.load({
+      //   adpid: 1507000689,
+      //   adType: "RewardedVideo"
+      // });
+
+      // AD.load({
+      //   adpid: 1507000611,
+      //   adType: "FullScreenVideo"
+      // });
     },
     methods: {
-      showAd() {
-        // 调用后默认显示Loading
-        AD.show(this._adpid, (res) => {
+      showRewardedVideoAd() {
+        // 调用后会显示 loading 界面
+        AD.show({
+          adpid: 1507000689, // HBuilder 基座测试广告位
+          adType: "RewardedVideo"
+        }, (res) => {
           // 用户点击了【关闭广告】按钮
           if (res && res.isEnded) {
             // 正常播放结束
@@ -155,32 +169,67 @@ options 为 object 类型，属性如下：
             console.log("onClose " + res.isEnded);
           }
         }, (err) => {
-          // 广告无法显示，输出错误信息
-          console.log(err) // {code: code, errMsg: message}
+          // 广告加载错误
+          console.log(err)
+        })
+      },
+      showFullScreenVideoAd() {
+        // 调用后会显示 loading 界面
+        AD.show({
+          adpid: 1507000611, // HBuilder 基座测试广告位
+          adType: "FullScreenVideo"
+        }, (res) => {
+          // 用户点击了【关闭广告】按钮
+          if (res && res.isEnded) {
+            // 正常播放结束
+            console.log("onClose " + res.isEnded);
+          } else {
+            // 播放中途退出
+            console.log("onClose " + res.isEnded);
+          }
+        }, (err) => {
+          // 广告加载错误
+          console.log(err)
         })
       }
     }
   }
 </script>
+
 ```
 
 ```js
 // ad.js
+const ADType = {
+  RewardedVideo: "RewardedVideo",
+  FullScreenVideo: "FullScreenVideo"
+}
+
 class AdHelper {
 
   constructor() {
     this._ads = {}
   }
 
-  load(adpid, onload, onerror) {
+  load(options, onload, onerror) {
+    let ops = this._fixOldOptions(options)
+    let {
+      adpid
+    } = ops
+
     if (!adpid || this.isBusy(adpid)) {
       return
     }
 
-    this.get(adpid).load(onload, onerror)
+    this.get(ops).load(onload, onerror)
   }
 
-  show(adpid, onsuccess, onfail) {
+  show(options, onsuccess, onfail) {
+    let ops = this._fixOldOptions(options)
+    let {
+      adpid
+    } = ops
+
     if (!adpid) {
       return
     }
@@ -189,7 +238,7 @@ class AdHelper {
       mask: true
     })
 
-    var ad = this.get(adpid)
+    var ad = this.get(ops)
 
     ad.load(() => {
       uni.hideLoading()
@@ -206,23 +255,37 @@ class AdHelper {
     return (this._ads[adpid] && this._ads[adpid].isLoading)
   }
 
-  get(adpid) {
+  get(options) {
+    const {
+      adpid
+    } = options
     if (!this._ads[adpid]) {
-      this._ads[adpid] = new RewardedVideo({
-        adpid: adpid
-      })
+      this._ads[adpid] = this._createAdInstance(options)
     }
 
     return this._ads[adpid]
   }
-}
 
-const eventNames = [
-  'load',
-  'close',
-  'verify',
-  'error'
-]
+  _createAdInstance(options) {
+    const adType = options.adType || ADType.RewardedVideo
+    delete options.adType
+
+    let ad = null;
+    if (adType === ADType.RewardedVideo) {
+      ad = new RewardedVideo(options)
+    } else if (adType === ADType.FullScreenVideo) {
+      ad = new FullScreenVideo(options)
+    }
+
+    return ad
+  }
+
+  _fixOldOptions(options) {
+    return (typeof options === "string") ? {
+      adpid: options
+    } : options
+  }
+}
 
 const EXPIRED_TIME = 1000 * 60 * 30
 const ProviderType = {
@@ -232,8 +295,8 @@ const ProviderType = {
 
 const RETRY_COUNT = 1
 
-class RewardedVideo {
-  constructor(options = {}) {
+class AdBase {
+  constructor(adInstance, options = {}) {
     this._isLoad = false
     this._isLoading = false
     this._lastLoadTime = 0
@@ -244,22 +307,22 @@ class RewardedVideo {
     this._closeCallback = null
     this._errorCallback = null
 
-    const rewardAd = this._rewardAd = plus.ad.createRewardedVideoAd(options)
-    rewardAd.onLoad((e) => {
+    const ad = this._ad = adInstance
+    ad.onLoad((e) => {
       this._isLoading = false
       this._isLoad = true
       this._lastLoadTime = Date.now()
 
       this.onLoad()
     })
-    rewardAd.onClose((e) => {
+    ad.onClose((e) => {
       this._isLoad = false
       this.onClose(e)
     })
-    rewardAd.onVerify((e) => {
+    ad.onVerify((e) => {
       // e.isValid
     })
-    rewardAd.onError(({
+    ad.onError(({
       code,
       message
     }) => {
@@ -294,7 +357,7 @@ class RewardedVideo {
   }
 
   getProvider() {
-    return this._rewardAd.getProvider()
+    return this._ad.getProvider()
   }
 
   load(onload, onerror) {
@@ -333,7 +396,7 @@ class RewardedVideo {
       return
     }
 
-    this._rewardAd.show()
+    this._ad.show()
   }
 
   onLoad(e) {
@@ -357,14 +420,26 @@ class RewardedVideo {
   }
 
   destroy() {
-    this._rewardAd.destroy()
+    this._ad.destroy()
   }
 
   _loadAd() {
     this._isLoad = false
     this._isLoading = true
     this._lastError = null
-    this._rewardAd.load()
+    this._ad.load()
+  }
+}
+
+class RewardedVideo extends AdBase {
+  constructor(options = {}) {
+    super(plus.ad.createRewardedVideoAd(options), options)
+  }
+}
+
+class FullScreenVideo extends AdBase {
+  constructor(options = {}) {
+    super(plus.ad.createFullScreenVideoAd(options), options)
   }
 }
 
@@ -436,7 +511,7 @@ rewardedVideoAd.load()
 
 ### 监听用户关闭广告
 
-![](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/24d1db60-441f-11eb-bd01-97bc1429a9ff.png)
+![](https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/24d1db60-441f-11eb-bd01-97bc1429a9ff.png)
 
 只有在用户点击激励视频广告组件上的 关闭广告 按钮时，广告才会关闭。这个事件可以通过 `RewardedVideoAd.onClose()` 监听。
 
@@ -463,9 +538,9 @@ rewardedVideoAd.onClose(res => {
 ```
 
 
-### 服务器回调
+### 服务器回调@callback
 
-App平台 2.6.8+ **仅穿山甲支持。优量汇和快手自身不支持**
+App平台 3.1.15+ 支持穿山甲/优量汇/快手
 
 激励视频广告可以支持广告服务器到业务服务器的回调，用于业务系统判断是否提供奖励给观看广告的用户。配置服务器回调后，当用户成功看完广告时，广告服务器会访问配置的回调链接，通知用户完成观看激励视频。
 
@@ -482,8 +557,6 @@ urlCallback示例
 rewardedVideoAd = uni.createRewardedVideoAd({
   adpid: '',
   urlCallback: {
-    amount: '6',
-    name: 'RewardVideoAD1',
     userId: 'testuser',
     extra: 'testdata'
   }
@@ -500,37 +573,31 @@ rewardedVideoAd.onVerify(e => {
 })
 ```
 
-### 服务器回调数据说明
+### 服务器回调说明
 
-当最终用户观看激励视频广告完成后，广告服务器会以GET方式请求业务服务器的回调链接，并拼接以下参数回传：
-`user_id=%s&trans_id=%s&reward_name=%s&reward_amount=%d&extra=%s&sign=%s`
+服务器回调基于[uniCloud](https://uniapp.dcloud.net.cn/uniCloud/README)，详细流程如下:
 
-字段名称|说明|字段类型|备注|
-:-|:-|:-|:-|
-sign|签名|String|签名信息|
-user_id|用户id|String	|调用API传入的userId|
-trans_id|交易id|String	|广告平台生成的唯一交易ID|
-reward_amount|奖励数量|String	|广告后台配置或调用API传入的amount|
-reward_name|奖励名称|String|广告后台配置或调用API传入的name|
-extra|自定义数据，可以为空|String|透传给回调服务器的数据，调用API传入的extra|
+1. 登陆 [uniCloud](https://unicloud.dcloud.net.cn/) web控制台，新建服务空间或选择已有服务空间，然后在HBuilderX中新建uni-app项目并关联服务空间，新建云函数上传，用于接收广告的回调
+2. 在 [uniAD](https://uniad.dcloud.net.cn/) web控制台开通服务器回调并选择上一步新建的云函数
+3. 开通后将在选择的服务空间下自动部署一个加密云函数 `uniAdCallback`
+4. `uniAdCallback` 接收广告商服务器回调验证签名并抹平穿山甲/优量汇/快手参数差异，然后以 [callFunction](https://uniapp.dcloud.net.cn/uniCloud/cf-functions?id=callbyfunction) 方式调用用户云函数
+5. 用户在自己的云函数中处理业务
 
-#### 签名信息
+注意：服务器通信和前端事件是并行的，前端需要轮询向服务器请求并验证结果
 
-在uni-AD广告平台申请激励视频广告位通过后，如果开启服务器回调则会生成appSecurityKey。
-appSecurityKey用于签名校验服务器回调请求的合法性（请务必保管好），sign字段值生成规则为：sign=sha256(appSecurityKey,trans_id)
-Python示例：
+### 云函数uniAdCallback传递的参数
 
-```
-import hashlib
+|字段定义|类型|字段名称|备注|
+|:-:|:-:|:-:|:-:|
+|adpid|String|DCloud广告位id||
+|provider|String|广告服务商|csj、ks、gdt|
+|platform|String|平台|iOS、Android|
+|trans_id|String|交易id|完成观看的唯一交易ID|
+|user_id|String|用户id|调用SDK透传，应用对用户的唯一标识|
+|extra|String|自定义数据|调用SDK传入并透传，如无需要则为空|
 
-if __name__ == "__main__":
-    trans_id = "6FEB23ACB0374985A2A52D282EDD5361u6643"
-    app_security_key = "7ca31ab0a59d69a42dd8abc7cf2d8fbd"
-    check_sign_raw = "%s:%s" % (app_security_key, trans_id)
-    sign = hashlib.sha256(check_sign_raw).hexdigest()
-```
 
-#### 回调请求返回数据约定
+#### 用户的云函数返回数据约定
 
 返回json数据，字段如下：
 
@@ -539,17 +606,144 @@ if __name__ == "__main__":
 isValid|校验结果|Blean|判定结果，是否发放奖励|
 
 示例
+```js
+exports.main = async (event, context) => {
+  //event为客户端上传的参数
+  console.log('event : ', event);
+
+  return {
+    "isValid": true
+  }
+};
 ```
-{
-  "isValid": true
+
+#### 用户云函数详细说明
+
+如果业务使用了uniCloud，可以直接在云函数内部处理
+
+也可以将结果发送给已有业务服务器
+
+示例代码
+```js
+'use strict';
+
+const crypto = require('crypto');
+
+const db = uniCloud.database();
+
+const DEFAUTL_TIMEOUT = 30000;
+const DEFAUTL_RETRY_COUNT = 3;
+const RETRY_TIMEOUT = 3000;
+
+const ProviderType = {
+  CSJ: "csj",
+  GDT: "gdt",
+  KS: "ks"
+};
+
+const collectionName = "opendb-uniad-callback-log";
+
+class DB {
+
+  static save(data) {
+    return new DB().add(data);
+  }
+
+  add(data) {
+    const collection = db.collection(collectionName);
+    const data2 = Object.assign(data, {
+      ad_type: 0,
+      create_date: new Date()
+    })
+    return collection.add(data2);
+  }
 }
+
+class UserServer {
+
+  static send(url, data) {
+    return new UserServer().sendHttpRequest(url, data);
+  }
+
+  async sendHttpRequest(url, data) {
+    let needRetry = parameters.provider !== ProviderType.GDT;
+    let retryCount = needRetry ? DEFAUTL_RETRY_COUNT : 1;
+    let timeout = needRetry ? RETRY_TIMEOUT : DEFAUTL_TIMEOUT;
+    let result = null;
+
+    while (retryCount > 0) {
+      console.log("sendHttpRequest::count::" + retryCount + "::", url, data);
+
+      try {
+        result = await uniCloud.httpclient.request(url, {
+          data,
+          dataType: 'json',
+          contentType: 'json',
+          timeout
+        });
+
+        if (result.data && result.data.isValid === true) {
+          break;
+        }
+      } catch (e) {
+        console.log(e);
+      }
+
+      retryCount--;
+    }
+
+    return result;
+  }
+}
+
+exports.main = async (event, context) => {
+  //event为客户端上传的参数
+  console.log('event : ', event);
+
+  const {
+    path,
+    queryStringParameters
+  } = event;
+
+  const data = {
+    adpid: event.adpid,
+    platform: event.platform,
+    provider: event.provider,
+    trans_id: event.trans_id,
+    sign: event.sign,
+    user_id: event.user_id,
+    extra: event.extra,
+  }
+
+  // 注意::必须验签请求来源
+  const secret = "";// uniad 后台开通激励视频回调后生成的 secret
+  const trans_id = event.trans_id;
+  const sign2 = crypto.createHash('sha256').update(`${secret}:${trans_id}`).digest('hex');
+  if (event.sign !== sign2) {
+    return null;
+  }
+
+
+  // 可选将回调记录保存到uniCloud，避免用户服务器没有响应时有日志可查，如果选择了保存记录需要做定时清理日志，避免日志过多影响性能
+  // try {
+  //   await DB.save(data);
+  // } catch (e) {
+  //   console.log(e);
+  // }
+
+  //const url = "https://"; // 用户业务服务器地址，为了避免请求被伪造，必须使用签名的方式请求
+  //let reuslt = await UserServer.send(url, data);
+
+  return {
+    "isValid": true
+  }
+};
 ```
+
 
 #### 安全注意
 
 由于激励视频对应着用户奖励，可能会遇到恶意刷激励奖励但实际上并不看广告的情况。此时广告平台不给结算，但开发者却可能把激励送出去。
-
-穿山甲有服务器回调，情况略好。但腾讯优量汇和快手均不支持服务器回调。
 
 为了提升安全性，建议所有使用激励视频的开发者都要做如下工作来加强保护：
 1. 前端代码加密。涉及激励相关的，在manifest中配置好要加密的代码文件，打包后会自动加密相应文件。[详见](https://ask.dcloud.net.cn/article/36437)
@@ -559,7 +753,7 @@ isValid|校验结果|Blean|判定结果，是否发放奖励|
 - plus.navigator.isSimulator 判断App是否运行在模拟器环境 [规范](https://www.html5plus.org/doc/zh_cn/navigator.html#plus.navigator.isSimulator)
 - plus.navigator.isRoot 判断设备是否被root或越狱 [规范](https://www.html5plus.org/doc/zh_cn/navigator.html#plus.navigator.isRoot)
 - plus.networkinfo.isSetProxy 判断设备的网络是否设置了代理 [规范](https://www.html5plus.org/doc/zh_cn/device.html#plus.networkinfo.isSetProxy)
-4. 避免使用短信验证码来识别身份，推荐使用可信度更高的 [手机号一键登陆](/univerify) 或 [微信登录](/api/plugins/login?id=login)
+4. 避免使用短信验证码来识别身份，推荐使用可信度更高的 [手机号一键登录](/univerify) 或 [微信登录](/api/plugins/login?id=login)
 5. 必要时可使用[生物认证（指纹和faceid）](/api/system/authentication)、[活体检测的sdk](https://ext.dcloud.net.cn/search?q=%E6%B4%BB%E4%BD%93%E6%A3%80%E6%B5%8B&orderBy=Relevance&cat1=5&cat2=51)
 
 #### 获取广告商名称
@@ -620,4 +814,4 @@ code|message|
 
 ### 案例参考
 - [全民董事长](https://android.myapp.com/myapp/detail.htm?apkName=com.dlt.qmdsz&info=DF3F955B42F0B77FECA41F03E7F77C8D)
-- [萌宠小凤凰](https://android.myapp.com/myapp/detail.htm?apkName=com.yexu.bird&info=F99297EC36071298FFAC45DA7BEEB8E3)
+- 重要项目源码《养猫合成游戏》，拿走就能用，[https://ext.dcloud.net.cn/plugin?id=4095](https://ext.dcloud.net.cn/plugin?id=4095)

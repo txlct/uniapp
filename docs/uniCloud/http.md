@@ -14,6 +14,7 @@
 **使用限制**
 
 - 腾讯云免费服务空间最多只支持配置10个云函数URL化地址
+- 阿里云暂不支持修改响应头中的content-disposition，即无法返回html并在浏览器中展示，只可以触发下载
 
 ## 操作步骤
 
@@ -23,22 +24,28 @@
 2. 单击左侧菜单栏【云函数】，进入云函数页面。
 3. 点击需要配置的云函数的【详情】按钮，配置访问路径。
 
-<img style="max-width:800px;height:auto;" src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/b79d1dc0-5a21-11eb-8a36-ebb87efcf8c0.jpg"></img>
+<img style="max-width:800px;height:auto;" src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-dc-site/b79d1dc0-5a21-11eb-8a36-ebb87efcf8c0.jpg"></img>
 
 ### 绑定自定义域名
 
 **目前阿里云不支持绑定自定义域名，只能使用其默认提供的域名，但是需要手动在【云函数域名绑定】处开启云函数Url化开关**
 
+**2021年5月25日起腾讯云绑定域名CNAME记录值由默认域名调整为腾讯云给定的`CNAME域名`，已经绑定正常使用的域名无需调整**
+
 1. 单击左侧菜单栏【云函数】，进入云函数页面。
 2. 单击【云函数域名绑定】，在弹出的配置窗口中进行配置。
 
-<img style="max-width:800px;height:auto;" src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/55897b30-5993-11eb-8ff1-d5dcf8779628.jpg"></img>
+<img style="max-width:800px;height:auto;" src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-dc-site/55897b30-5993-11eb-8ff1-d5dcf8779628.jpg"></img>
 
->- 每个服务空间最多绑定1个自定义域名。
->- uniCloud提供默认域名供体验和测试该特性。
->- 绑定自定义域名之前，请先设置您默认域名的 CNAME 记录值为默认域名，CNAME 记录不存在时会导致域名绑定失败，另外需要注意的是此域名必须已经备案。
->- 单个服务空间可支持被访问的最大 QPS 为5000，单个云函数可支持被访问的最大 QPS 为2000（具体频次受函数并发限制）。
->- 默认域名可支持被访问的最大 QPS 为200，推荐您绑定自定义域名以获取更大的访问频次。
+上一步中填写域名证书且绑定成功后会返回一个`CNAME域名`，将绑定的域名配置CNAME记录值为此`CNAME域名`即可
+
+**注意**
+
+- 每个服务空间最多绑定1个自定义域名
+- uniCloud提供默认域名供体验和测试该特性
+- 需要注意的是绑定的域名必须已经备案
+- 单个服务空间可支持被访问的最大 QPS 为5000，单个云函数可支持被访问的最大 QPS 为2000（具体频次受函数并发限制）
+- 默认域名可支持被访问的最大 QPS 为200，推荐您绑定自定义域名以获取更大的访问频次
 
 如需要更高的QPS支持，请发邮件到service@dcloud.io申请。若您还没有SSL证书，点此[快速获取](https://cloud.tencent.com/act/cps/redirect?redirect=33848&cps_key=c858f748f10419214b870236b5bb94c6)
 
@@ -48,7 +55,7 @@
 
 ### 通过 HTTP URL 方式访问云函数
 
-- 方式一：通过`https://${云函数Url化域名}/${path}`直接访问函数，其中`${spaceId}`是服务空间 ID，`${path}`是配置的函数触发路径。
+- 方式一：通过`https://${云函数Url化域名}/${path}`直接访问函数，其中`${path}`是配置的函数触发路径。
 ```sh
 $ curl https://${云函数Url化域名}/${path}
 ```
@@ -112,7 +119,7 @@ $ curl https://${云函数Url化域名}/${path}
 ```
 
 
-使用POST请求`https://${云函数Url化域名}/${functionPath}`，云函数接收到的`event`为请求发送的数据，**uni.request默认content-type为application/json**
+使用POST请求`https://${spaceId}.service.tcloudbase.com/${functionPath}`，云函数接收到的`event.body`为请求发送的数据，**uni.request默认content-type为application/json**
 
 ```js
 // 以uni.request为例
@@ -129,20 +136,16 @@ uni.request({
 })
 
 // 云函数收到的event为, 注意如果直接return此格式数据可能会被作为集成响应处理，参考下面的集成响应文档
-```
-
-```js
 {
     path: '/',
-    httpMethod: 'GET',
+    httpMethod: 'POST',
     headers: {
     	...
     	"content-type": 'application/json'
     },
-    queryStringParameters: {a: "1", b: "2"},
     requestContext: {云开发相关信息},
     isBase64Encoded: false,
-    body: '{"a":1,"b":2}',
+    body: '{"a":1,"b":2}', // 注意此处可能是base64，需要根据isBase64Encoded判断
 }
 ```
 
@@ -151,6 +154,10 @@ uni.request({
 - 阿里云目前请求与响应有如下限制
   + 请求Body大小限制，不能超过1M。
   + 响应Body大小限制，不能超过1M。
+
+- 腾讯云目前请求与响应有如下限制
+  + 请求Body大小限制，不能超过4M。
+  + 响应Body大小限制，不能超过6M。
 
 >在云函数URL化的场景无法获取客户端平台信息，可以在调用依赖客户端平台的接口接口之前（推荐在云函数入口）通过修改context.PLATFORM手动传入客户端平台信息
 
@@ -240,6 +247,8 @@ content-length: 13
 ##### 使用集成响应返回 HTML
 
 将`content-type`设置为`text/html`，即可在`body`中返回 HTML，会被浏览器自动解析：
+
+**阿里云目前无法返回html并在浏览器中展示，只可以触发下载**
 
 ```js
 exports.main = function() {

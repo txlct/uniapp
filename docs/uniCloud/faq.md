@@ -6,9 +6,10 @@
 
 简单来说，uniCloud和微信小程序云开发、支付宝小程序云开发一样稳定健壮，但有更多优势：
 - 跨平台。不管你在uniCloud里选择了阿里还是腾讯的serverless，均可以跨uni-app的全端使用。从pc到h5，从Android到iOS，以及各家小程序快应用，十几个平台全端支持
-- uniCloud提供了`clientDB`神器，减少90%的服务器开发工作量，且保障数据安全。[详见](https://uniapp.dcloud.io/uniCloud/database)
-- uniCloud提供了[uni-id](https://uniapp.dcloud.io/uniCloud/uni-id)、[uniPay](https://uniapp.dcloud.io/uniCloud/unipay)等重要框架，大幅减少开发者的相应功能开发量。
-- uniCloud提供了[uniCloud admin](https://uniapp.dcloud.io/uniCloud/admin)，管理端开发工作量大幅减少。
+- uniCloud提供了`clientDB`神器，减少90%的服务器开发工作量，且保障数据安全。[详见](/uniCloud/database)
+- uniCloud提供了[uni-id](/uniCloud/uni-id)、[uniPay](/uniCloud/unipay)等重要框架，大幅减少开发者的相应功能开发量。
+- uniCloud提供了[uniCloud admin](/uniCloud/admin)，管理端开发工作量大幅减少。
+- uniCloud提供了[schema2code](/uniCloud/schema?id=autocode)，只需编制数据库schema文件，用户端和管理端的数据列表、分页、搜索、详情查看、修改、删除，全套代码均能自动生成。
 - 更易学。uniCloud提供了`JQL`查询语言，比SQL和MongoDB的查询语法更简单易掌握，尤其是联表查询非常简单。[详见](https://uniapp.dcloud.io/uniCloud/database?id=jsquery)
 - 更完善的工具链。前端uni-app、云端uniCloud、还有ide端的HBuilderX，互相紧密搭配，打造闭环的优秀开发体验
 - 更丰富的生态。插件市场有大量现成的轮子和资源 [详见](https://ext.dcloud.net.cn/?cat1=7&orderBy=TotalDownload)
@@ -39,7 +40,7 @@
 
 ### uniCloud只支持uni-app，怎么开发web界面？
 
-uni-app本来可以开发web界面，详见：[uni-app宽屏适配指南](https://uniapp.dcloud.io/adapt)
+uni-app可以开发web界面，详见：[uni-app宽屏适配指南](https://uniapp.dcloud.io/adapt)
 
 如果是需要pc版admin的话，uniCloud提供了[uniCloud admin](https://uniapp.dcloud.io/uniCloud/admin)
 
@@ -55,15 +56,39 @@ uniCloud提供了`云函数URL化`，来满足上述需求。[详见](https://un
 ### 微信云开发支持客户端直接操作数据库，uniCloud支持吗？
 uniCloud提供了比微信云开发更优秀的前端操作数据库方案，见：[clientDB](https://uniapp.dcloud.net.cn/uniCloud/database)
 
-### 云开发是nodejs+MongoDB组合，对比php+mysql的传统组合怎么样？
-nodejs的性能高于php，MongoDB的性能也优于mysql。
+### 云开发是nodejs+改良版MongoDB组合，对比php+mysql的传统组合怎么样？
+
+nodejs的性能优于php，MongoDB的性能也优于mysql。
 
 对于前端而言，MongoDB这种类json的文档数据库更加易用，且有更高的灵活性。
-操作MongoDB仍然使用js的方法，而无需学习sql语句。
+操作MongoDB仍然使用js的方法。
 
-对于喜欢传统数据库的开发者而言，仍然可以按传统方式设计数据库表结构。对于希望增加数据冗余以提高性能的开发者而言，nosql数据库则是利器。
+MongoDB非常灵活，可以对大数据量的表随便增加字段。而mysql的表数据量一旦变大，每增加一个字段，数据库的体积和性能都会造成负面影响。
 
-uniCloud提供了`JQL`，它更符合js开发者的习惯，并且极大的降低了联表查询的复杂度，其他方案相比`JQL`都复杂很多。[详见](https://uniapp.dcloud.net.cn/uniCloud/database?id=jsquery)
+MongoDB的字段可以嵌套，表达tree型的数据非常方便，扩展起来随心所欲。
+
+对于希望增加数据冗余以提高性能的开发者而言，nosql数据库则是利器。
+
+当然，对于喜欢传统数据库的开发者而言，仍然可以按传统方式设计数据库表结构。
+
+MongoDB的功能要比mysql强大很多。sql太简单的了，一段sql语句其实就是一个字符串，写不了复杂的逻辑。
+
+而MongoDB有非常多的js api，各种聚合运算符，它是可编程的，而不是仅靠一段字符串sql语句来表达。
+
+举个例子，商品数据表中有4个字段：浏览量、收藏量、购买量、评价。需要生成一个近期热门商品列表，4个字段各占25%的权重，加权后排序。这种需求sql是无法直接实现的。而MongoDB里可以一个查询直接返回排序好的结果。
+
+SQL的模糊查询也很弱，like只有前后%，导致很多开发者不得不再使用ElastciSearch这些三方数据库。虽然后期版本的mysql也支持有限正则。但MongoDB的正则查询还是超过开发者预期的强大。
+
+MongoDB虽然强大，但易用性不佳，尤其是聚合运算写起来非常复杂。
+
+uniCloud在MongoDB的基础上改良，进一步提供了`DB Schema`和`JQL`。
+
+`DB Schema`是一个json文件，可以对数据进行描述、约定字段值域、控制操作权限、描述字段之间的关系，让数据库管理更高效，并且大幅降低了服务端的代码开发工作量。[详见](https://uniapp.dcloud.io/uniCloud/schema)
+
+`JQL`是一套操作uniCloud数据库的方法，它更符合js开发者的习惯，并且极大的降低了学习成本和代码量。
+比如联表查询、tree查询，都变的非常简单。像tree查询是以往只有oracle才有的功能。`JQL`文档[详见](https://uniapp.dcloud.net.cn/uniCloud/database?id=jsquery)
+
+曾经DCloud官方也推进过阿里云和腾讯云提供serverless的mysql。但经过对MongoDB的深入研究和改良，DCloud已经放弃了难用的mysql。推荐开发者了解uniCloud的云数据库，用起来更强大和方便。
 
 ### 支持websocket吗？
 websocket的实时特性导致serverless化比较复杂，目前曲线方案有：
@@ -92,23 +117,27 @@ websocket的实时特性导致serverless化比较复杂，目前曲线方案有�
 1. 使用clientDB可以减少遇到冷启动问题的概率
 2. 非高频访问的云函数，合并到高频云函数中。有的开发者使用纯单页方式编写云函数，即在一个云函数中通过路由处理实现了整个应用的所有后台逻辑。参考[插件](https://ext.dcloud.net.cn/search?q=%E8%B7%AF%E7%94%B1&cat1=7&orderBy=UpdatedDate)
 3. 非高频访问的云函数，可以通过定时任务持续运行它（注意腾讯云可以使用这个方式完全避开冷启动，而阿里云的定时任务最短周期大于资源回收周期）
-4. 向service@dcloud.io发邮件，申请预留资源不销毁
+4. 配置云函数的单实例多并发
 
 ### uniCloud访问速度感觉不如传统服务器？@slow
+有开发者在一台单机上安装php或java，连接同电脑的mysql。然后与uniCloud比较速度，认为uniCloud偏慢。这里需要澄清如下差异：
 
-抛开冷启动，只看热启动，也有开发者反应unicloud的数据不如传统服务器。其实原因如下：
+- 原因1. 冷启动。具体分析见上一问题
 
-在一台单机上安装php或java，同时安装数据库，访问速度确实快。
+- 原因2. 代码和数据库不在一台服务器
+在一台单机上安装php或java，同时安装数据库，访问速度确实快。但在使用云数据库时，即数据库是单独的服务器，和运行代码不在一台服务器上时，就会略微造成些延迟。但商业应用的数据库肯定都是独立服务器。
 
-但在使用云数据库时，即数据库是单独的服务器，和运行代码不在一台服务器上时，本身就会略微造成些延迟。
-
-如果每个请求都要拦截，校验权限，尤其是要查库校验权限的话，访问速度又会进一步延迟。
+- 原因3. 拦截器
+后端开发的请求一般都有路由管理框架或拦截器，每个请求都要拦截，校验权限。使用这类框架肯定会增加耗时。
 
 clientDB就是这种情况，因为clientDB内部有权限校验系统，某些权限的验证还需要数据库查询。
 
-所以虽然clientDB的速度慢一些，但实际上开发者在自己写了路由拦截和权限管理的框架后，速度也下降。
+所以虽然clientDB的速度慢一些，但实际上开发者在自己写了路由拦截和权限管理的框架后，速度也一样会下降。
 
-clientDB也仍然在优化，减少查库校验权限的频次，优化速度。
+从uni-id 3.0起，用户的角色权限缓存在token里，不再查库。clientDB的速度比之前提升了100毫秒左右。如果还未升级，请尽快[升级](https://ext.dcloud.net.cn/plugin?id=2116)。同时注意如果用了uniCloud admin，也要配套升级。如果自己在云函数里编写过相关业务逻辑，请务必阅读升级注意事项。
+
+- 原因4. 数据库索引
+查询表的索引要正确配置，需要在where里查询的字段都建议配上索引。
 
 ### 发布H5时还得自己找个服务器部署前端网页，可以不用自己再找服务器吗？
 
@@ -121,7 +150,9 @@ uniCloud支持[前端网页托管](https://uniapp.dcloud.io/uniCloud/hosting)，
 
 ### uniCloud云数据库如何实现全文检索
 
-查询数据时可以传入正则表达式进行查询，详情请参考[正则表达式查询](https://uniapp.dcloud.io/uniCloud/cf-database?id=regexp)
+uniCloud的云数据库本身就是文档型数据库，可以全文检索，无需额外配置ElastciSearch等三方数据库。
+
+查询数据时可以传入正则表达式。相比sql的like只有前后的%，正则表达式要强大的多。详情请参考[正则表达式查询](https://uniapp.dcloud.io/uniCloud/cf-database?id=regexp)
 
 ### uniCloud内如何使用formdata
 
@@ -154,20 +185,30 @@ uniCloud.httpclient.request('https://example.com',{
 
 ### 如何控制云函数数量？云函数是否可以按多级目录整理@merge-functions
 
-其实不需要控制数量，实际开发中不会突破限制。
+不需要控制数量，实际开发中不会突破限制。
 
-因为大多数项目，会使用clientDB和单路由云函数框架。
+因为实际开发中会使用框架而不是真的一个一个开发云函数。
+
+1. 使用[clientDB](https://uniapp.dcloud.net.cn/uniCloud/clientdb)。这种方式是在前端直接操作数据库，此时一个云函数都不需要写。开发效率远超传统开发模式。包括它配套的action云函数是不占用云函数数量的。
+2. 使用[uni-cloud-router单路由云函数框架](https://uniapp.dcloud.net.cn/uniCloud/uni-cloud-router)，这种方式只有一个云函数，所有接口都是这个云函数的不同参数，它有统一的路由管理。
+
+以免费空间的48个云函数举例，一般情况下：
+- 后台管理系统使用[uniCloud admin](https://uniapp.dcloud.net.cn/uniCloud/admin)，会自带一个uni-admin的云函数；
+- 前端项目，会有一个[uni-id](https://uniapp.dcloud.net.cn/uniCloud/uni-id)配套的user-center云函数。如果和uniCloud admin复用一个服务空间，此云函数也不需要；
+- 如果有热搜词统计跑批，[uni-search](https://ext.dcloud.net.cn/plugin?id=3851)配套一个云函数uni-analyse-searchhot；
+
+上述几个是官方推荐的几个常用框架所带的云函数，然后开发者自己的代码里，大多数业务使用clientDB开发，不写云函数，或者写了配套的action云函数也不占用云函数数量；如果还需要自己写一些云函数，再加上uni-cloud-router，用这个单路由云函数搞定剩余需求；另外如果有跑批数据的需求可以再来一个云函数。所以无论如何48个云函数都占不满。
 
 uniCloud的每个云函数是一个独立进程，不存在云函数级别的多级目录概念。
 
 每个云函数下可以有子目录，但它们都属于这个云函数的一部分，而不是另一个云函数。
 
-当然也可以在一个云函数下实现单路由云函数开发框架，插件市场有很多类似框架：[详见](https://ext.dcloud.net.cn/search?q=%E8%B7%AF%E7%94%B1&cat1=7&orderBy=TotalDownload)
+单路由云函数框架不止是官方提供的uni-cloud-router，插件市场有很多类似框架：[详见](https://ext.dcloud.net.cn/search?q=%E8%B7%AF%E7%94%B1&cat1=7&orderBy=TotalDownload)
 
 
 ### 海外用户访问比较慢怎么办
 
-uniCloud服务商为阿里云时支持配置全球加速，步骤如下：
+国外用户需要使用全球加速。uniCloud服务商为阿里云时支持配置全球加速，步骤如下：
 
 1. 参考[阿里云全球加速](https://help.aliyun.com/document_detail/153198.html)文档，开通服务并对`自有域名`进行加速
 2. 将上述域名CNAME到`api.bspapp.com`
@@ -225,3 +266,85 @@ exports.main = async function(event){
 ### 使用腾讯云报未登录Cloudbase
 
 腾讯云会在本地storage存储一些信息，请不要在应用使用过程中使用clearStorage等接口直接删除storage。
+
+### 阿里云前端网页托管域名报错指引@ali-hosting-domain
+
+1. 错误信息：`该域名已经被添加过，不能重复添加`
+
+  前端网页托管会和阿里云上其他的CDN业务（包括但不限于CDN）冲突，如需绑定到前端网页托管请先将此域名与其他业务解除关联。
+  
+2. 错误信息：`The root domain of your domain is reserved by another account`
+
+  当前域名有在阿里云开通全站加速相关业务（可能配置了泛域名加速），与前端网页托管冲突。可以考虑使用三级域名或去除泛域名加速改为单独配置需要加速的域名。
+
+### 授权其他用户访问服务空间@collaborator
+
+开发期间经常需要多人共用同一个服务空间，此时可以在[DCloud开发者中心](https://dev.dcloud.net.cn/)将特定应用及其关联的服务空间共享给协作者，详细步骤如下
+
+1. 在开发者中心`我创建的应用`列表页面选择特定的应用
+
+  ![我创建的应用](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-f184e7c3-1912-41b2-b81f-435d1b37c7b4/865a0df3-3169-48df-8b4c-8acacf1a621f.jpg)
+  
+2. 在第一步选择的应用详情页面左侧菜单点击`项目成员管理`
+3. 输入协作者邮箱并点击`添加协作者按钮`，下方会出现协作者权限配置界面
+
+  ![项目成员管理](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-f184e7c3-1912-41b2-b81f-435d1b37c7b4/2e59ce9b-f202-4432-954c-d6182187ef94.jpg)
+  
+4. 勾选uniCloud并点击`设置授权服务空间`，在弹出界面勾选希望此协作者访问的服务空间
+  
+  ![设置授权服务空间](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-f184e7c3-1912-41b2-b81f-435d1b37c7b4/b3c234a7-e514-4b14-b33d-e7322130bd7d.jpg)
+
+5. 点击第4步弹出界面的`保存按钮`以及第3步的`保存权限设置`按钮
+
+### 如何使用promise/async/await@promise
+
+uniCloud客户端callFunction及数据库相关接口会返回Promise类型结果，请参考以下写法使用：
+
+```html
+// index.vue
+<template>
+  <view class="content">
+    <button type="default" @click="testThen">promise+then</button>
+    <button type="default" @click="testAwait">async+await</button>
+  </view>
+</template>
+
+<script>
+  export default {
+    data() {
+      return {}
+    },
+    methods: {
+      testThen() {
+        uniCloud.callFunction({
+          name: 'test'
+        }).then(res => {
+          console.log(res)
+        }).catch(err => {
+          console.error(err)
+        })
+      },
+      async testAwait() {
+        const res = await uniCloud.callFunction({
+          name: 'test'
+        })
+        console.log(res)
+
+        // 如需捕获错误需使用如下写法
+        // try {
+        //   const res = await uniCloud.callFunction({
+        //     name: 'test'
+        //   })
+        //   console.log(res)
+        // } catch (err) {
+        //   console.error(err)
+        // }
+
+      }
+    }
+  }
+</script>
+
+<style>
+</style>
+```

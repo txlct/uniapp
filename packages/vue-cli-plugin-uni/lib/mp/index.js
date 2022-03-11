@@ -4,7 +4,7 @@ const webpack = require('webpack')
 const {
   parseEntry,
   getMainEntry,
-  // normalizePath,
+  normalizePath,
   getPlatformExts,
   getPlatformCssnano
 } = require('@dcloudio/uni-cli-shared')
@@ -38,6 +38,8 @@ function getProvides () {
   if (process.env.UNI_USING_COMPONENTS) {
     if (process.env.UNI_SUBPACKGE) {
       provides.createApp = [uniPath, 'createSubpackageApp']
+    } else if (process.env.UNI_MP_PLUGIN) {
+      provides.createApp = [uniPath, 'createPlugin']
     } else {
       provides.createApp = [uniPath, 'createApp']
     }
@@ -70,7 +72,7 @@ function getProvides () {
 
 function processWxss (name, assets) {
   const dirname = path.dirname(name)
-  const mainWxssCode = `@import "${path.relative(dirname, 'common/main.wxss')}";`
+  const mainWxssCode = `@import "${normalizePath(path.relative(dirname, 'common/main.wxss'))}";`
   const code = `${mainWxssCode}` + assets[name].source().toString()
   assets[name] = {
     size () {
@@ -84,9 +86,9 @@ function processWxss (name, assets) {
 
 function procssJs (name, assets, hasVendor) {
   const dirname = path.dirname(name)
-  const runtimeJsCode = `require('${path.relative(dirname, 'common/runtime.js')}');`
-  const vendorJsCode = hasVendor ? `require('${path.relative(dirname, 'common/vendor.js')}');` : ''
-  const mainJsCode = `require('${path.relative(dirname, 'common/main.js')}');`
+  const runtimeJsCode = `require('${normalizePath(path.relative(dirname, 'common/runtime.js'))}');`
+  const vendorJsCode = hasVendor ? `require('${normalizePath(path.relative(dirname, 'common/vendor.js'))}');` : ''
+  const mainJsCode = `require('${normalizePath(path.relative(dirname, 'common/main.js'))}');`
   const code = `${runtimeJsCode}${vendorJsCode}${mainJsCode}` + assets[name].source().toString()
   assets[name] = {
     size () {
@@ -126,11 +128,11 @@ class PreprocessAssetsPlugin {
 
 function initSubpackageConfig (webpackConfig, vueOptions) {
   if (process.env.UNI_OUTPUT_DEFAULT_DIR === process.env.UNI_OUTPUT_DIR) { // 未自定义output
-    process.env.UNI_OUTPUT_DIR = path.resolve(process.env.UNI_OUTPUT_DIR, process.env.UNI_SUBPACKGE)
+    process.env.UNI_OUTPUT_DIR = path.resolve(process.env.UNI_OUTPUT_DIR, (process.env.UNI_SUBPACKGE || process.env.UNI_MP_PLUGIN))
   }
   vueOptions.outputDir = process.env.UNI_OUTPUT_DIR
   webpackConfig.output.path(process.env.UNI_OUTPUT_DIR)
-  webpackConfig.output.jsonpFunction('webpackJsonp_' + process.env.UNI_SUBPACKGE)
+  webpackConfig.output.jsonpFunction('webpackJsonp_' + (process.env.UNI_SUBPACKGE || process.env.UNI_MP_PLUGIN))
 }
 
 module.exports = {
@@ -154,7 +156,7 @@ module.exports = {
 
     const statCode = process.env.UNI_USING_STAT ? 'import \'@dcloudio/uni-stat\';' : ''
 
-    const beforeCode = 'import \'uni-pages\';'
+    let beforeCode = 'import \'uni-pages\';'
 
     const plugins = [
       new WebpackUniAppPlugin(),
@@ -162,8 +164,19 @@ module.exports = {
       new webpack.ProvidePlugin(getProvides())
     ]
 
-    if (process.env.UNI_SUBPACKGE && process.env.UNI_SUBPACKGE !== 'main') {
+    if ((process.env.UNI_SUBPACKGE || process.env.UNI_MP_PLUGIN) && process.env.UNI_SUBPACKGE !== 'main') {
       plugins.push(new PreprocessAssetsPlugin())
+    }
+
+    if (process.env.UNI_MP_PLUGIN) {
+      // 小程序插件入口使用
+      // packages\webpack-uni-mp-loader\lib\plugin\index-new.js -> addMPPluginRequire
+      beforeCode += `wx.__webpack_require_${process.env.UNI_MP_PLUGIN.replace('-', '_')}__ = __webpack_require__;`
+
+      const UNI_MP_PLUGIN_MAIN = process.env.UNI_MP_PLUGIN_MAIN
+      if (UNI_MP_PLUGIN_MAIN) {
+        process.UNI_ENTRY[UNI_MP_PLUGIN_MAIN.split('.')[0]] = path.resolve(process.env.UNI_INPUT_DIR, UNI_MP_PLUGIN_MAIN)
+      }
     }
 
     return {
@@ -272,7 +285,7 @@ module.exports = {
         }))
     }
 
-    if (process.env.UNI_SUBPACKGE) {
+    if (process.env.UNI_SUBPACKGE || process.env.UNI_MP_PLUGIN) {
       initSubpackageConfig(webpackConfig, vueOptions)
     }
 

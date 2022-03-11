@@ -11,6 +11,10 @@ import {
   getFileName
 } from '../util'
 
+import {
+  t
+} from 'uni-core/helpers/i18n'
+
 /**
  * 获取文件信息
  * @param {string} filePath 文件路径
@@ -26,7 +30,7 @@ function getFileInfo (filePath) {
 
 function compressImage (tempFilePath) {
   const dstPath = `${TEMP_PATH}/compressed/${Date.now()}_${getFileName(tempFilePath)}`
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     plus.nativeUI.showWaiting()
     plus.zip.compressImage({
       src: tempFilePath,
@@ -35,9 +39,9 @@ function compressImage (tempFilePath) {
     }, () => {
       plus.nativeUI.closeWaiting()
       resolve(dstPath)
-    }, (error) => {
+    }, () => {
       plus.nativeUI.closeWaiting()
-      reject(error)
+      resolve(tempFilePath)
     })
   })
 }
@@ -45,7 +49,8 @@ function compressImage (tempFilePath) {
 export function chooseImage ({
   count,
   sizeType,
-  sourceType
+  sourceType,
+  crop
 } = {}, callbackId) {
   const errorCallback = warpPlusErrorCallback(callbackId, 'chooseImage', 'cancel')
 
@@ -61,7 +66,7 @@ export function chooseImage ({
         // 压缩阈值 0.5 兆
         const THRESHOLD = 1024 * 1024 * 0.5
         // 判断是否需要压缩
-        if (sizeType.includes('compressed') && size > THRESHOLD) {
+        if (!crop && sizeType.includes('compressed') && size > THRESHOLD) {
           return compressImage(path).then(dstPath => {
             path = dstPath
             return getFileInfo(path)
@@ -89,7 +94,8 @@ export function chooseImage ({
     camera.captureImage(path => successCallback([path]),
       errorCallback, {
         filename: TEMP_PATH + '/camera/',
-        resolution: 'high'
+        resolution: 'high',
+        crop
       })
   }
 
@@ -99,7 +105,8 @@ export function chooseImage ({
       multiple: true,
       system: false,
       filename: TEMP_PATH + '/gallery/',
-      permissionAlert: true
+      permissionAlert: true,
+      crop
     })
   }
 
@@ -113,11 +120,11 @@ export function chooseImage ({
     }
   }
   plus.nativeUI.actionSheet({
-    cancel: '取消',
+    cancel: t('uni.chooseImage.cancel'),
     buttons: [{
-      title: '拍摄'
+      title: t('uni.chooseImage.sourceType.camera')
     }, {
-      title: '从手机相册选择'
+      title: t('uni.chooseImage.sourceType.album')
     }]
   }, (e) => {
     switch (e.index) {

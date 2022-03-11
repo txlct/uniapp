@@ -14,7 +14,7 @@
 |backgroundColor|Color		|#EBEBEB	|未选择的进度条的颜色									|						|
 |active			|Boolean	|false		|进度条从左往右的动画									|						|
 |active-mode	|String		|backwards	|backwards: 动画从头播；forwards：动画从上次结束点接着播|App、H5、微信小程序、QQ小程序	|
-|duration|number|30|进度增加1%所需毫秒数|App-nvue2.6.1+、微信基础库2.8.2+|
+|duration|number|30|进度增加1%所需毫秒数|App-nvue2.6.1+、微信基础库2.8.2+、H5 3.1.11+|
 |@activeend		|EventHandle|			|动画完成事件											|微信小程序				|
 
 **示例** [查看演示](https://hellouniapp.dcloud.net.cn/pages/component/progress/progress)
@@ -42,4 +42,4 @@
 </template>
 ```
 
-![](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/43f66da0-4f30-11eb-b997-9918a5dda011.png)
+![](https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/43f66da0-4f30-11eb-b997-9918a5dda011.png)

@@ -5,106 +5,52 @@
 ### 注意事项
 
 - nvue的css**仅支持flex布局**，是webview的css语法的子集。这是因为操作系统原生排版不支持非flex之外的web布局。当然flex足以排布出各种页面，只是写法需要适应。
-- 在选择器方面支持的较少，只支持简单的```class="classA"```。
 - class 进行绑定时只支持数组语法。
 - 不支持媒体查询
-- 不支持 class 以外的选择器
-- 不支持组合选择器（3.1.0+ 开始支持）
-- 不支持简写样式（3.1.0+ 开始支持）
 - 不能在 style 中引入字体文件
-- 布局不能使用百分比，如```width：100%```；
-- 有些web的css属性在nvue里无法支持，比如背景图。但可以使用image组件和层级来实现类似web中的背景效果。因为原生开发本身也没有web这种背景图概念
-- nvue 的各组件在安卓端默认是透明的，如果不设置```background-color```，可能会导致出现重影的问题
-- 文字内容，必须只能在```text```组件下，```text```组件不能换行写内容，否则会出现无法去除的周边空白
-- 只有```text```标签可以设置字体大小，字体颜色
+- 不能使用百分比布局，如`width：100%`
+- 不支持在css里写背景图`background-image`，但可以使用image组件和层级来实现类似web中的背景效果。因为原生开发本身也没有web这种背景图概念
+- 使用`image`标签，支持使用base64
+- nvue 的各组件在安卓端默认是透明的，如果不设置`background-color`，可能会导致出现重影的问题
+- 文字内容，必须只能在`text`组件下，`text`组件不能换行写内容，否则会出现无法去除的周边空白
+- 只有`text`标签可以设置字体大小，字体颜色
 
-下面有些正确和错误的写法示例对比：
 
-- 选择器类型仅支持 class 选择器
+**HBuilderX 3.1.0+ 开始支持更多简写样式**
+- `border`
+- `border-top`
+- `border-right`
+- `border-bottom`
+- `border-left`
+- `border-style`
+- `border-width`
+- `border-color`
+- `border-radius`
+- `flex-flow`
+- `background`
 
-```css
-	/* 错误 */
-	#id {}
-	
-	/* 正确 */
-	.class {}
-```
 
-- 仅支持单个选择器（3.1.0+ 开始支持组合选择器）
+**HBuilderX 3.1.0+ 开始支持新的样式编译模式**
+- 新增 `nvueStyleCompiler` 配置，支持组合选择器（相邻兄弟选择器、普通兄弟选择器、子选择器、后代选择器）。[详见](https://ask.dcloud.net.cn/article/38751)
 
-```css
-	/* 错误 */
-	.a .b .c {}
-	.a > .b {}
-	
-	/* 正确 */
-	.class {}
-```
-
-- 不支持简写样式（3.1.0+ 开始支持更多简写样式）
-
-```css
-	/* 错误 */
-	.class {
-	    border: 1px red solid;
-	}
-	
-	/* 正确 */
-	.class {
-	    border-width: 1px;
-	    border-style: solid;
-	    border-color: red;
-	}
-	
-	/* 错误 */
-	.class {
-	    background: red;
-	}
-	
-	/* 正确 */
-	.class {
-	    background-color: red;
-	}
-```
 
 - nvue的```uni-app```编译模式下，App.vue 中的样式，会编译到每个 nvue文件。对于共享样式，如果有不合法属性控制台会给出警告，可以通过[条件编译](https://uniapp.dcloud.io/platform)```APP-PLUS-NVUE```屏蔽 App 中的警告。
 
-```css
-	/* 错误 */
-	/*	控制台警告：
-		WARNING: `border` is not a standard property name (may not be supported)  
-		WARNING: `-webkit-transform` is not a standard property name (may not be supported)
-	*/
-	.class {
-		border: 1px red solid;
-		-webkit-transform: scaleY(.5);
-	}
-
-	/* 正确 */
-	.class {
-		border-width: 1px;
-		border-style: solid;
-		border-color: red;
-		/* #ifndef APP-PLUS-NVUE */
-		-webkit-transform: scaleY(.5);
-		/* #endif*/
-	}
-```
 
 ## 盒模型
 
 nvue盒模型基于 CSS 盒模型，每个 nvue 元素都可视作一个盒子。我们一般在讨论设计或布局时，会提到「盒模型」这个概念。
 
-盒模型描述了一个元素所占用的空间。每一个盒子有四条边界：外边距边界 ```margin edge```, 边框边界 ```border edge```, 内边距边界 ```padding edge``` 与内容边界 ```content edge```。这四层边界，形成一层层的盒子包裹起来，这就是盒模型大体上的含义。
+盒模型描述了一个元素所占用的空间。每一个盒子有四条边界：外边距边界 `margin edge`, 边框边界 `border edge`, 内边距边界 `padding edge` 与内容边界 `content edge`。这四层边界，形成一层层的盒子包裹起来，这就是盒模型大体上的含义。
 
-![图片描述文字](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/ec4f2810-2fec-11eb-899d-733ae62bed2f.png)
+![图片描述文字](https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-dc-site/ec4f2810-2fec-11eb-899d-733ae62bed2f.png)
 
 
-> nvue盒模型的 ```box-sizing``` 默认为 ```border-box```，即盒子的宽高包含内容、内边距和边框的宽度，不包含外边距的宽度。
+> nvue盒模型的 `box-sizing` 默认为 `border-box`，即盒子的宽高包含内容、内边距和边框的宽度，不包含外边距的宽度。
 
-> 在 Android 平台，nvue只支持 ```overflow:hidden```。
+> 在 Android 平台，nvue只支持 `overflow:hidden`。
 
-> 在 iOS 上，nvue支持 ```overflow:hidden``` 和 ```overflow:visible```，默认是 ```overflow:visible```。
+> 在 iOS 上，nvue支持 `overflow:hidden` 和 `overflow:visible`，默认是 `overflow:visible`。
 
 
 
@@ -113,7 +59,7 @@ nvue盒模型基于 CSS 盒模型，每个 nvue 元素都可视作一个盒子�
 ```html
 	<template>
 		<view>
-			<image style="width: 400rpx; height: 200rpx; margin-left: 20rpx;" src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/9c877c50-2f0c-11eb-899d-733ae62bed2f.png"></image>
+			<image style="width: 400rpx; height: 200rpx; margin-left: 20rpx;" src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-dc-site/9c877c50-2f0c-11eb-899d-733ae62bed2f.png"></image>
 		</view>
 	</template>
 ```
@@ -270,7 +216,7 @@ nvue布局模型基于 CSS Flexbox，以便所有页面元素的排版能够一�
 |space-around	|表示 flex 成员项两侧的间隔相等，所以，成员项之间的间隔比成员项与边框的间隔大一倍	|
 
 
-![图片描述文字](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/9610d190-2f17-11eb-97b7-0dc4655d6e68.png)
+![图片描述文字](https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-dc-site/9610d190-2f17-11eb-97b7-0dc4655d6e68.png)
 
 
 
@@ -286,7 +232,7 @@ nvue布局模型基于 CSS Flexbox，以便所有页面元素的排版能够一�
 |flex-end	|下对齐，所有的成员项排列在容器底部	|
 |center		|中间对齐，所有成员项都垂直地居中显示	|
 
-![图片描述文字](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/ad305030-2f17-11eb-b680-7980c8a877b8.png)
+![图片描述文字](https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-dc-site/ad305030-2f17-11eb-b680-7980c8a877b8.png)
 
 ### flex
 	
@@ -463,7 +409,7 @@ flex {number}：值为 number 类型。
 <template>
 	<view class="row">
 		<view class="box" :class="{'active':isActive}" @click="isActive = !isActive">
-			<image class="img" src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/9c877c50-2f0c-11eb-899d-733ae62bed2f.png" mode="aspectFill"></image>
+			<image class="img" src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-dc-site/9c877c50-2f0c-11eb-899d-733ae62bed2f.png" mode="aspectFill"></image>
 		</view>
 	</view>
 </template>
@@ -506,7 +452,7 @@ flex {number}：值为 number 类型。
 </style>
 ```
 
-<img width="300px" src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/0d2fc7a0-3089-11eb-8ff1-d5dcf8779628.gif" />
+<img width="300px" src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-dc-site/0d2fc7a0-3089-11eb-8ff1-d5dcf8779628.gif" />
 
 ## Transform
 
@@ -638,7 +584,7 @@ flex {number}：值为 number 类型。
 
 
 
-<img width="300px" src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/810e5de0-3088-11eb-b997-9918a5dda011.gif" />
+<img width="300px" src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-dc-site/810e5de0-3088-11eb-b997-9918a5dda011.gif" />
 
 
 ## 伪类
@@ -657,7 +603,7 @@ flex {number}：值为 number 类型。
 
 - 互联规则如下所示
 
-<img width="400px" src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/f3069420-2f17-11eb-8a36-ebb87efcf8c0.png" />
+<img width="400px" src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-dc-site/f3069420-2f17-11eb-8a36-ebb87efcf8c0.png" />
 
 
 ## 线性渐变
@@ -687,7 +633,7 @@ flex {number}：值为 number 类型。
 > **目前暂不支持 radial-gradient（径向渐变）。**
 
 
-<img width="300px" src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-dc-site/8f70e4e0-308b-11eb-97b7-0dc4655d6e68.PNG" />
+<img width="300px" src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-dc-site/8f70e4e0-308b-11eb-97b7-0dc4655d6e68.PNG" />
 
 
 ## 阴影@boxshadow

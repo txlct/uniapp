@@ -12,7 +12,7 @@
 |placeholder-class|String|textarea-placeholder|指定 placeholder 的样式类，注意页面或组件的style中写了scoped时，需要在类名前写/deep/|字节跳动小程序不支持|
 |disabled|Boolean|false|是否禁用||
 |maxlength|Number|140|最大输入长度，设置为 -1 的时候不限制最大长度||
-|focus|Boolean|false|获取焦点|在 H5 平台能否聚焦以及软键盘是否跟随弹出，取决于当前浏览器本身的实现。|
+|focus|Boolean|false|获取焦点|在 H5 平台能否聚焦以及软键盘是否跟随弹出，取决于当前浏览器本身的实现。nvue 页面不支持，需使用组件的 focus()、blur() 方法控制焦点|
 |auto-height|Boolean|false|是否自动增高，设置auto-height时，style.height不生效||
 |fixed|Boolean|false|如果 textarea 是在一个 position:fixed 的区域，需要显示指定属性 fixed 为 true|微信小程序、百度小程序、字节跳动小程序、QQ小程序|
 |cursor-spacing|Number|0|指定光标与键盘的距离，单位 px 。取 textarea 距离底部的距离和 cursor-spacing 指定的距离的最小值作为光标与键盘的距离|App、微信小程序、百度小程序、字节跳动小程序、QQ小程序|
@@ -76,7 +76,7 @@ export default {
 }
 ```
 
-![uniapp](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/3aa1edc0-4f2f-11eb-bd01-97bc1429a9ff.png)
+![uniapp](https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/3aa1edc0-4f2f-11eb-bd01-97bc1429a9ff.png)
 
 **Tips**
 
@@ -88,6 +88,61 @@ export default {
 - 如果遇到 focus 属性设置不生效的问题参考：[组件属性设置不生效解决办法](/vue-api?id=_4-组件属性设置不生效解决办法)
 - 软键盘的弹出和收起逻辑，详见[input的文档](/component/input?id=app%E5%B9%B3%E5%8F%B0ios%E7%AB%AF%E8%BD%AF%E9%94%AE%E7%9B%98%E4%B8%8A%E6%96%B9%E6%A8%AA%E6%9D%A1%E5%8E%BB%E9%99%A4%E6%96%B9%E6%A1%88)
 - 如需禁止点击其他位置收起键盘的默认行为，可以监听`touch`事件并使用`prevent`修饰符（仅支持App-v3、H5，其他平台可以通过设置`focus`来使输入框重新获取焦点），例如在确认按钮上使用：```@touchend.prevent="onTap"```
+- js中给textarea组件赋值为字符串，在字符串中加\n可实现换行。
+
+```
+<template>
+    <view class="content">
+        <textarea class="textarea" v-model="txt"></textarea>
+    </view>
+</template>
+<script>
+    export default {
+        data() {
+            return {
+                "txt":"hello world！\n textarea多行输入框"
+            }
+        }
+    }
+</script>
+```
+
+
+
+nvue下键盘右下角按钮点击仅触发换行；如想监听该按钮事件可以参考，示例代码如下：
+```
+<template>
+	<view class="content">
+		<textarea class="textarea" v-model="txt"></textarea>
+	</view>
+</template>
+
+<script>
+	export default {
+		data() {
+			return {
+				txt:"txt"
+			}
+		},
+		watch: {
+			txt(txt) {
+				if( txt.indexOf('\n') != -1 ){ //敲了回车键了
+				   uni.hideKeyboard() //收起软键盘
+				}
+			}
+		},
+		methods: {
+		}
+	}
+</script>
+
+<style>
+.textarea{
+	border: solid 1px red;
+}
+</style>
+```
+
 
 **富文本编辑的解决方案**
 在输入框里图文混排内容，在web上该功能依赖document，而小程序和app的正常页面又没有document。

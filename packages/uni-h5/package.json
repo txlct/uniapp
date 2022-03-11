@@ -1,16 +1,21 @@
 {
   "name": "@dcloudio/uni-h5",
-  "version": "2.0.0-31420210305001",
+  "version": "2.0.0-31920210709003",
   "description": "uni-app h5",
   "main": "dist/index.umd.min.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dcloudio/uni-app.git",
+    "url": "https://github.com/txlct/uniapp.git",
     "directory": "packages/uni-h5"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "files": [
+    "dist",
+    "lib",
+    "src"
+  ],
   "author": "fxy060608",
   "license": "Apache-2.0",
   "dependencies": {
@@ -24,5 +29,5 @@
     "title": "H5",
     "main": "lib/h5/uni.config.js"
   },
-  "gitHead": "b366367ac0b63f41ef205dc93eee55d8e9f8f3ed"
+  "gitHead": "2033cd540cff5d8469ff77e87779cd4daa5c9121"
 }

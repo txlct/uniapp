@@ -1,5 +1,55 @@
 import Vue from 'vue';
 
+function b64DecodeUnicode (str) {
+  return decodeURIComponent(atob(str).split('').map(function (c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+  }).join(''))
+}
+
+function getCurrentUserInfo () {
+  const token = ( uni ).getStorageSync('uni_id_token') || '';
+  const tokenArr = token.split('.');
+  if (!token || tokenArr.length !== 3) {
+    return {
+      uid: null,
+      role: [],
+      permission: [],
+      tokenExpired: 0
+    }
+  }
+  let userInfo;
+  try {
+    userInfo = JSON.parse(b64DecodeUnicode(tokenArr[1]));
+  } catch (error) {
+    throw new Error('获取当前用户信息出错，详细错误信息为：' + error.message)
+  }
+  userInfo.tokenExpired = userInfo.exp * 1000;
+  delete userInfo.exp;
+  delete userInfo.iat;
+  return userInfo
+}
+
+function uniIdMixin (Vue) {
+  Vue.prototype.uniIDHasRole = function (roleId) {
+    const {
+      role
+    } = getCurrentUserInfo();
+    return role.indexOf(roleId) > -1
+  };
+  Vue.prototype.uniIDHasPermission = function (permissionId) {
+    const {
+      permission
+    } = getCurrentUserInfo();
+    return this.uniIDHasRole('admin') || permission.indexOf(permissionId) > -1
+  };
+  Vue.prototype.uniIDTokenValid = function () {
+    const {
+      tokenExpired
+    } = getCurrentUserInfo();
+    return tokenExpired > Date.now()
+  };
+}
+
 const _toString = Object.prototype.toString;
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -381,7 +431,7 @@ function processArgs (methodName, fromArgs, argsOption = {}, returnValue = {}, k
           keyOption = keyOption(fromArgs[key], fromArgs, toArgs);
         }
         if (!keyOption) { // 不支持的参数
-          console.warn(`app-plus ${methodName}暂不支持${key}`);
+          console.warn(`The '${methodName}' method of platform 'app-plus' does not support option '${key}'`);
         } else if (isStr(keyOption)) { // 重写参数 key
           toArgs[keyOption] = fromArgs[key];
         } else if (isPlainObject(keyOption)) { // {name:newName,value:value}可重新指定参数 key:value
@@ -416,7 +466,7 @@ function wrapper (methodName, method) {
     const protocol = protocols[methodName];
     if (!protocol) { // 暂不支持的 api
       return function () {
-        console.error(`app-plus 暂不支持${methodName}`);
+        console.error(`Platform 'app-plus' does not support '${methodName}'.`);
       }
     }
     return function (arg1, arg2) { // 目前 api 最多两个参数
@@ -463,7 +513,7 @@ function createTodoApi (name) {
     complete
   }) {
     const res = {
-      errMsg: `${name}:fail:暂不支持 ${name} 方法`
+      errMsg: `${name}:fail method '${name}' not supported`
     };
     isFn(fail) && fail(res);
     isFn(complete) && complete(res);
@@ -602,7 +652,7 @@ const customize = cached((str) => {
 
 function initTriggerEvent (mpInstance) {
   {
-    if (!wx.canIUse('nextTick')) {
+    if (!wx.canIUse || !wx.canIUse('nextTick')) {
       return
     }
   }
@@ -849,6 +899,11 @@ function initProperties (props, isBehavior = false, file = '') {
     properties.generic = {
       type: Object,
       value: null
+    };
+    // scopedSlotsCompiler auto
+    properties.scopedSlotsCompiler = {
+      type: String,
+      value: ''
     };
     properties.vueSlots = { // 小程序不能直接定义 $slots 的 props，所以通过 vueSlots 转换到 $slots
       type: null,
@@ -1292,6 +1347,7 @@ function parseBaseApp (vm, {
   if (vm.$options.store) {
     Vue.prototype.$store = vm.$options.store;
   }
+  uniIdMixin(Vue);
 
   Vue.prototype.mpHost = "app-plus";
 
@@ -1312,7 +1368,12 @@ function parseBaseApp (vm, {
 
       delete this.$options.mpType;
       delete this.$options.mpInstance;
-
+      if (this.mpType === 'page' && typeof getApp === 'function') { // hack vue-i18n
+        const app = getApp();
+        if (app.$vm && app.$vm.$i18n) {
+          this._i18n = app.$vm.$i18n;
+        }
+      }
       if (this.mpType !== 'app') {
         initRefs(this);
         initMocks(this, mocks);
@@ -1684,6 +1745,7 @@ function createSubpackageApp (vm) {
   const app = getApp({
     allowDefault: true
   });
+  vm.$scope = app;
   const globalData = app.globalData;
   if (globalData) {
     Object.keys(appOptions.globalData).forEach(name => {
@@ -1699,17 +1761,36 @@ function createSubpackageApp (vm) {
   });
   if (isFn(appOptions.onShow) && wx.onAppShow) {
     wx.onAppShow((...args) => {
-      appOptions.onShow.apply(app, args);
+      vm.__call_hook('onShow', args);
     });
   }
   if (isFn(appOptions.onHide) && wx.onAppHide) {
     wx.onAppHide((...args) => {
-      appOptions.onHide.apply(app, args);
+      vm.__call_hook('onHide', args);
     });
   }
   if (isFn(appOptions.onLaunch)) {
     const args = wx.getLaunchOptionsSync && wx.getLaunchOptionsSync();
-    appOptions.onLaunch.call(app, args);
+    vm.__call_hook('onLaunch', args);
+  }
+  return vm
+}
+
+function createPlugin (vm) {
+  const appOptions = parseApp$1(vm);
+  if (isFn(appOptions.onShow) && wx.onAppShow) {
+    wx.onAppShow((...args) => {
+      appOptions.onShow.apply(vm, args);
+    });
+  }
+  if (isFn(appOptions.onHide) && wx.onAppHide) {
+    wx.onAppHide((...args) => {
+      appOptions.onHide.apply(vm, args);
+    });
+  }
+  if (isFn(appOptions.onLaunch)) {
+    const args = wx.getLaunchOptionsSync && wx.getLaunchOptionsSync();
+    appOptions.onLaunch.call(vm, args);
   }
   return vm
 }
@@ -1726,10 +1807,10 @@ canIUses.forEach(canIUseApi => {
   }
 });
 
-let uni = {};
+let uni$1 = {};
 
 if (typeof Proxy !== 'undefined' && "app-plus" !== 'app-plus') {
-  uni = new Proxy({}, {
+  uni$1 = new Proxy({}, {
     get (target, name) {
       if (hasOwn(target, name)) {
         return target[name]
@@ -1755,27 +1836,27 @@ if (typeof Proxy !== 'undefined' && "app-plus" !== 'app-plus') {
   });
 } else {
   Object.keys(baseApi).forEach(name => {
-    uni[name] = baseApi[name];
+    uni$1[name] = baseApi[name];
   });
 
   Object.keys(eventApi).forEach(name => {
-    uni[name] = eventApi[name];
+    uni$1[name] = eventApi[name];
   });
 
   Object.keys(api).forEach(name => {
-    uni[name] = promisify(name, api[name]);
+    uni$1[name] = promisify(name, api[name]);
   });
 
   Object.keys(wx).forEach(name => {
     if (hasOwn(wx, name) || hasOwn(protocols, name)) {
-      uni[name] = promisify(name, wrapper(name, wx[name]));
+      uni$1[name] = promisify(name, wrapper(name, wx[name]));
     }
   });
 }
 
 {
   if (typeof global !== 'undefined') {
-    global.uni = uni;
+    global.uni = uni$1;
     global.UniEmitter = eventApi;
   }
 }
@@ -1784,8 +1865,9 @@ wx.createApp = createApp;
 wx.createPage = createPage;
 wx.createComponent = createComponent;
 wx.createSubpackageApp = createSubpackageApp;
+wx.createPlugin = createPlugin;
 
-var uni$1 = uni;
+var uni$2 = uni$1;
 
-export default uni$1;
-export { createApp, createComponent, createPage, createSubpackageApp };
+export default uni$2;
+export { createApp, createComponent, createPage, createPlugin, createSubpackageApp };

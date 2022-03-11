@@ -13,6 +13,7 @@
 - iOS端支持高斯模糊，<a href="https://ask.dcloud.net.cn/article/36617#view" target="_blank">详情</a>
 - 可实现区域滚动长列表+左右拖动列表+吸顶的复杂排版效果
 - 优化圆角边框绘制性能
+- 扩展了更多的css
 
 
 
@@ -24,7 +25,7 @@ nvue的组件和API写法与vue页面一致，其内置组件还比vue页面内�
 
 如果你是web前端，不熟悉原生排版，那么建议你仍然以使用vue页面为主，在App端某些vue页面表现不佳的场景下使用 nvue 作为强化补充。这些场景如下：
 
-1. 需要高性能的区域长列表或瀑布流滚动。webview的页面级长列表滚动时没有性能问题的（就是滚动条覆盖webview整体高度），但页面中某个区域做长列表滚动，则需要使用nvue的```list```、```recycle-list```、```waterfall```等组件([详见](https://uniapp.dcloud.io/component/list))。这些组件的性能要高于vue页面里的区域滚动组件```scroll-view```。
+1. 需要高性能的区域长列表或瀑布流滚动。webview的页面级长列表滚动是没有性能问题的（就是滚动条覆盖webview整体高度），但页面中某个区域做长列表滚动，则需要使用nvue的```list```、```recycle-list```、```waterfall```等组件([详见](https://uniapp.dcloud.io/component/list))。这些组件的性能要高于vue页面里的区域滚动组件```scroll-view```。
 2. 复杂高性能的自定义下拉刷新。uni-app的pages.json里可以配置原生下拉刷新，但引擎内置的下拉刷新样式只有雪花和circle圈2种样式。如果你需要自己做复杂的下拉刷新，推荐使用nvue的refresh组件。当然[插件市场](https://ext.dcloud.net.cn/search?q=%E4%B8%8B%E6%8B%89%E5%88%B7%E6%96%B0)里也有很多vue下的自定义下拉刷新插件，只要是基于renderjs或wxs的，性能也可以商用，只是没有nvue的```refresh```组件更极致。
 3. 左右拖动的长列表。在webview里，通过```swiper```+```scroll-view```实现左右拖动的长列表，前端模拟下拉刷新，这套方案的性能不好。此时推荐使用nvue，比如新建uni-app项目时的[新闻示例模板](https://ext.dcloud.net.cn/plugin?id=103)，就采用了nvue，切换很流畅。
 4. 实现区域滚动长列表+左右拖动列表+吸顶的复杂排版效果，效果可参考hello uni-app模板里的```swiper-list```。[详见](https://ext.dcloud.net.cn/plugin?id=2128)
@@ -38,6 +39,9 @@ nvue的组件和API写法与vue页面一致，其内置组件还比vue页面内�
 但注意，在某些场景下，nvue不如vue页面，如下：
 1. ```canvas```。nvue的canvas性能不高，尤其是Android App平台，所以这个组件干脆没有内置，而是需要单独引入。操作canvas动画，最高性能的方式是使用vue页面的renderjs技术，在hello uni-app里的canvas示例就是如此。
 2. 动态横竖屏。nvue页面的css不支持媒体查询，所以横竖屏动态切换、动态适配屏幕是很困难的。
+
+
+
 
 
 ## 纯原生渲染模式
@@ -126,7 +130,28 @@ nvue 的页面跳转，与 weex 不同，仍然遵循 uni-app 的路由模型。
 
 weex 编译模式下支持使用 weex ui ，例子[详见](https://ext.dcloud.net.cn/plugin?id=442)。但相比uni-app插件市场及官方[uni ui](https://ext.dcloud.net.cn/plugin?id=55)而言，weex语法的组件生态还是比较欠缺的。
 
+
+**HBuilderX 3.1.0+ 开始支持新的样式编译模式**
+- weex 编译模式：老模式，样式支持与普通 weex 相同
+- uni-app 编译模式：新模式，在 weex 原有样式基础上支持组合选择器（相邻兄弟选择器、普通兄弟选择器、子选择器、后代选择器）[详见](https://ask.dcloud.net.cn/article/38751)
+```js
+  // manifest.json  
+  {        
+      // ...        
+       /* App平台特有配置 */        
+      "app-plus":  {  
+          "nvueStyleCompiler": "uni-app"  
+      }  
+  }
+```
+
+
+
+
+
 ## 快速上手
+
+
 ### 1.新建nvue页面
 在HBuilderX的 ```uni-app``` 项目中，新建页面，弹出界面右上角可以选择是建立```vue```页面还是```nvue```页面，或者2个同时建。
 
@@ -151,6 +176,45 @@ weex 编译模式下支持使用 weex ui ，例子[详见](https://ext.dcloud.ne
 
 ### 3.调试 nvue 页面
 HBuilderX内置了weex调试工具的强化版，包括审查界面元素、看log、debug打断点，[详见](https://uniapp.dcloud.io/snippet?id=%e5%85%b3%e4%ba%8e-app-%e7%9a%84%e8%b0%83%e8%af%95)
+
+
+
+
+
+## render-whole
+
+在HBuilder X 3.1.0起版本，nvue 新增 `render-whole`属性，类型`Boolean`。
+
+- 设置render-whole="true"时，视图层将组件以及子组件的信息结构一次性和原生层通讯，通过整个节点的重绘提升了排版渲染性能。
+- 设置render-whole="false"时，视图层将以子节点一个接着一个和原生层通讯再重绘。总体的渲染时间可能更久。
+
+默认启用`render-whole`为`true`的组件列表
+
+- `text`
+- `cell`
+- `header`
+- `cell-slot`
+- `recycle-list`
+
+**使用**
+
+```html
+<swiper :render-whole="true"></swiper>
+```
+
+**演示**
+
+ > 此演示在Android 5.1版本手机上的效果，高版本手机效果没有这么明显
+ 
+<img style="width:300px;" src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-dc-site/29c0c580-55ab-11eb-a16f-5b3e54966275.gif"></img>
+ 
+
+示例工程[点击下载](https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-dc-site/d5adb160-55af-11eb-bd01-97bc1429a9ff.zip)
+ 
+
+
+
+
 
 
 ## nvue开发与vue开发的常见区别

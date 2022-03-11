@@ -1,11 +1,11 @@
 {
   "name": "@dcloudio/uni-mp-kuaishou",
-  "version": "2.0.0-31420210305001",
+  "version": "2.0.0-31920210709003",
   "description": "uni-app mp-kuaishou",
   "main": "dist/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dcloudio/uni-app.git",
+    "url": "https://github.com/txlct/uniapp.git",
     "directory": "packages/uni-mp-kuaishou"
   },
   "scripts": {
@@ -17,5 +17,5 @@
     "name": "mp-kuaishou",
     "title": "快手小程序"
   },
-  "gitHead": "b366367ac0b63f41ef205dc93eee55d8e9f8f3ed"
+  "gitHead": "2033cd540cff5d8469ff77e87779cd4daa5c9121"
 }

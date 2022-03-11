@@ -8,8 +8,13 @@ import {
 
 import {
   isPage,
-  initRelation
+  initRelation,
+  mocks
 } from './util'
+
+import {
+  initMocks
+} from 'uni-wrapper/util'
 
 import parseBaseComponent from '../../../mp-weixin/runtime/wrapper/component-base-parser'
 
@@ -27,6 +32,29 @@ export default function parseComponent (vueOptions) {
   const oldAttached = componentOptions.lifetimes.attached
   // 百度小程序基础库 3.260 以上支持页面 onInit 生命周期，提前创建 vm 实例
   componentOptions.lifetimes.onInit = function onInit (query) {
+    // 百度小程序后续可能移除 pageinstance 属性，为向后兼容进行补充
+    if (!this.pageinstance || !this.pageinstance.setData) {
+      const pages = getCurrentPages()
+      this.pageinstance = pages[pages.length - 1]
+    }
+
+    // 处理百度小程序 onInit 生命周期调用 setData 无效的问题
+    const setData = this.setData
+    const setDataArgs = []
+    this.setData = function () {
+      setDataArgs.push(arguments)
+    }
+    this.__fixInitData = function () {
+      delete this.__fixInitData
+      this.setData = setData
+      if (setDataArgs.length) {
+        this.groupSetData(() => {
+          setDataArgs.forEach(args => {
+            setData.apply(this, args)
+          })
+        })
+      }
+    }
     oldAttached.call(this)
     this.pageinstance.$vm = this.$vm
     this.$vm.__call_hook('onInit', query)
@@ -34,6 +62,9 @@ export default function parseComponent (vueOptions) {
   componentOptions.lifetimes.attached = function attached () {
     if (!this.$vm) {
       oldAttached.call(this)
+    } else {
+      initMocks(this.$vm, mocks)
+      this.__fixInitData && this.__fixInitData()
     }
     if (isPage.call(this)) { // 百度 onLoad 在 attached 之前触发（基础库小于 3.70）
       // 百度 当组件作为页面时 pageinstancce 不是原来组件的 instance

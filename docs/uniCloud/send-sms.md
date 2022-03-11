@@ -16,10 +16,11 @@
 
 |参数名		|类型	|必填	|说明															|
 |:-:		|:-:	|:-:	|:-:															|
+|appid		|String	|是		|DCloud appid，可以在项目manifest.json内看到		|
 |smsKey		|String	|是		|调用短信接口的密钥key，从 dev.dcloud.net.cn/uniSms 后台获取		|
 |smsSecret	|String	|是		|调用短信接口的密钥secret，从 dev.dcloud.net.cn/uniSms 后台获取	|
 |phone		|String	|是		|发送目标手机号，暂仅支持中国大陆手机号，不能填写多个手机号|
-|templateId	|String	|是		|模版Id，短信内容为固定模板，详见下方说明						|
+|templateId	|String	|是		|模版Id，短信内容为固定模板，详见下方说明（应用开发阶段，可以使用 DCloud 提供的测试模板）						|
 |data		|Object	|是		|模版里的各个变量字段，json格式										|
 
 
@@ -56,6 +57,15 @@
 
 - 短信类别：
 分为3类，即验证码类短信、通知类短信、营销类短信。验证码类短信，其模板审核简单快速，只能单次发送。
+
+**短信测试模板说明**
+
+运营商目前审核比较严格，处于开发阶段的应用可能无法通过运营商的审核。为方便开发者测试短信功能，DCloud 提供了一个测试模板，该模板的templateId为：uni_sms_test，内容为：`【DC】尊敬的用户，您的验证码是：${code}。5分钟内有效，请尽快验证。请勿泄漏您的验证码。`
+
+使用该模板的限制：
+
+1. 每日最多给10个手机号发送不超过100条短信；
+2. 使用该模板也会正常收取费用，请保证账户有充足余额。
 
 <!--
 目前短信功能包括如下模版，暂不可扩展新模版，模版形式如下。参数data内的字段会填充到模版内容里。
@@ -125,6 +135,7 @@
 exports.main = async (event, context) => {
   try {
     const res = await uniCloud.sendSms({
+      appid: '__UNI__xxxxxxx',
       smsKey: '****************',
       smsSecret: '****************',
       phone: '188********',
@@ -166,7 +177,8 @@ exports.main = async (event, context) => {
 - data内如果有`测试`、`test`等字样，系统可能会被判定为测试用途，不会真正把短信下发到对应手机（此行为由运营商控制，可能真实发送，也可能不发送）
 - 在[DCloud开发者中心](https://dev.dcloud.net.cn/uniSms)绑定`uniCloud`服务空间后，将会只允许绑定的服务空间调用此接口，绑定列表为空时表示不限制服务空间
 - 短信内容不可包含★、 ※、 →、 ●等特殊符号，可能会导致短信乱码
-- 如果是用于用户注册的短信验证码，那么强烈推荐使用uni-id，这是一套云端一体的、完善的用户管理方案，已经内置封装好的短信验证码功能，详见：[https://ext.dcloud.net.cn/plugin?id=2116](https://ext.dcloud.net.cn/plugin?id=2116)
+- 如果是用于用户注册的短信验证码，那么强烈推荐使用uni-id，这是一套云端一体的、完善的用户管理方案，已经内置封装好的短信验证码功能，详见：[https://uniapp.dcloud.net.cn/uniCloud/uni-id](https://uniapp.dcloud.net.cn/uniCloud/uni-id)。
+- 发送短信如果需要图形验证码来防止机刷，可以使用[uni-captcha图形验证码](https://ext.dcloud.net.cn/plugin?id=4048)。在云端一体登录模板中已经集成了uni-id、uni-captcha，详见：[https://ext.dcloud.net.cn/plugin?id=13](https://ext.dcloud.net.cn/plugin?id=13)
 - Android手机在App端获取短信验证码，参考：[https://ask.dcloud.net.cn/article/676](https://ask.dcloud.net.cn/article/676)
 - 短信内容超过70个字符时为长短信，需分条发送，每67个字按一条短信计算
 - 如果本地运行提示`不支持的模板ID`，请更新到`2.9.9+`版本的HBuilderX 

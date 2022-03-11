@@ -2,7 +2,7 @@
 
 `uni一键登录`是DCloud联合个推公司推出的，整合了三大运营商网关认证能力的服务。
 
-通过运营商的底层SDK，实现App端无需短信验证码直接获取手机号，也就是很多主流App都提供的一键登陆功能。
+通过运营商的底层SDK，实现App端无需短信验证码直接获取手机号，也就是很多主流App都提供的一键登录功能。
 
 `uni一键登录`是替代短信验证登录的下一代登录验证方式，能消除现有短信验证模式等待时间长、操作繁琐和容易泄露的痛点。
 
@@ -13,19 +13,40 @@
 
 ![](https://dcloud-img.oss-cn-hangzhou.aliyuncs.com/client/doc/univerify/demo.png)
 
+<a id="fullscreen"/>
+
+> HBuilderX3.1.6+版本授权登录界面支持全屏模式
+
+调用uni.login时设置univerifyStyle中的fullScreen属性值为true即可：
+```js
+uni.login({
+	provider: 'univerify',
+	univerifyStyle: { 
+            fullScreen: true
+        }
+})
+```
+
+全屏效果如下:
+
+![](https://dcloud-img.oss-cn-hangzhou.aliyuncs.com/client/doc/univerify/full.png)
 
 ### 产品优势
 
 - **用户体验好**
-用户体验好，无需等待短信验证码，能有效降低用户流失率，提升用户注册量在App激活量中的占比。
+
+一键登录，无需等待和复制短信验证码，能有效降低用户流失率，提升用户注册量在App激活量中的转换率。
 
 - **便宜**
-使用`uni一键登录`的成本比短信验证码便宜数倍。（该业务移动运营商需要收费，DCloud在该业务上并不赚钱。所以`uni一键登录`的费用比市场上三方提供的一键登陆要更便宜）
+
+使用`uni一键登录`，每次验证仅需2分！比短信验证码便宜数倍，也比市场上三方提供的一键登录要更便宜。
 
 - **安全**
+
 采用运营商网关认证，避免短信劫持，有效提升安全性
 
 - **开发体验好**
+
 无需原生插件，无需自定义基座（HBuilder标准基座就可以直接运行调试），简单快速完成上线。
 
 ### 流程
@@ -70,12 +91,12 @@
 
 本文主要介绍uni-app的客户端调用方法。5+ App（Wap2App）请另行参考：[5+ App一键登录使用指南](https://ask.dcloud.net.cn/article/38009)
 
-DCloud还提供了更易用的封装。在[uni-id](/uniCloud/uni-id)里已经预置了`uni一键登陆`，并基于`uni-id`提供了[前后一体登录模板](https://ext.dcloud.net.cn/plugin?id=13)（也可以在HBuilderX 3.0+ 新建项目界面选择“前后一体登录模板”），开发者可以拿去直接用
+DCloud还提供了更易用的封装。在[uni-id](/uniCloud/uni-id)里已经预置了`uni一键登录`，并基于`uni-id`提供了[前后一体登录模板](https://ext.dcloud.net.cn/plugin?id=13)（也可以在HBuilderX 3.0+ 新建项目界面选择“前后一体登录模板”），开发者可以拿去直接用
 
 接下来继续介绍原始API的用法。
 
 ### 客户端-获取可用的服务提供商
-一键登陆，和 uni.login 中的微信登录、QQ登录等provider是并列的。
+一键登录，和 uni.login 中的微信登录、QQ登录等provider是并列的。
 
 其中一键登录对应的 provider ID为 'univerify'，当获取provider列表时发现包含 'univerify' ，则说明当前环境打包了一键登录的sdk。
 
@@ -93,7 +114,7 @@ uni.getProvider({
 
 如果当前设备环境不支持一键登录，此时应该显示其他的登录选项。
 
-如果手机没有插入有效的sim卡，或者手机蜂窝数据网络关闭，都有可能造成预登陆校验失败。
+如果手机没有插入有效的sim卡，或者手机蜂窝数据网络关闭，都有可能造成预登录校验失败。
 
 `uni.preLogin(options)`
 
@@ -127,7 +148,7 @@ uni.login({
     //参考`univerifyStyle 数据结构`
   },
 	success(res){ // 登录成功
-		console.log(res.authResult);  // {openid:'deviceIDlength+deviceID+gyuid',access_token:'接口返回的 token'}
+		console.log(res.authResult);  // {openid:'登录授权唯一标识',access_token:'接口返回的 token'}
 	},
 	fail(res){  // 登录失败
 		console.log(res.errCode)
@@ -137,64 +158,78 @@ uni.login({
 ```
 
 
-`uni一键登录`的授权弹出界面是半屏的，这个界面本质是运营商sdk弹出的，它询问手机用户是否授权自己的手机号给这个App使用。
+`uni一键登录`的授权弹出界面是默认是半屏的，也可以配置为全屏。这个界面本质是运营商sdk弹出的，它询问手机用户是否授权自己的手机号给这个App使用。
 
 这个授权弹出界面可以通过 univerifyStyle 设置有限定制。
 
 univerifyStyle 数据结构：
 
 ```json
-{
-  "backgroundColor": "#ffffff",  // 授权页面背景颜色，默认值：#ffffff  
-  "icon": {  
-      "path": "static/xxx.png" // 自定义显示在授权框中的logo，仅支持本地图片 默认显示App logo   
-  },  
-  "phoneNum": {  
-      "color": "#000000",  // 手机号文字颜色 默认值：#000000   
-      "fontSize": "18" // 手机号字体大小 默认值：18  
-  },  
-  "slogan": {  
-      "color": "#8a8b90",  //  slogan 字体颜色 默认值：#8a8b90  
-      "fontSize": "12" // slogan 字体大小 默认值：12  
-  },  
-  "authButton": {  
-      "normalColor": "#3479f5", // 授权按钮正常状态背景颜色 默认值：#3479f5  
-      "highlightColor": "#2861c5",  // 授权按钮按下状态背景颜色 默认值：#2861c5（仅ios支持）  
-      "disabledColor": "#73aaf5",  // 授权按钮不可点击时背景颜色 默认值：#73aaf5（仅ios支持）  
-      "textColor": "#ffffff",  // 授权按钮文字颜色 默认值：#ffffff  
-      "title": "本机号码一键登录" // 授权按钮文案 默认值：“本机号码一键登录”  
-  },  
-  "otherLoginButton": {  
-      "visible": "true", // 是否显示其他登录按钮，默认值：true  
-      "normalColor": "#f8f8f8", // 其他登录按钮正常状态背景颜色 默认值：#f8f8f8  
-      "highlightColor": "#dedede", // 其他登录按钮按下状态背景颜色 默认值：#dedede  
-      "textColor": "#000000", // 其他登录按钮文字颜色 默认值：#000000  
-      "title": "其他登录方式", // 其他登录方式按钮文字 默认值：“其他登录方式”  
-      "borderWidth": "1px",  // 边框宽度 默认值：1px（仅ios支持）  
-      "borderColor": "#c5c5c5"  //边框颜色 默认值： #c5c5c5（仅ios支持）  
-  },  
-  "privacyTerms": {  
-      "defaultCheckBoxState":"true", // 条款勾选框初始状态 默认值： true   
-      "textColor": "#8a8b90", // 文字颜色 默认值：#8a8b90  
-      "termsColor": "#1d4788", //  协议文字颜色 默认值： #1d4788  
-      "prefix": "我已阅读并同意", // 条款前的文案 默认值：“我已阅读并同意”  
-      "suffix": "并使用本机号码登录", // 条款后的文案 默认值：“并使用本机号码登录”  
-      "fontSize": "12", // 字体大小 默认值：12,  
-      "privacyItems": [  
-          // 自定义协议条款，最大支持2个，需要同时设置url和title. 否则不生效  
-          {  
-              "url": "https://", // 点击跳转的协议详情页面  
-              "title": "用户服务协议" // 协议名称  
-          }  
-      ]  
-  }  
+{  
+    "fullScreen": "false", // 是否全屏显示，默认值： "false"
+    "backgroundColor": "#ffffff",  // 授权页面背景颜色，默认值：#ffffff
+    "backgroundImage": "", // 全屏显示的背景图片，默认值："" （仅支持本地图片，只有全屏显示时支持）  
+    "icon": {  
+        "path": "static/xxx.png" // 自定义显示在授权框中的logo，仅支持本地图片 默认显示App logo   
+    },  
+    "phoneNum": {  
+        "color": "#202020"  // 手机号文字颜色 默认值：#202020  
+    },  
+    "slogan": {  
+        "color": "#BBBBBB"  //  slogan 字体颜色 默认值：#BBBBBB  
+    },  
+    "authButton": {  
+        "normalColor": "#3479f5", // 授权按钮正常状态背景颜色 默认值：#3479f5  
+        "highlightColor": "#2861c5",  // 授权按钮按下状态背景颜色 默认值：#2861c5（仅ios支持）  
+        "disabledColor": "#73aaf5",  // 授权按钮不可点击时背景颜色 默认值：#73aaf5（仅ios支持）  
+        "textColor": "#ffffff",  // 授权按钮文字颜色 默认值：#ffffff  
+        "title": "本机号码一键登录", // 授权按钮文案 默认值：“本机号码一键登录”  
+        "borderRadius": "24px"	// 授权按钮圆角 默认值："24px" （按钮高度的一半）
+    },  
+    "otherLoginButton": {  
+        "visible": "true", // 是否显示其他登录按钮，默认值：true  
+        "normalColor": "", // 其他登录按钮正常状态背景颜色 默认值：透明 
+        "highlightColor": "", // 其他登录按钮按下状态背景颜色 默认值：透明 
+        "textColor": "#656565", // 其他登录按钮文字颜色 默认值：#656565  
+        "title": "其他登录方式", // 其他登录方式按钮文字 默认值：“其他登录方式”  
+        "borderColor": "",  //边框颜色 默认值：透明（仅iOS支持）  
+        "borderRadius": "0px" // 其他登录按钮圆角 默认值："0px" 
+    },  
+    "privacyTerms": {  
+        "defaultCheckBoxState":"true", // 条款勾选框初始状态 默认值： true   
+        "textColor": "#BBBBBB", // 文字颜色 默认值：#BBBBBB  
+        "termsColor": "#5496E3", //  协议文字颜色 默认值： #5496E3  
+        "prefix": "我已阅读并同意", // 条款前的文案 默认值：“我已阅读并同意”  
+        "suffix": "并使用本机号码登录", // 条款后的文案 默认值：“并使用本机号码登录”  
+        "privacyItems": [  
+            // 自定义协议条款，最大支持2个，需要同时设置url和title. 否则不生效  
+            {  
+                "url": "https://", // 点击跳转的协议详情页面  
+                "title": "用户服务协议" // 协议名称  
+            }  
+        ]  
+    },
+    "buttons": {  // 自定义登陆按钮
+      "iconWidth": "45px", // 图标宽度（高度等比例缩放） 默认值：45px
+      "list": [
+        {
+          "provider": "apple",
+          "iconPath": "/static/apple.png" // 图标路径仅支持本地图片
+        }, 
+        {
+          "provider": "weixin",
+          "iconPath": "/static/wechat.png" // 图标路径仅支持本地图片
+        }
+      ]
+    }
 }
 ```
 
 univerifyStyle 属性对应配置的界面指示图
 
-![](https://dcloud-img.oss-cn-hangzhou.aliyuncs.com/client/doc/univerify/styles.png)
-
+全屏效果  | 非全屏效果
+:--------:|:--------:
+<img src="https://img.cdn.aliyun.dcloud.net.cn/client/doc/univerify/full_styles_v2.png" width=240>  | <img src="https://img.cdn.aliyun.dcloud.net.cn/client/doc/univerify/half_styles_v2.png" width=240>
 
 返回数据示例
 
@@ -219,6 +254,20 @@ univerifyStyle 属性对应配置的界面指示图
 uni.closeAuthView()
 ```
 
+### 用户点击一键登录自定义按钮
+
+`univerifyStyle`中如果配置了`"fullScreen": "true"`和`buttons`选项并且`buttons`数组不为空时，在全屏的时候会渲染出自定义按钮。
+
+当用户点击`自定义按钮`时，会触发`uni.login`的`fail`回调，返回数据如下：
+
+```json
+{
+  "code": "30008",
+  "errMsg": "用户点击了自定义按钮",
+  "index": 0, // 第几个按钮
+  "provider": "apple",
+}
+```
 
 ### 用access_token换手机号
 
@@ -255,7 +304,7 @@ uniCloud.callFunction({
   //   code: '',
   //   message: ''
   // }
-  // 登录成功，可以关闭一键登陆授权界面了
+  // 登录成功，可以关闭一键登录授权界面了
 }).catch(err=>{
   // 处理错误
 })
@@ -288,7 +337,7 @@ exports.main = async (event, context) => {
 
 完整的项目实例源码，可以参考：
 1. 云端一体项目模板：[https://ext.dcloud.net.cn/plugin?id=13](https://ext.dcloud.net.cn/plugin?id=13)
-2. hello uni-app。打包后直接体验：[https://m3w.cn/uniapp](https://m3w.cn/uniapp)；源码获取：在HBuilderX中新建uni-app项目，选择hello uni-app模板。一键登陆的具体位置在 API - login 栏目中。
+2. hello uni-app。打包后直接体验：[https://m3w.cn/uniapp](https://m3w.cn/uniapp)；源码获取：在HBuilderX中新建uni-app项目，选择hello uni-app模板。一键登录的具体位置在 API - login 栏目中。
 
 **注意**
 
@@ -322,7 +371,7 @@ xhr.send(JSON.stringify({
 云函数代码：
 ```js
 // 下面仅展示客户端使用post方式发送content-type为application/json请求的场景
-module.exports = async(event){
+exports.main = async(event) => {
   let body = event.body
   if(event.isBase64Encoded) {
     body = Buffer.from(body,'base64')
@@ -385,7 +434,7 @@ const sign = hmac.digest('hex')
 ```js
 // 云函数验证签名，此示例中以接受GET请求为例作演示
 const crypto = require('crypto')
-module.exports = async(event){
+exports.main = async(event) => {
   
   const secret = 'your-secret-string' // 自己的密钥不要直接使用示例值，且注意不要泄露
   const hmac = crypto.createHmac('sha256', secret);
@@ -444,12 +493,16 @@ module.exports = async(event){
 
 
 ### 错误码
+
 |  错误码  |  错误描述  |
 |  -:-  |  -:-  |
+|  -7   |  uniAppid 缺失，检查是否配置/已通过审核  |
 |  1000 |  当前 uniAppid 尚未开通一键登录  |
 |  1001 |  应用所有者账号信息异常，请检查账号一键登录服务是否正常  |
 |  1002 |  应用所有者账号信息异常，请检查账号余额是否充足 |
 |  4001 |  请求参数异常 |
+|  4003 |  开发者账户appid 校验异常，联系官方人员 |
+|  5000 |  服务器未知异常，联系官方人员 |
 | 30001	|  当前网络环境不适合执行该操作  |
 | 30002 |  用户点击了其他登录方式  |
 | 30003 |  用户关闭验证界面  |
@@ -457,12 +510,16 @@ module.exports = async(event){
 | 30005 |  预登录失败  |
 | 30006 |  一键登录失败  |
 | 30007 |  获取本机号码校验token失败  |
+| 30008 |  用户点击了自定义按钮  |
+| 40004 |  应用不存在  |
 | 40047 |  一键登录取号失败  |
 | 40053 |  手机号校验失败  |
+| 40201 |  源IP鉴权失败 |
+
 
 ## 运行基座和打包
 
-- 使用`uni一键登陆`，不需要制作自定义基座，使用HBuilder标准真机运行基座即可。在云函数中配置好apiKey、apiSecret后，一样从你的账户充值中扣费。
+- 使用`uni一键登录`，不需要制作自定义基座，使用HBuilder标准真机运行基座即可。在云函数中配置好apiKey、apiSecret后，一样从你的账户充值中扣费。
 
 - 云端打包
 在项目manifest.json页面“App模块配置”项的“OAuth(登录鉴权)”下勾选“一键登录(uni-verify)”
@@ -478,9 +535,23 @@ module.exports = async(event){
 预登录有效期为10分钟，超过10分钟后预登录失效，此时调用login授权登录相当于之前没有调用过预登录，大概需要等待1-2秒才能弹出授权界面。
 预登录只能使用一次，调用login弹出授权界面后，如果用户操作取消登录授权，再次使用一键登录时需要重新调用预登录。
 
+- **双卡手机能否同时获取两个手机号码**
+不支持同时获取两个手机号，
+双卡手机以开启数据流量的 SIM 卡进行认证。
+
+
 - **提示“非移动网关ip地址”**
 大多数情况 是因为部分特定设备，不支持双卡双待的网络环境
 
 - **错误代码 40201，提示“源IP鉴权失败”**
 检查一下手机卡类型是否是正常运营商手机卡，关闭飞行模式后重新尝试
+
+- **错误代码 40004，提示“应用不存在”**
+多出现在自定义基座的场景，请确保应用已通过审核后，且已重新打包。
+
+- **错误代码 30005，提示“预登录失败”**
+不具备一键登录的使用前提，设备不支持/未开启数据流量/其他原因
+
+
+
 

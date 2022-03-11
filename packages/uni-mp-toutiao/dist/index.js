@@ -1,5 +1,55 @@
 import Vue from 'vue';
 
+function b64DecodeUnicode (str) {
+  return decodeURIComponent(atob(str).split('').map(function (c) {
+    return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
+  }).join(''))
+}
+
+function getCurrentUserInfo () {
+  const token = ( tt).getStorageSync('uni_id_token') || '';
+  const tokenArr = token.split('.');
+  if (!token || tokenArr.length !== 3) {
+    return {
+      uid: null,
+      role: [],
+      permission: [],
+      tokenExpired: 0
+    }
+  }
+  let userInfo;
+  try {
+    userInfo = JSON.parse(b64DecodeUnicode(tokenArr[1]));
+  } catch (error) {
+    throw new Error('获取当前用户信息出错，详细错误信息为：' + error.message)
+  }
+  userInfo.tokenExpired = userInfo.exp * 1000;
+  delete userInfo.exp;
+  delete userInfo.iat;
+  return userInfo
+}
+
+function uniIdMixin (Vue) {
+  Vue.prototype.uniIDHasRole = function (roleId) {
+    const {
+      role
+    } = getCurrentUserInfo();
+    return role.indexOf(roleId) > -1
+  };
+  Vue.prototype.uniIDHasPermission = function (permissionId) {
+    const {
+      permission
+    } = getCurrentUserInfo();
+    return this.uniIDHasRole('admin') || permission.indexOf(permissionId) > -1
+  };
+  Vue.prototype.uniIDTokenValid = function () {
+    const {
+      tokenExpired
+    } = getCurrentUserInfo();
+    return tokenExpired > Date.now()
+  };
+}
+
 const _toString = Object.prototype.toString;
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 
@@ -560,6 +610,13 @@ var getSystemInfo = {
   }
 };
 
+const oName = 'getUserInfo';
+const nName = 'getUserProfile';
+
+var getUserProfile = {
+  name: tt.canIUse(nName) ? nName : oName
+};
+
 // 不支持的 API 列表
 const todos = [
   'preloadPage',
@@ -664,6 +721,7 @@ const protocols = {
   previewImage,
   getSystemInfo,
   getSystemInfoSync: getSystemInfo,
+  getUserProfile,
   connectSocket: {
     args: {
       method: false
@@ -753,7 +811,7 @@ function processArgs (methodName, fromArgs, argsOption = {}, returnValue = {}, k
           keyOption = keyOption(fromArgs[key], fromArgs, toArgs);
         }
         if (!keyOption) { // 不支持的参数
-          console.warn(`头条小程序 ${methodName}暂不支持${key}`);
+          console.warn(`The '${methodName}' method of platform '头条小程序' does not support option '${key}'`);
         } else if (isStr(keyOption)) { // 重写参数 key
           toArgs[keyOption] = fromArgs[key];
         } else if (isPlainObject(keyOption)) { // {name:newName,value:value}可重新指定参数 key:value
@@ -788,7 +846,7 @@ function wrapper (methodName, method) {
     const protocol = protocols[methodName];
     if (!protocol) { // 暂不支持的 api
       return function () {
-        console.error(`头条小程序 暂不支持${methodName}`);
+        console.error(`Platform '头条小程序' does not support '${methodName}'.`);
       }
     }
     return function (arg1, arg2) { // 目前 api 最多两个参数
@@ -835,7 +893,7 @@ function createTodoApi (name) {
     complete
   }) {
     const res = {
-      errMsg: `${name}:fail:暂不支持 ${name} 方法`
+      errMsg: `${name}:fail method '${name}' not supported`
     };
     isFn(fail) && fail(res);
     isFn(complete) && complete(res);
@@ -869,7 +927,7 @@ function getProvider ({
     isFn(success) && success(res);
   } else {
     res = {
-      errMsg: 'getProvider:fail:服务[' + service + ']不存在'
+      errMsg: 'getProvider:fail service not found'
     };
     isFn(fail) && fail(res);
   }
@@ -1267,6 +1325,11 @@ function initProperties (props, isBehavior = false, file = '') {
       type: Object,
       value: null
     };
+    // scopedSlotsCompiler auto
+    properties.scopedSlotsCompiler = {
+      type: String,
+      value: ''
+    };
     properties.vueSlots = { // 小程序不能直接定义 $slots 的 props，所以通过 vueSlots 转换到 $slots
       type: null,
       value: [],
@@ -1620,14 +1683,70 @@ function initEventChannel$1 () {
   };
 }
 
+function initScopedSlotsParams () {
+  const center = {};
+  const parents = {};
+
+  Vue.prototype.$hasScopedSlotsParams = function (vueId) {
+    const has = center[vueId];
+    if (!has) {
+      parents[vueId] = this;
+      this.$on('hook:destory', () => {
+        delete parents[vueId];
+      });
+    }
+    return has
+  };
+
+  Vue.prototype.$getScopedSlotsParams = function (vueId, name, key) {
+    const data = center[vueId];
+    if (data) {
+      const object = data[name] || {};
+      return key ? object[key] : object
+    } else {
+      parents[vueId] = this;
+      this.$on('hook:destory', () => {
+        delete parents[vueId];
+      });
+    }
+  };
+
+  Vue.prototype.$setScopedSlotsParams = function (name, value) {
+    const vueIds = this.$options.propsData.vueId;
+    if (vueIds) {
+      const vueId = vueIds.split(',')[0];
+      const object = center[vueId] = center[vueId] || {};
+      object[name] = value;
+      if (parents[vueId]) {
+        parents[vueId].$forceUpdate();
+      }
+    }
+  };
+
+  Vue.mixin({
+    destroyed () {
+      const propsData = this.$options.propsData;
+      const vueId = propsData && propsData.vueId;
+      if (vueId) {
+        delete center[vueId];
+        delete parents[vueId];
+      }
+    }
+  });
+}
+
 function parseBaseApp (vm, {
   mocks,
   initRefs
 }) {
   initEventChannel$1();
+  {
+    initScopedSlotsParams();
+  }
   if (vm.$options.store) {
     Vue.prototype.$store = vm.$options.store;
   }
+  uniIdMixin(Vue);
 
   Vue.prototype.mpHost = "mp-toutiao";
 
@@ -1648,7 +1767,12 @@ function parseBaseApp (vm, {
 
       delete this.$options.mpType;
       delete this.$options.mpInstance;
-
+      if (this.mpType === 'page' && typeof getApp === 'function') { // hack vue-i18n
+        const app = getApp();
+        if (app.$vm && app.$vm.$i18n) {
+          this._i18n = app.$vm.$i18n;
+        }
+      }
       if (this.mpType !== 'app') {
         initRefs(this);
         initMocks(this, mocks);
@@ -2005,34 +2129,50 @@ function parseBaseComponent (vueComponentOptions, {
   return [componentOptions, VueComponent]
 }
 
+const components = [];
+
 function parseComponent (vueOptions) {
   const [componentOptions, VueComponent] = parseBaseComponent(vueOptions);
 
+  // 基础库 2.0 以上 attached 顺序错乱，按照 created 顺序强制纠正
+  componentOptions.lifetimes.created = function created () {
+    components.push(this);
+  };
+
   componentOptions.lifetimes.attached = function attached () {
-    const properties = this.properties;
+    this.__lifetimes_attached = function () {
+      const properties = this.properties;
 
-    const options = {
-      mpType: isPage.call(this) ? 'page' : 'component',
-      mpInstance: this,
-      propsData: properties
+      const options = {
+        mpType: isPage.call(this) ? 'page' : 'component',
+        mpInstance: this,
+        propsData: properties
+      };
+
+      initVueIds(properties.vueId, this);
+
+      // 初始化 vue 实例
+      this.$vm = new VueComponent(options);
+
+      // 处理$slots,$scopedSlots（暂不支持动态变化$slots）
+      initSlots(this.$vm, properties.vueSlots);
+
+      // 处理父子关系
+      initRelation.call(this, {
+        vuePid: this._$vuePid,
+        mpInstance: this
+      });
+
+      // 触发首次 setData
+      this.$vm.$mount();
     };
-
-    initVueIds(properties.vueId, this);
-
-    // 初始化 vue 实例
-    this.$vm = new VueComponent(options);
-
-    // 处理$slots,$scopedSlots（暂不支持动态变化$slots）
-    initSlots(this.$vm, properties.vueSlots);
-
-    // 处理父子关系
-    initRelation.call(this, {
-      vuePid: this._$vuePid,
-      mpInstance: this
-    });
-
-    // 触发首次 setData
-    this.$vm.$mount();
+    let component = this;
+    while (component && component.__lifetimes_attached && components[0] && component === components[0]) {
+      components.shift();
+      component.__lifetimes_attached();
+      delete component.__lifetimes_attached;
+      component = components[0];
+    }
   };
 
   // ready 比 handleLink 还早，初始化逻辑放到 handleLink 中
@@ -2122,6 +2262,7 @@ function createSubpackageApp (vm) {
   const app = getApp({
     allowDefault: true
   });
+  vm.$scope = app;
   const globalData = app.globalData;
   if (globalData) {
     Object.keys(appOptions.globalData).forEach(name => {
@@ -2137,17 +2278,36 @@ function createSubpackageApp (vm) {
   });
   if (isFn(appOptions.onShow) && tt.onAppShow) {
     tt.onAppShow((...args) => {
-      appOptions.onShow.apply(app, args);
+      vm.__call_hook('onShow', args);
     });
   }
   if (isFn(appOptions.onHide) && tt.onAppHide) {
     tt.onAppHide((...args) => {
-      appOptions.onHide.apply(app, args);
+      vm.__call_hook('onHide', args);
     });
   }
   if (isFn(appOptions.onLaunch)) {
     const args = tt.getLaunchOptionsSync && tt.getLaunchOptionsSync();
-    appOptions.onLaunch.call(app, args);
+    vm.__call_hook('onLaunch', args);
+  }
+  return vm
+}
+
+function createPlugin (vm) {
+  const appOptions = parseApp(vm);
+  if (isFn(appOptions.onShow) && tt.onAppShow) {
+    tt.onAppShow((...args) => {
+      appOptions.onShow.apply(vm, args);
+    });
+  }
+  if (isFn(appOptions.onHide) && tt.onAppHide) {
+    tt.onAppHide((...args) => {
+      appOptions.onHide.apply(vm, args);
+    });
+  }
+  if (isFn(appOptions.onLaunch)) {
+    const args = tt.getLaunchOptionsSync && tt.getLaunchOptionsSync();
+    appOptions.onLaunch.call(vm, args);
   }
   return vm
 }
@@ -2232,8 +2392,9 @@ tt.createApp = createApp;
 tt.createPage = createPage;
 tt.createComponent = createComponent;
 tt.createSubpackageApp = createSubpackageApp;
+tt.createPlugin = createPlugin;
 
 var uni$1 = uni;
 
 export default uni$1;
-export { createApp, createComponent, createPage, createSubpackageApp };
+export { createApp, createComponent, createPage, createPlugin, createSubpackageApp };

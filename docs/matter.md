@@ -1,3 +1,7 @@
+每个端有每个端的特点，有的能被抹平，有的不可能被抹平。
+
+注意：跨端，不是把web的习惯迁移到全平台。而是按照uni的写法，然后全平台使用。
+
 ### H5正常但App异常的可能性
 1. css异常：
 
@@ -132,7 +136,7 @@ vue页面在App端的渲染引擎默认是系统webview（不是手机自带浏�
 * H5 发布到服务器注意：
     1. 配置发行后的路径（发行在网站根目录可不配置），比如发行网站路径是 www.xxx.com/html5，在 `manifest.json` 文件内编辑 h5 节点，router 下增加 base 属性为 html5
 <div>
-<img src="https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/9f026b20-4f3c-11eb-b680-7980c8a877b8.png" width="500">
+<img src="https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/9f026b20-4f3c-11eb-b680-7980c8a877b8.png" width="500">
 </div>
     2. 点击菜单 发行-> H5
     3. 在当下项目下的 ``unpackage/dist/build/h5`` 目录找到出的资源，部署服务器（或者使用本地服务器预览），如需部署到相对路径（支持本地file协议打开）参考：https://ask.dcloud.net.cn/article/37432。
@@ -193,7 +197,7 @@ vue页面在App端的渲染引擎默认是系统webview（不是手机自带浏�
 
 2.自定义组件渲染差异
 
-微信/QQ/百度/字节跳动这四家小程序，自定义组件在渲染时会比App/H5端多一级节点，在写样式时需要注意：
+微信（可以使用[virtualHost](https://uniapp.dcloud.io/vue-api?id=%e5%85%b6%e4%bb%96%e9%85%8d%e7%bd%ae)配置）/QQ/百度/字节跳动这四家小程序，自定义组件在渲染时会比App/H5端多一级节点，在写样式时需要注意：
 
 * 使用`flex`布局时，直接给自定义组件的父元素设置为`display:flex`不能影响到自定义组件内部的根节点，需要设置当前自定义组件为`display:flex`才可以。
 * 在自定义组件内部设置根元素高度为100%，不能撑满自定义组件父元素。需要同时设置当前自定义组件高度为100%才可以。

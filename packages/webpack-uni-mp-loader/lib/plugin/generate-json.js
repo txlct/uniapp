@@ -15,6 +15,16 @@ const EMPTY_COMPONENT = 'Component({})'
 
 const usingComponentsMap = {}
 
+// 百度小程序动态组件库 usingSwanComponents 引用组件
+const mpBaiduDynamicLibs = [
+  'dynamicLib://editorLib/editor',
+  'dynamicLib://echartsLib/chart',
+  'dynamicLib://myModelviewer/modelviewer',
+  'dynamicLib://myDynamicLib/panoviewer',
+  'dynamicLib://myDynamicLib/spintileviewer',
+  'dynamicLib://myDynamicLib/vrvideo'
+]
+
 function analyzeUsingComponents () {
   if (!process.env.UNI_OPT_SUBPACKAGES) {
     return
@@ -51,7 +61,7 @@ function analyzeUsingComponents () {
         return false
       }
       pkgs.add(pkgRoot)
-      if (pkgs.length > 1) { // 被多个分包引用
+      if (pkgs.size > 1) { // 被多个分包引用
         return false
       }
     }
@@ -92,7 +102,7 @@ function normalizeUsingComponents (file, usingComponents) {
   }
   file = path.dirname('/' + file)
   names.forEach(name => {
-    usingComponents[name] = path.relative(file, usingComponents[name])
+    usingComponents[name] = normalizePath(path.relative(file, usingComponents[name]))
   })
   return usingComponents
 }
@@ -129,9 +139,16 @@ module.exports = function generateJson (compilation) {
       Object.keys(usingComponents).forEach(key => {
         const value = usingComponents[key]
         if (value.includes('://')) {
-          delete usingComponents[key]
-          jsonObj.usingSwanComponents = jsonObj.usingSwanComponents || {}
-          jsonObj.usingSwanComponents[key] = value
+          /**
+           * 部分动态库组件（如：editor）使用‘usingSwanComponents’ 引入
+           * 部分动态库组件（如：swan-sitemap-list）使用'usingComponents'引入
+           * 做白名单机制
+           */
+          if (mpBaiduDynamicLibs.includes(value)) {
+            delete usingComponents[key]
+            jsonObj.usingSwanComponents = jsonObj.usingSwanComponents || {}
+            jsonObj.usingSwanComponents[key] = value
+          }
         }
       })
     }
@@ -179,7 +196,7 @@ module.exports = function generateJson (compilation) {
       delete jsonObj.navigationBarShadow
     }
 
-    if (process.env.UNI_SUBPACKGE && jsonObj.usingComponents) {
+    if ((process.env.UNI_SUBPACKGE || process.env.UNI_MP_PLUGIN) && jsonObj.usingComponents) {
       jsonObj.usingComponents = normalizeUsingComponents(name, jsonObj.usingComponents)
     }
     const source = JSON.stringify(jsonObj, null, 2)

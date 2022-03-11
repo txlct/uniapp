@@ -1,6 +1,6 @@
 #### movable-area
 
-可拖动区域组件。
+可拖动区域
 
 由于app和小程序的架构是逻辑层与视图层分离，使用js监听拖动时会引发逻辑层和视图层的频繁通讯，影响性能。为了方便高性能的实现拖动，平台特封装了`movable-area`组件。
 
@@ -137,4 +137,4 @@ export default {
 }
 ```
 
- ![uni](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/41b00010-4f30-11eb-a16f-5b3e54966275.png)
+ ![uni](https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/41b00010-4f30-11eb-a16f-5b3e54966275.png)

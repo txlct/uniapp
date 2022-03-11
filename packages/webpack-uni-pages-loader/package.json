@@ -1,11 +1,11 @@
 {
   "name": "@dcloudio/webpack-uni-pages-loader",
-  "version": "2.0.0-31420210305001",
+  "version": "2.0.0-31920210709003",
   "description": "uni-app pages.json loader",
   "main": "lib/index.js",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/dcloudio/uni-app.git",
+    "url": "https://github.com/txlct/uniapp.git",
     "directory": "packages/webpack-uni-pages-loader"
   },
   "files": [
@@ -21,7 +21,7 @@
     "strip-json-comments": "^2.0.1"
   },
   "uni-app": {
-    "compilerVersion": "3.1.4"
+    "compilerVersion": "3.1.22"
   },
-  "gitHead": "b366367ac0b63f41ef205dc93eee55d8e9f8f3ed"
+  "gitHead": "2033cd540cff5d8469ff77e87779cd4daa5c9121"
 }

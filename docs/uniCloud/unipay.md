@@ -67,6 +67,17 @@ const unipayIns = unipay.initWeixin({
   key: 'you parterner key',
   pfx: fs.readFileSync('/path/to/your/pfxfile'), // p12文件路径，使用微信退款时需要，需要注意的是阿里云目前不支持以相对路径读取文件，请使用绝对路径的形式
 })
+
+
+// 以证书放在云函数index.js同级的cert目录下为例，index.js内可以按照下面这个写
+const fs  = require('fs');  
+const path = require('path');  
+const unipayIns = unipay.initWeixin({
+  appId: 'your appId',
+  mchId: 'your mchId',
+  key: 'you parterner key',
+  pfx: fs.readFileSync(path.resolve(__dirname, 'cert/xxx.p12'))  
+})
 ```
 
 ### 支付宝支付
@@ -608,6 +619,7 @@ exports.main = async function (event) {
   // 注意如果处理成功需要严格按照下面的格式进行返回，否则厂商会持续通知
   // 微信处理成功之后 
   return {  
+    "mpserverlessComposedResponse": true,
     statusCode: 200,  
     headers: {  
         'content-type': 'text/xml;charset=utf-8'  
@@ -616,6 +628,7 @@ exports.main = async function (event) {
   }
   // 支付宝处理成功后  
   return {  
+    "mpserverlessComposedResponse": true,
     statusCode: 200,
     headers: {  
       'content-type': 'text/plain'  

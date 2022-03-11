@@ -16,7 +16,7 @@
 |scroll-left			|Number		|		|设置横向滚动条位置																				|			|
 |scroll-into-view		|String		|		|值应为某子元素id（id不能以数字开头）。设置哪个方向可滚动，则在哪个方向滚动到该元素				|			|
 |scroll-with-animation	|Boolean	|false	|在设置滚动条位置时使用动画过渡																	|			|
-|enable-back-to-top		|Boolean	|false	|iOS点击顶部状态栏、安卓双击标题栏时，滚动条返回顶部，只支持竖向								|微信小程序	|
+|enable-back-to-top		|Boolean	|false	|iOS点击顶部状态栏、安卓双击标题栏时，滚动条返回顶部，只支持竖向								|app-nvue，微信小程序	|
 |show-scrollbar         |Boolean	|false	|控制是否出现滚动条| App-nvue 2.1.5+ |
 |refresher-enabled		|Boolean	|false	|开启自定义下拉刷新|app-vue 2.5.12+,微信小程序基础库2.10.1+|
 |refresher-threshold	|number		|45		|设置自定义下拉刷新阈值|app-vue 2.5.12+,微信小程序基础库2.10.1+|
@@ -162,7 +162,7 @@ export default {
 </script>
 
 ```
-![uniapp](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-uni-app-doc/99567750-4f2f-11eb-a16f-5b3e54966275.png)
+![uniapp](https://bjetxgzv.cdn.bspapp.com/VKCEYUGU-uni-app-doc/99567750-4f2f-11eb-a16f-5b3e54966275.png)
  
 **Tips**
 

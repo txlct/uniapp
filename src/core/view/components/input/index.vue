@@ -5,7 +5,7 @@
       class="uni-input-wrapper"
     >
       <div
-        v-show="!(composing || valueSync.length || !valid)"
+        v-show="!(composing || valueSync.length || cachedValue === '-')"
         ref="placeholder"
         :style="placeholderStyle"
         :class="placeholderClass"
@@ -23,6 +23,7 @@
         :maxlength="maxlength"
         :step="step"
         :enterkeyhint="confirmType"
+        :pattern="type === 'number' ? '[0-9]*' : null"
         class="uni-input-input"
         autocomplete="off"
         @change.stop
@@ -98,12 +99,8 @@ export default {
   },
   data () {
     return {
-      composing: false,
-      valid: true,
       wrapperHeight: 0,
-      cachedValue: '',
-      // Safari 14 以上修正禁用状态颜色
-      fixColor: String(navigator.vendor).indexOf('Apple') === 0 && CSS.supports('image-orientation:from-image')
+      cachedValue: ''
     }
   },
   computed: {
@@ -177,55 +174,51 @@ export default {
       })
     },
     _onInput ($event, force) {
+      let outOfMaxlength = false
+
       if (this.composing) {
         return
       }
 
-      if (~NUMBER_TYPES.indexOf(this.type)) {
-        // 在输入 - 负号 的情况下，event.target.value没有值，但是会触发校验 false，因此做此处理
-        this.valid = this.$refs.input.validity && this.$refs.input.validity.valid
-        this.cachedValue = this.valueSync
+      if (this.inputType === 'number') {
+        // type="number" 不支持 maxlength 属性，因此需要主动限制长度。
+        const maxlength = parseInt(this.maxlength, 10)
+        if (maxlength > 0 && $event.target.value.length > maxlength) {
+          // 输入前字符长度超出范围，则不触发input，且将值还原
+          // 否则截取一定长度且触发input
+          if (this.cachedValue.length === maxlength) {
+            this.valueSync = this.cachedValue
+            outOfMaxlength = true
+          } else {
+            $event.target.value = $event.target.value.slice(0, maxlength)
+            this.valueSync = $event.target.value
+          }
+        }
 
-        // 处理部分输入法可以输入其它字符的情况
-        // 上一处理导致无法输入 - ，因此去除
-        /* if (this.$refs.input.validity && !this.$refs.input.validity.valid) {
-          $event.target.value = this.cachedValue
-          this.valueSync = $event.target.value
+        // 数字类型输入错误时无法获取具体的值，自定义校验和纠正。
+        this.__clearCachedValue && $event.target.removeEventListener('blur', this.__clearCachedValue)
+        if ($event.target.validity && !$event.target.validity.valid) {
+          if ((!this.cachedValue && $event.data === '-') || (this.cachedValue[0] === '-' && $event.inputType === 'deleteContentBackward')) {
+            this.cachedValue = '-'
+            const clearCachedValue = this.__clearCachedValue = () => {
+              this.cachedValue = ''
+            }
+            $event.target.addEventListener('blur', clearCachedValue)
+            return
+          }
+          this.cachedValue = this.valueSync = $event.target.value = this.cachedValue === '-' ? '' : this.cachedValue
           // 输入非法字符不触发 input 事件
           return
         } else {
           this.cachedValue = this.valueSync
-        } */
-      }
-
-      // type="number" 不支持 maxlength 属性，因此需要主动限制长度。
-      if (this.inputType === 'number') {
-        const maxlength = parseInt(this.maxlength, 10)
-        if (maxlength > 0 && $event.target.value.length > maxlength) {
-          $event.target.value = $event.target.value.slice(0, maxlength)
-          this.valueSync = $event.target.value
-          // 字符长度超出范围不触发 input 事件
-          return
         }
       }
+
+      if (outOfMaxlength) return
+
       this.$triggerInput($event, {
         value: this.valueSync
       }, force)
-    },
-    _onFocus ($event) {
-      this.$trigger('focus', $event, {
-        value: $event.target.value
-      })
-    },
-    _onBlur ($event) {
-      // iOS 输入法 compositionend 事件可能晚于 blur
-      if (this.composing) {
-        this.composing = false
-        this._onInput($event, true)
-      }
-      this.$trigger('blur', $event, {
-        value: $event.target.value
-      })
     },
     _onComposition ($event) {
       if ($event.type === 'compositionstart') {

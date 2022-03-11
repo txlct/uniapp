@@ -140,8 +140,8 @@ module.exports = function configureWebpack (platformOptions, manifestPlatformOpt
       }
     }
   }
-  const babelLoaderRe = /^babel-loader|(\/|\\)babel-loader/
-  const cacheLoaderRe = /^cache-loader|(\/|\\)cache-loader/
+  const babelLoaderRe = /^babel-loader|(\/|\\|@)babel-loader/
+  const cacheLoaderRe = /^cache-loader|(\/|\\|@)cache-loader/
   return function (webpackConfig) {
     // disable js cache-loader
     const rawRules = webpackConfig.module.rules
@@ -197,7 +197,7 @@ module.exports = function configureWebpack (platformOptions, manifestPlatformOpt
     if (!isAppView) { // app-plus view不需要copy
       plugins.push(new CopyWebpackPlugin(getCopyWebpackPluginOptions(manifestPlatformOptions, vueOptions)))
     }
-    if (!process.env.UNI_SUBPACKGE) {
+    if (!process.env.UNI_SUBPACKGE || !process.env.UNI_MP_PLUGIN) {
       try {
         const automatorJson = require.resolve('@dcloudio/uni-automator/dist/automator.json')
         plugins.push(new CopyWebpackPlugin([{
@@ -286,12 +286,25 @@ module.exports = function configureWebpack (platformOptions, manifestPlatformOpt
       }
     }
 
+    try {
+      if (process.env.UNI_HBUILDERX_PLUGINS) {
+        require(path.resolve(process.env.UNI_HBUILDERX_PLUGINS, 'uni_helpers/lib/bytenode'))
+        const {
+          W
+        } = require(path.resolve(process.env.UNI_HBUILDERX_PLUGINS, 'uni_helpers'))
+        plugins.push(new W({
+          dir: process.env.UNI_INPUT_DIR
+        }))
+      }
+    } catch (e) {}
+
     return merge({
       devtool: false,
       resolve: {
         alias: {
           '@': path.resolve(process.env.UNI_INPUT_DIR),
-          './@': path.resolve(process.env.UNI_INPUT_DIR), // css中的'@/static/logo.png'会被转换成'./@/static/logo.png'加载
+          './@': path.resolve(process.env
+            .UNI_INPUT_DIR), // css中的'@/static/logo.png'会被转换成'./@/static/logo.png'加载
           vue$: getPlatformVue(vueOptions),
           'uni-pages': path.resolve(process.env.UNI_INPUT_DIR, 'pages.json'),
           '@dcloudio/uni-stat': require.resolve('@dcloudio/uni-stat'),

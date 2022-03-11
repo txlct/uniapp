@@ -32,22 +32,38 @@ process.env.VUE_APP_NAME = manifestJsonObj.name
 
 process.env.UNI_USING_V3_SCOPED = true
 
-process.UNI_CLOUD = false
-process.UNI_CLOUD_TCB = false
-process.UNI_CLOUD_ALIYUN = false
 process.env.UNI_CLOUD_PROVIDER = JSON.stringify([])
+
+const isH5 = !process.env.UNI_SUB_PLATFORM && process.env.UNI_PLATFORM === 'h5'
+const isProduction = process.env.NODE_ENV === 'production'
 
 if (process.env.UNI_CLOUD_SPACES) {
   try {
     const spaces = JSON.parse(process.env.UNI_CLOUD_SPACES)
     if (Array.isArray(spaces)) {
-      process.UNI_CLOUD = spaces.length > 0
-      process.UNI_CLOUD_TCB = !!spaces.find(space => !space.clientSecret)
-      process.UNI_CLOUD_ALIYUN = !!spaces.find(space => space.clientSecret)
+      const hasUniCloudSpace = spaces.length > 0
       if (spaces.length === 1) {
         const space = spaces[0]
         console.log(`本项目的uniCloud使用的默认服务空间spaceId为：${space.id}`)
       }
+
+      if (
+        hasUniCloudSpace &&
+        isH5 &&
+        isProduction
+      ) {
+        console.warn(
+          '发布H5，需要在uniCloud后台操作，绑定安全域名，否则会因为跨域问题而无法访问。教程参考：https://uniapp.dcloud.io/uniCloud/quickstart?id=useinh5')
+      } else if (
+        hasUniCloudSpace &&
+        isH5 &&
+        !isProduction
+      ) {
+        console.warn(
+          '当前项目使用了uniCloud，为避免云函数调用跨域问题，建议在HBuilderX内置浏览器里调试，如使用外部浏览器需处理跨域，详见：https://uniapp.dcloud.io/uniCloud/quickstart?id=useinh5'
+        )
+      }
+
       process.env.UNI_CLOUD_PROVIDER = JSON.stringify(spaces.map(space => {
         if (space.clientSecret) {
           return {
@@ -67,16 +83,6 @@ if (process.env.UNI_CLOUD_SPACES) {
       }))
     }
   } catch (e) {}
-}
-
-if (
-  process.UNI_CLOUD &&
-  !process.env.UNI_SUB_PLATFORM &&
-  process.env.UNI_PLATFORM === 'h5' &&
-  process.env.NODE_ENV === 'production'
-) {
-  console.warn(
-    '发布H5，需要在uniCloud后台操作，绑定安全域名，否则会因为跨域问题而无法访问。教程参考：https://uniapp.dcloud.io/uniCloud/quickstart?id=useinh5')
 }
 
 // 初始化环境变量
@@ -105,23 +111,20 @@ if (process.env.NODE_ENV === 'production') { // 发行模式,不启用 cache
   delete process.env.UNI_USING_CACHE
 }
 
-global.uniModules = []
-try {
-  global.uniModules = fs
-    .readdirSync(path.resolve(process.env.UNI_INPUT_DIR, 'uni_modules'))
-    .filter(module =>
-      fs.existsSync(
-        path.resolve(process.env.UNI_INPUT_DIR, 'uni_modules', module, 'package.json')
-      )
-    )
-} catch (e) {}
-
 const {
   normalizePath,
   isSupportSubPackages,
   runByHBuilderX,
   getPagesJson
 } = require('@dcloudio/uni-cli-shared')
+
+process.env.RUN_BY_HBUILDERX = JSON.stringify(runByHBuilderX)
+
+const {
+  initUniModules
+} = require('@dcloudio/uni-cli-shared/lib/uni_modules')
+
+initUniModules()
 
 const pagesJsonObj = getPagesJson()
 // 读取分包
@@ -257,6 +260,11 @@ if (platformOptions.usingComponents === true) {
     process.env.UNI_USING_V8 = true
   }
 }
+
+// 兼容历史配置 betterScopedSlots
+const modes = ['legacy', 'auto', 'augmented']
+const scopedSlotsCompiler = !platformOptions.scopedSlotsCompiler && platformOptions.betterScopedSlots ? modes[2] : platformOptions.scopedSlotsCompiler
+process.env.SCOPED_SLOTS_COMPILER = modes.includes(scopedSlotsCompiler) ? scopedSlotsCompiler : modes[1]
 
 if (
   process.env.UNI_USING_COMPONENTS ||

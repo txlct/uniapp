@@ -41,6 +41,7 @@
 * 可以通过用户授权API来判断用户是否给应用授予相册或摄像头的访问权限[https://uniapp.dcloud.io/api/other/authorize](https://uniapp.dcloud.io/api/other/authorize)
 * App下如需进一步压缩视频大小，可以在插件市场搜索[视频压缩](http://ext.dcloud.net.cn/search?q=%E8%A7%86%E9%A2%91%E5%8E%8B%E7%BC%A9)插件
 * 如需上传到cdn，可使用uniCloud.uploadFile API，uniCloud提供了免费cdn给开发者使用，详见[https://uniapp.dcloud.io/uniCloud/storage?id=uploadfile](https://uniapp.dcloud.io/uniCloud/storage?id=uploadfile)
+* 选择视频大多为了上传，uni ui封装了更完善的[uni-file-picker组件](https://ext.dcloud.net.cn/plugin?id=4079)，文件选择、上传到uniCloud的免费存储和cdn中，一站式集成。强烈推荐使用。
 
 **示例**
 
@@ -160,6 +161,7 @@ uni.chooseMedia({
 **Tips**
 
 * 如需上传到cdn，可使用uniCloud.uploadFile API，uniCloud提供了免费cdn给开发者使用，详见[https://uniapp.dcloud.io/uniCloud/storage?id=uploadfile](https://uniapp.dcloud.io/uniCloud/storage?id=uploadfile)
+* 选择文件大多为了上传，uni ui封装了更完善的[uni-file-picker组件](https://ext.dcloud.net.cn/plugin?id=4079)，文件选择、上传到uniCloud的免费存储和cdn中，一站式集成。强烈推荐使用。
 * 经开发者提醒，微信小程序ios真机可以选择的文件个数不能大于9，详见帖子[https://ask.dcloud.net.cn/question/115561](https://ask.dcloud.net.cn/question/115561)
 
 
@@ -239,7 +241,7 @@ export default {
 
 |App|H5|微信小程序|支付宝小程序|百度小程序|字节跳动小程序|QQ小程序|
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-|x|x|2.11.0+|x|x|x|x|
+|3.1.10+|3.1.10+|2.11.0+|x|x|x|x|
 
 **OBJECT 参数说明**
 
@@ -252,16 +254,16 @@ export default {
 
 **success 返回参数说明**
 
-|参数名			|类型		|说明								|
-|:-					|:-			|:-									|
-|orientation|string	|画面方向						|
-|type				|string	|视频格式						|
-|duration		|number	|视频长度						|
-|size				|number	|视频大小，单位 kB	|
-|height			|number	|视频的长，单位 px	|
-|width			|number	|视频的宽，单位 px	|
-|fps				|number	|视频帧率						|
-|bitrate		|number	|视频码率，单位 kbps|
+|参数名			|类型		|说明								|平台差异说明|
+|:-					|:-			|:-									||
+|orientation|string	|画面方向						|微信小程序、App（3.1.14+）|
+|type				|string	|视频格式						|微信小程序、App（3.1.14+）|
+|duration		|number	|视频长度						|微信小程序、App（3.1.10+）、H5|
+|size				|number	|视频大小，单位 kB	|微信小程序、App（3.1.10+）、H5|
+|height			|number	|视频的长，单位 px	|微信小程序、App（3.1.10+）、H5|
+|width			|number	|视频的宽，单位 px	|微信小程序、App（3.1.10+）、H5|
+|fps				|number	|视频帧率						|微信小程序、App（3.1.14+）|
+|bitrate		|number	|视频码率，单位 kbps|微信小程序、App（3.1.14+）|
 
 **res.orientation参数说明**
 
@@ -284,7 +286,7 @@ export default {
 
 |App|H5|微信小程序|支付宝小程序|百度小程序|字节跳动小程序|QQ小程序|
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|
-|x|x|2.11.0+|x|x|x|x|
+|3.1.10+|x|2.11.0+|x|x|x|x|
 
 App端有很多插件支持视频压缩，详见[插件市场](https://ext.dcloud.net.cn/search?q=%E8%A7%86%E9%A2%91%E5%8E%8B%E7%BC%A9)
 

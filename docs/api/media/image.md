@@ -11,9 +11,19 @@ App端如需要更丰富的相机拍照API（如直接调用前置摄像头）�
 |sizeType|Array&lt;String&gt;|否|original 原图，compressed 压缩图，默认二者都有|App、微信小程序、支付宝小程序、百度小程序|
 |extension|Array&lt;String&gt;|否|根据文件拓展名过滤，每一项都不能是空字符串。默认不过滤。|H5(HBuilder X2.9.9+)|
 |sourceType|Array&lt;String&gt;|否|album 从相册选图，camera 使用相机，默认二者都有。如需直接开相机或直接选相册，请只使用一个选项||
+|crop|Object|否|图像裁剪参数，设置后 sizeType 失效|App 3.1.19+|
 |success|Function|是|成功则返回图片的本地文件路径列表 tempFilePaths||
 |fail|Function|否|接口调用失败的回调函数|小程序、App|
 |complete|Function|否|接口调用结束的回调函数（调用成功、失败都会执行）|&nbsp;|
+
+**crop 参数说明**
+
+|参数名|类型|必填|说明|
+|:-|:-|:-|:-|
+|quality|Number|否|取值范围为1-100，数值越小，质量越低（仅对jpg格式有效）。默认值为80。|
+|width|Number|是|裁剪的宽度，单位为px，用于计算裁剪宽高比。|
+|height|Number|是|裁剪的高度，单位为px，用于计算裁剪宽高比。|
+|resize|Boolean|否|是否将width和height作为裁剪保存图片真实的像素值。默认值为true。注：设置为false时在裁剪编辑界面显示图片的像素值，设置为true时不显示|
 
 **Tips**
 
@@ -21,6 +31,7 @@ App端如需要更丰富的相机拍照API（如直接调用前置摄像头）�
 - sourceType 在H5端对应`input`的`capture`属性，设置为`['album']`无效，依然可以使用相机。
 - 可以通过用户授权API来判断用户是否给应用授予相册或摄像头的访问权限[https://uniapp.dcloud.io/api/other/authorize](https://uniapp.dcloud.io/api/other/authorize)
 - App端如需选择非媒体文件，可在插件市场搜索[文件选择](https://ext.dcloud.net.cn/search?q=文件选择)，其中Android端可以使用Native.js，无需原生插件，而iOS端需要原生插件。
+- 选择照片大多为了上传，uni ui封装了更完善的[uni-file-picker组件](https://ext.dcloud.net.cn/plugin?id=4079)，文件选择、上传到uniCloud的免费存储和cdn中，一站式集成。强烈推荐使用。
 
 
 **注：文件的临时路径，在应用本次启动期间可以正常使用，如需持久保存，需在主动调用 [uni.saveFile](api/file/file?id=savefile)，在应用下次启动时才能访问得到。**
