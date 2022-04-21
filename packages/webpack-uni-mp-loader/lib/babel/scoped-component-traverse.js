@@ -72,11 +72,14 @@ function handleComponentsObjectExpression (componentsObjExpr, path, state, prepe
 function handlePlaceholderExpression (objExpr, state) {
   const placeholder = objExpr.properties
     .filter(prop => t.isObjectProperty(prop) && (t.isStringLiteral(prop.value) || t.isIdentifier(prop.value)))
-    .reduce((acc, { key: { name = '', value = '' } = {}, value: { name: valName = '' } = {} }) => {
+    .reduce((acc, {
+      key: { name = '', value = '' } = {},
+      value: { value: valName = '' } = {}
+    }) => {
       const key = name || value
 
       if (key) {
-        acc[key] = valName
+        acc[key] = valName 
       }
 
       return acc
