@@ -37,6 +37,8 @@ const {
   addDynamicImport
 } = require('./babel/util')
 
+const isObject = val => Object.prototype.toString.call(val) === '[object Object]'
+
 module.exports = function (content, map) {
   this.cacheable && this.cacheable()
 
@@ -102,6 +104,10 @@ module.exports = function (content, map) {
 
   const dynamicImports = Object.create(null)
   Promise.all(components.map(component => {
+    if (component?.source?.startsWith('plugin://')) {
+      return Promise.resolve(component)
+    }
+
     return resolve.call(this, component.source).then(resolved => {
       component.name = getComponentName(hyphenate(component.name))
       const source = component.source
@@ -123,7 +129,9 @@ module.exports = function (content, map) {
       name,
       source
     }) => {
-      usingComponents[name] = `/${source}`
+      const prefix = source.startsWith('plugin://') ? '' : '/'
+
+      usingComponents[name] = `${prefix}${source}`
     })
 
     const babelLoader = findBabelLoader(this.loaders)
@@ -134,7 +142,9 @@ module.exports = function (content, map) {
 
       updateUsingComponents(resourcePath, usingComponents, type)
 
-      componentPlaceholder && updateComponentGenerics(resourcePath, componentPlaceholder, 'componentPlaceholder');
+      isObject(componentPlaceholder) &&
+        Object.keys(componentPlaceholder).length &&
+        updateComponentGenerics(resourcePath, componentPlaceholder, 'componentPlaceholder')
 
       callback(null, content, map)
     }
