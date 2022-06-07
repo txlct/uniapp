@@ -32,7 +32,11 @@ function parseComponents (names, bindings, path) {
     name,
     value
   }) => {
-    const importDeclaration = findImportDeclaration(value, bindings)
+    const importDeclaration =
+      typeof value === 'string' && value.startsWith('plugin://')
+        ? { node: { source: { value } }, remove () { } }
+        : findImportDeclaration(value, bindings)
+
     if (!importDeclaration) {
       throw new Error(`组件 ${name} 引用错误,仅支持 import 方式引入组件`)
     }

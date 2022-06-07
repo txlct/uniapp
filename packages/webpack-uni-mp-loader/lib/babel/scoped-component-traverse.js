@@ -59,11 +59,17 @@ function handleObjectExpression (declaration, path, state) {
 
 function handleComponentsObjectExpression (componentsObjExpr, path, state, prepend) {
   const properties = componentsObjExpr.properties
-    .filter(prop => t.isObjectProperty(prop) && t.isIdentifier(prop.value))
+    .filter(prop =>
+      t.isObjectProperty(prop) &&
+      (t.isIdentifier(prop.value) || (t.isStringLiteral(prop.value) && prop?.value?.value?.startsWith('plugin://')))
+    )
   const components = parseComponents(properties.map(prop => {
+    const { value: { value = '' } = {} } = prop || {}
+    const plugin = typeof value === 'string' && value.startsWith('plugin://') ? value : ''
+
     return {
       name: prop.key.name || prop.key.value,
-      value: prop.value.name
+      value: prop.value.name || plugin
     }
   }), path.scope.bindings, path)
   state.components = prepend ? components.concat(state.components) : components

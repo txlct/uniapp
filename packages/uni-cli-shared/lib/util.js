@@ -91,6 +91,10 @@ function hasModule (name) {
 const NODE_MODULES_REGEX = /(\.\.\/)?node_modules/g
 
 function normalizeNodeModules (str) {
+  if (str.startsWith('plugin://')) {
+    return str
+  }
+
   str = normalizePath(str).replace(NODE_MODULES_REGEX, 'node-modules')
   // HBuilderX 内置模块路径转换
   str = str.replace(/.*\/plugins\/uniapp-cli\/node[-_]modules/, 'node-modules')
