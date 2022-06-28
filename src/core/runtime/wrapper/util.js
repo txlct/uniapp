@@ -11,7 +11,7 @@ export const PAGE_EVENT_HOOKS = [
   'onPullDownRefresh',
   'onReachBottom',
   'onAddToFavorites',
-  'onShareTimeline',
+  // 'onShareTimeline',
   'onShareAppMessage',
   'onPageScroll',
   'onResize',
