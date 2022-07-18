@@ -6,7 +6,7 @@ const {
   capitalize
 } = require('./util')
 
-const platformTags = ['map', 'video', 'web-view', 'cover-view', 'cover-image', 'picker']
+const platformTags = ['map', 'video', 'web-view', 'cover-view', 'cover-image', 'picker', 'ad', 'view']
 
 const autoloadTags = {
   // input 在 pageHead 中有使用，resize-sensor 在很多组件中有使用，暂时直接加载
@@ -25,7 +25,7 @@ module.exports = function updateComponents (tags) {
       autoloadTags.other[tagName].forEach(tag => tags.add(tag))
     }
   })
-  tags = [...tags]
+  tags = [...tags].sort() // 固定顺序，避免因顺序的变化导致内容变化，从而生成不同的 hash 文件名
   const importsStr = tags.map(tagName => {
     if (platformTags.indexOf(tagName) !== -1) {
       return `import ${capitalize(camelize(tagName))} from 'uni-platform/view/components/${tagName}'`
