@@ -109,6 +109,7 @@
   </uni-page-head>
 </template>
 <style>
+
   uni-page-head {
     display: block;
     box-sizing: border-box;
@@ -313,39 +314,39 @@
     overflow: visible;
   }
 
-  uni-page-head .uni-page-head-shadow::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 100%;
-    height: 5px;
-    background-size: 100% 100%;
-  }
+    /* uni-page-head .uni-page-head-shadow::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 100%;
+      height: 5px;
+      background-size: 100% 100%;
+    }
 
-  uni-page-head .uni-page-head-shadow-grey::after {
-    background-image: url("https://cdn.dcloud.net.cn/img/shadow-grey.png");
-  }
+    uni-page-head .uni-page-head-shadow-grey::after {
+      background-image: url("https://cdn.dcloud.net.cn/img/shadow-grey.png");
+    }
 
-  uni-page-head .uni-page-head-shadow-blue::after {
-    background-image: url("https://cdn.dcloud.net.cn/img/shadow-blue.png");
-  }
+    uni-page-head .uni-page-head-shadow-blue::after {
+      background-image: url("https://cdn.dcloud.net.cn/img/shadow-blue.png");
+    }
 
-  uni-page-head .uni-page-head-shadow-green::after {
-    background-image: url("https://cdn.dcloud.net.cn/img/shadow-green.png");
-  }
+    uni-page-head .uni-page-head-shadow-green::after {
+      background-image: url("https://cdn.dcloud.net.cn/img/shadow-green.png");
+    }
 
-  uni-page-head .uni-page-head-shadow-orange::after {
-    background-image: url("https://cdn.dcloud.net.cn/img/shadow-orange.png");
-  }
+    uni-page-head .uni-page-head-shadow-orange::after {
+      background-image: url("https://cdn.dcloud.net.cn/img/shadow-orange.png");
+    }
 
-  uni-page-head .uni-page-head-shadow-red::after {
-    background-image: url("https://cdn.dcloud.net.cn/img/shadow-red.png");
-  }
+    uni-page-head .uni-page-head-shadow-red::after {
+      background-image: url("https://cdn.dcloud.net.cn/img/shadow-red.png");
+    }
 
-  uni-page-head .uni-page-head-shadow-yellow::after {
-    background-image: url("https://cdn.dcloud.net.cn/img/shadow-yellow.png");
-  }
+    uni-page-head .uni-page-head-shadow-yellow::after {
+      background-image: url("https://cdn.dcloud.net.cn/img/shadow-yellow.png");
+    } */
 </style>
 <script>
 import appendCss from 'uni-platform/helpers/append-css'
