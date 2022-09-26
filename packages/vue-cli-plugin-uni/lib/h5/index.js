@@ -61,6 +61,17 @@ if (process.env.NODE_ENV !== 'production') {
   ))
 }
 
+const getPlatFormType = () => {
+  const PLATFORM_TYPE = process.env.PLATFORM_TYPE || ''
+  const PREFIX = process.env.PREFIX || ''
+
+  return {
+    name: `${PREFIX}${PLATFORM_TYPE}`,
+    PLATFORM_TYPE,
+    PREFIX
+  }
+}
+
 /**
  * @description 获取页面应用的pages 对象，支持MPA模式的pages对象组装；默认兜底获取单页面应用pages对象
  * 1. 使用 subPackages 里面提供的`root` 作为相关的pages key
@@ -69,24 +80,26 @@ if (process.env.NODE_ENV !== 'production') {
  * @return {*}
  */
 function getPagesConfig () {
+  const { name, PLATFORM_TYPE } = getPlatFormType()
   const pagesConfig = {}
+  const entryName = name || 'index'
 
   const basePagesConfigWithoutEntry = {
     // 模板来源
     template,
     // 在 dist/index.html 的输出
-    filename: 'index.html',
+    filename: `${entryName}.html`,
     // 当使用 title 选项时，
     // template 中的 title 标签需要是 <title><%= htmlWebpackPlugin.options.title %></title>
     title,
     // 在这个页面中包含的块，默认情况下会包含
     // 提取出来的通用 chunk 和 vendor chunk。
-    chunks: ['chunk-vendors', 'chunk-common', 'index'],
+    chunks: ['chunk-vendors', 'chunk-common', entryName],
     baseUrl: publicPath
   }
 
   // 定义默认的单页面应用的pages配置
-  pagesConfig.index = {
+  pagesConfig[entryName] = {
     // page 的入口
     entry: path.resolve(process.env.UNI_INPUT_DIR, getMainEntry()),
     ...basePagesConfigWithoutEntry
@@ -94,20 +107,33 @@ function getPagesConfig () {
 
   // 返回 subPackages 的页面config
   const subPagesEntryConfig = getSubPagesWithEntry()
+  let subConfigs = {}
 
   // 填充pages 的base config
   if (subPagesEntryConfig && Object.keys(subPagesEntryConfig).length) {
-    Object.keys(subPagesEntryConfig).forEach(pageItem => {
-      pageItem = {
+    subConfigs = Object.keys(subPagesEntryConfig).map(pageItem => {
+      return {
         ...pageItem,
         ...basePagesConfigWithoutEntry
       }
     })
   }
 
+  // 若有平台标记，则独立编译平台场景
+  if (PLATFORM_TYPE) {
+    const match = subConfigs && Object.keys(subConfigs).find(({ root }) => root === PLATFORM_TYPE)
+
+    if (match) {
+      return {
+        ...match,
+        ...(match?.root && { filename: match.root + '.html' })
+      }
+    }
+  }
+
   return {
     ...pagesConfig,
-    ...subPagesEntryConfig
+    ...subConfigs
   }
 }
 
