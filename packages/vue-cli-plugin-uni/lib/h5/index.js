@@ -5,6 +5,7 @@ const webpack = require('webpack')
 const {
   getMainEntry,
   getH5Options,
+  getResolveEntry,
   getSubPagesWithEntry
 } = require('@dcloudio/uni-cli-shared')
 
@@ -103,7 +104,7 @@ function getPagesConfig () {
   // 定义默认的单页面应用的pages配置
   pagesConfig[entryName] = {
     // page 的入口
-    entry: path.resolve(process.env.UNI_INPUT_DIR, getMainEntry()),
+    entry: getResolveEntry(entryName),
     ...getBaseConfig(entryName)
   }
 

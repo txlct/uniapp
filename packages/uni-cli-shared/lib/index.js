@@ -17,6 +17,7 @@ const {
   getNVueMainEntry,
   parseEntry,
   parsePages,
+  getResolveEntry,
   getSubPagesWithEntry,
   getPagesJson,
   parsePagesJson
@@ -78,6 +79,7 @@ module.exports = {
   getH5Options,
   getMainEntry,
   getNVueMainEntry,
+  getResolveEntry,
   getSubPagesWithEntry,
   getPagesJson,
   getManifestJson,
