@@ -204,6 +204,20 @@ function parsePages (pagesJson, pageCallback, subPageCallback) {
 }
 
 /**
+ *
+ * @param {string} name
+ * @returns
+ */
+function getResolveEntry (name = '') {
+  // Add fallback entry support
+  const fallbackEntry = path.resolve(process.env.UNI_INPUT_DIR, getMainEntry())
+  const pagesEntry = path.resolve(process.env.UNI_INPUT_DIR, name, getMainEntry())
+  const entry = fs.existsSync(pagesEntry) ? pagesEntry : fallbackEntry
+
+  return entry
+}
+
+/**
  * @description Get subPackage for mpa usage by finleyliang
  * 获取并返回 pages 对象，目前包装 entry 作为对象的key，其他所需的key 在外层进行包装
  *
@@ -226,13 +240,8 @@ function getSubPagesWithEntry (pagesJson) {
 
       // Concat main.ts/main.js with pages root definition
       if (root) {
-        // Add fallback entry support
-        const fallbackEntry = path.resolve(process.env.UNI_INPUT_DIR, getMainEntry())
-        const pagesEntry = path.resolve(process.env.UNI_INPUT_DIR, root, getMainEntry())
-        const entry = fs.existsSync(pagesEntry) ? pagesEntry : fallbackEntry
-
         pages[root] = {
-          entry
+          entry: getResolveEntry(root)
         }
       }
     })
@@ -565,6 +574,7 @@ module.exports = {
   getNVueMainEntry,
   parsePages,
   parseEntry,
+  getResolveEntry,
   getSubPagesWithEntry,
   getPagesJson,
   parsePagesJson,
