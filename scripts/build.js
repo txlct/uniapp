@@ -120,15 +120,19 @@ async function build(target) {
   // }
 
   const env = devOnly ? 'development' : 'production'
+  const isDev = !!devOnly;
 
   if (hasViteBundler) {
     const env = {}
+    const viteArgs = [isDev ? '' : 'build', '--config', path.resolve(pkgDir, 'vite.config.ts')]
+      .filter(item => item);
+
     if (target === 'size-check') {
       env.UNI_PLATFORM = 'h5'
     }
     await execa(
       'vite',
-      ['build', '--config', path.resolve(pkgDir, 'vite.config.ts')],
+      viteArgs,
       {
         stdio: 'inherit',
         env: Object.assign({ FORMAT: 'es' }, process.env, env),
@@ -138,7 +142,7 @@ async function build(target) {
     if (target === 'uni-h5') {
       await execa(
         'vite',
-        ['build', '--config', path.resolve(pkgDir, 'vite.config.ts')],
+        viteArgs,
         {
           stdio: 'inherit',
           env: Object.assign({ FORMAT: 'cjs' }, process.env),
@@ -152,6 +156,11 @@ async function build(target) {
       '-p',
       path.resolve(pkgDir, 'tsconfig.json'),
     ]
+
+    if (isDev) {
+      args.push('-w');
+    }
+
     if (types) {
       args.push('--declaration')
     }
@@ -176,3 +185,4 @@ async function build(target) {
     }
   }
 }
+

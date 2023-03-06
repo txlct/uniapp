@@ -1,5 +1,5 @@
 import path from 'path'
-import { extend } from '@vue/shared'
+import { extend } from '@vue/shared';
 import { ComponentJson, PageWindowOptions, UsingComponents } from './types'
 import {
   removeExt,
@@ -15,6 +15,7 @@ const jsonFilesCache = new Map<string, string>()
 const jsonPagesCache = new Map<string, PageWindowOptions>()
 const jsonComponentsCache = new Map<string, ComponentJson>()
 const jsonUsingComponentsCache = new Map<string, UsingComponents>()
+const jsonComponentPlaceholderCache = new Map<string, UsingComponents>()
 
 export function isMiniProgramPageFile(file: string, inputDir?: string) {
   if (inputDir && path.isAbsolute(file)) {
@@ -91,6 +92,21 @@ export function findChangedJsonFiles(
       newJson.usingComponents = usingComponents
     }
 
+    // 扩展组件配置及页面中的componentPlaceholder
+    const componentPlaceholder = extend({}, newJson.componentPlaceholder, jsonComponentPlaceholderCache.get(filename));
+
+    // 增加componentPlaceholder占位符
+    newJson.componentPlaceholder = Object.keys(newJson.usingComponents)
+      .reduce((acc, key) => {
+        if (!acc[key]) {
+          // 使用空白占位符
+          acc[key] = '';
+        };
+
+        // 使用配置项组件名
+        return acc;
+      }, componentPlaceholder);
+
     const jsonStr = JSON.stringify(newJson, null, 2)
     if (jsonFilesCache.get(filename) !== jsonStr) {
       changedJsonFiles.set(filename, jsonStr)
@@ -117,6 +133,7 @@ export function addMiniProgramPageJson(
   json: PageWindowOptions
 ) {
   jsonPagesCache.set(filename, json)
+  console.log('--------- jsonPagesCache', jsonPagesCache);
 }
 
 export function addMiniProgramComponentJson(
@@ -131,6 +148,10 @@ export function addMiniProgramUsingComponents(
   json: UsingComponents
 ) {
   jsonUsingComponentsCache.set(filename, json)
+}
+
+export function addMiniProgramComponentPlaceholder(filename: string, json: UsingComponents) {
+  jsonComponentPlaceholderCache.set(filename, json);
 }
 
 export function isMiniProgramUsingComponent(

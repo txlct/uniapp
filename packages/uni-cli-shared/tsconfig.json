@@ -5,7 +5,9 @@
     "outDir": "dist",
     "paths": {
       "types/alias": ["types/alias.d.ts"]
-    }
+    },
+    "sourceMap": true,
+    "declaration": true
   },
   "include": [
     "src",

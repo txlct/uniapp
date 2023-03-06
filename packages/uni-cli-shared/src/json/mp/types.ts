@@ -24,6 +24,8 @@ export interface PageWindowOptions extends ShareWindowOptions {
   component?: true // 百度小程序页面必须配置component: true
   disableScroll?: boolean // false
   usingComponents?: UsingComponents
+  // 小程序分包异步化占位符
+  componentPlaceholder?: Record<string, string>;
   usingSwanComponents?: UsingComponents // 百度小程序特有
   initialRenderingCache?: 'static' | string
   style?: Style

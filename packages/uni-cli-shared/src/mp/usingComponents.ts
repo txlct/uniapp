@@ -26,11 +26,11 @@ import { M } from '../messages'
 import { BINDING_COMPONENTS, EXTNAME_VUE_RE } from '../constants'
 import { normalizeMiniProgramFilename, removeExt } from '../utils'
 import { cleanUrl, parseVueRequest } from '../vite/utils'
-import { addMiniProgramUsingComponents } from '../json/mp/jsonFile'
+import { addMiniProgramUsingComponents, addMiniProgramComponentPlaceholder } from '../json/mp/jsonFile'
 
 type BindingComponents = Record<
   string,
-  { tag: string; type: 'unknown' | 'setup' | 'self' }
+  { tag: string; type: 'unknown' | 'setup' | 'self', value?: string; }
 >
 
 const mainDescriptors = new Map<string, MainDescriptor>()
@@ -193,16 +193,27 @@ function createUsingComponents(
   bindingComponents: BindingComponents,
   imports: ImportDeclaration[],
   inputDir: string,
-  normalizeComponentName: (name: string) => string
+  normalizeComponentName: (name: string) => string,
+  isComponentPlaceholder: boolean = false,
 ) {
   const usingComponents: Record<string, string> = {}
+
+  if (isComponentPlaceholder && Object.keys(bindingComponents)?.length) {
+    return Object.values(bindingComponents).reduce((acc, { tag = '', value = '' }) => ({
+      ...acc,
+      [normalizeComponentName(hyphenate(tag))]: value
+    }), {});
+  }
+
   imports.forEach(({ source: { value }, specifiers: [specifier] }) => {
     const { name } = specifier.local
-    if (!bindingComponents[name]) {
+    const component = bindingComponents[name];
+
+    if (!component) {
       return
     }
     const componentName = normalizeComponentName(
-      hyphenate(bindingComponents[name].tag)
+      hyphenate(component.tag)
     )
     if (!usingComponents[componentName]) {
       usingComponents[componentName] = addLeadingSlash(
@@ -237,14 +248,17 @@ export function updateMiniProgramComponentsByMainFilename(
     },
     scriptDescriptor.bindingComponents
   )
+  const bindingComponentPlaceholder = scriptDescriptor.bindingComponentPlaceholder;
   const imports = parseImports(
     mainDescriptor.imports,
     scriptDescriptor.imports,
     templateDescriptor.imports
   )
 
+  const filename = removeExt(normalizeMiniProgramFilename(mainFilename, inputDir));
+
   addMiniProgramUsingComponents(
-    removeExt(normalizeMiniProgramFilename(mainFilename, inputDir)),
+    filename,
     createUsingComponents(
       bindingComponents,
       imports,
@@ -252,6 +266,17 @@ export function updateMiniProgramComponentsByMainFilename(
       normalizeComponentName
     )
   )
+
+  bindingComponentPlaceholder && addMiniProgramComponentPlaceholder(
+    filename,
+    createUsingComponents(
+      bindingComponentPlaceholder,
+      imports,
+      inputDir,
+      normalizeComponentName,
+      true
+    )
+  );
 }
 
 function findBindingComponent(
@@ -306,7 +331,7 @@ function parseImports(
 }
 
 export interface TemplateDescriptor {
-  bindingComponents: BindingComponents
+  bindingComponents: BindingComponents;
   imports: ImportDeclaration[]
 }
 /**
@@ -345,6 +370,7 @@ interface ParseDescriptor {
   isExternal: boolean
 }
 export interface ScriptDescriptor extends TemplateDescriptor {
+  bindingComponentPlaceholder: BindingComponents;
   setupBindingComponents: BindingComponents
 }
 
@@ -393,6 +419,7 @@ export async function parseScriptDescriptor(
     : []
   const descriptor: ScriptDescriptor = {
     bindingComponents: parseComponents(ast),
+    bindingComponentPlaceholder: parseComponents(ast, 'componentPlaceholder'),
     setupBindingComponents: findBindingComponents(ast.body),
     imports,
   }
@@ -520,8 +547,10 @@ function parseGlobalComponents(ast: Program) {
  * @param ast
  * @param bindingComponents
  */
-function parseComponents(ast: Program) {
+function parseComponents(ast: Program, propKeyName: 'components' | 'componentPlaceholder' = 'components') {
   const bindingComponents: BindingComponents = {}
+  const isComponentPlaceholder = propKeyName === 'componentPlaceholder';
+
   ;(walk as any)(ast, {
     enter(child: Node) {
       if (!isObjectExpression(child)) {
@@ -531,7 +560,7 @@ function parseComponents(ast: Program) {
         (prop) =>
           isObjectProperty(prop) &&
           isIdentifier(prop.key) &&
-          prop.key.name === 'components'
+          prop.key.name === propKeyName
       ) as ObjectProperty
       if (!componentsProp) {
         return
@@ -540,6 +569,11 @@ function parseComponents(ast: Program) {
       if (!isObjectExpression(componentsExpr)) {
         return
       }
+
+      const valueTypeCheckFn = isComponentPlaceholder
+        ? isStringLiteral
+        : isIdentifier;
+
       componentsExpr.properties.forEach((prop) => {
         if (!isObjectProperty(prop)) {
           return
@@ -547,12 +581,20 @@ function parseComponents(ast: Program) {
         if (!isIdentifier(prop.key) && !isStringLiteral(prop.key)) {
           return
         }
-        if (!isIdentifier(prop.value)) {
+        if (!valueTypeCheckFn(prop.value)) {
           return
         }
-        bindingComponents[prop.value.name] = {
-          tag: isIdentifier(prop.key) ? prop.key.name : prop.key.value,
+
+        const tag = isIdentifier(prop.key) ? prop.key.name : prop.key.value;
+        const name = isStringLiteral(prop.value)
+          ? tag || ''
+          : prop.value.name;
+
+        bindingComponents[name] = {
+          tag,
           type: 'unknown',
+          // 仅在组件定义有componentPlaceholder时增加value占位符返回
+          ...(isComponentPlaceholder && isStringLiteral(prop.value) && { value: prop.value?.value || '' }),
         }
       })
     },

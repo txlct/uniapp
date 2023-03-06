@@ -1,0 +1,3 @@
+<template>
+  inner component;
+</template>

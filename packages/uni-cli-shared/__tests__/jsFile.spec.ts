@@ -12,12 +12,20 @@ describe('miniProgram:jsonFile', () => {
     }
     addMiniProgramPageJson(filename, {
       usingComponents,
+      componentPlaceholder: Object.keys(usingComponents).reduce((acc, key) => ({
+        ...acc,
+        [key]: ''
+      }), {})
     })
     expect(JSON.parse(findChangedJsonFiles().get(filename)!)).toEqual({
       usingComponents: {
         subscribe: 'plugin://subscribeMsg/subscribe',
         demo: '../../components/demo/demo',
       },
+      componentPlaceholder: {
+        subscribe: '',
+        demo: '',
+      }
     })
   })
 })

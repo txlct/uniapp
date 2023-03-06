@@ -1,0 +1,39 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "debug vue3 playground",
+      "request": "launch",
+      "runtimeArgs": [
+        "build:mp",
+        "devOnly",
+        "debug"
+      ],
+      "runtimeExecutable": "pnpm",
+      "runtimeVersion": "16.19.0",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "cwd": "${workspaceFolder}/packages/playground/vue3",
+      "type": "node"
+    },
+    {
+      "name": "debug uniapp mp-weixin",
+      "request": "launch",
+      "runtimeArgs": [
+        "dev:mp",
+        "devOnly",
+      ],
+      "runtimeExecutable": "pnpm",
+      "runtimeVersion": "16.19.0",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "cwd": "${workspaceFolder}",
+      "type": "node"
+    }
+  ]
+}
