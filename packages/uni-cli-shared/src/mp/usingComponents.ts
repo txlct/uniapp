@@ -189,21 +189,23 @@ export async function updateMiniProgramGlobalComponents(
   }
 }
 
+function getComponentPlaceholder(
+  bindingComponents: BindingComponents,
+  normalizeComponentName: (name: string) => string,
+) {
+  return Object.values(bindingComponents).reduce((acc, { tag = '', value = '' }) => ({
+    ...acc,
+    [normalizeComponentName(hyphenate(tag))]: value
+  }), {});
+}
+
 function createUsingComponents(
   bindingComponents: BindingComponents,
   imports: ImportDeclaration[],
   inputDir: string,
   normalizeComponentName: (name: string) => string,
-  isComponentPlaceholder: boolean = false,
 ) {
   const usingComponents: Record<string, string> = {}
-
-  if (isComponentPlaceholder && Object.keys(bindingComponents)?.length) {
-    return Object.values(bindingComponents).reduce((acc, { tag = '', value = '' }) => ({
-      ...acc,
-      [normalizeComponentName(hyphenate(tag))]: value
-    }), {});
-  }
 
   imports.forEach(({ source: { value }, specifiers: [specifier] }) => {
     const { name } = specifier.local
@@ -269,12 +271,9 @@ export function updateMiniProgramComponentsByMainFilename(
 
   bindingComponentPlaceholder && addMiniProgramComponentPlaceholder(
     filename,
-    createUsingComponents(
+    getComponentPlaceholder(
       bindingComponentPlaceholder,
-      imports,
-      inputDir,
       normalizeComponentName,
-      true
     )
   );
 }
