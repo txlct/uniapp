@@ -132,8 +132,7 @@ export function addMiniProgramPageJson(
   filename: string,
   json: PageWindowOptions
 ) {
-  jsonPagesCache.set(filename, json)
-  console.log('--------- jsonPagesCache', jsonPagesCache);
+  jsonPagesCache.set(filename, json);
 }
 
 export function addMiniProgramComponentJson(

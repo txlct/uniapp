@@ -29,10 +29,10 @@
     "@vue/compiler-core": "3.2.47"
   },
   "dependencies": {
-    "@dcloudio/uni-cli-shared": "3.0.0-3070320230222002",
-    "@dcloudio/uni-mp-vite": "3.0.0-3070320230222002",
-    "@dcloudio/uni-mp-vue": "3.0.0-3070320230222002",
-    "@dcloudio/uni-shared": "3.0.0-3070320230222002",
+    "@dcloudio/uni-cli-shared": "workspace:*",
+    "@dcloudio/uni-mp-vite": "workspace:3.0.0-3070320230222002",
+    "@dcloudio/uni-mp-vue": "workspace:3.0.0-3070320230222002",
+    "@dcloudio/uni-shared": "workspace:3.0.0-3070320230222002",
     "@vue/shared": "3.2.47"
   }
 }

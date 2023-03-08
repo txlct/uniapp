@@ -20,6 +20,7 @@ import { VForOptions } from './transforms/vFor'
 export interface CodegenRootNode extends RootNode {
   renderData: ObjectExpression | CallExpression
   bindingComponents: TransformContext['bindingComponents']
+  bindingComponentPlaceholder: TransformContext['bindingComponentPlaceholder'];
 }
 
 export interface ErrorHandlingOptions {

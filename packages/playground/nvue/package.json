@@ -10,15 +10,15 @@
     "build:app": "uni build -p app"
   },
   "dependencies": {
-    "@dcloudio/uni-app": "../../uni-app",
-    "@dcloudio/uni-app-plus": "../../uni-app-plus",
-    "@dcloudio/uni-components": "../../uni-components",
+    "@dcloudio/uni-app": "link:../../uni-app",
+    "@dcloudio/uni-app-plus": "link:../../uni-app-plus",
+    "@dcloudio/uni-components": "link:../../uni-components",
     "vue": "3.2.47",
     "vue-router": "^4.1.6",
     "vuex": "^4.1.0"
   },
   "devDependencies": {
-    "@dcloudio/vite-plugin-uni": "../../vite-plugin-uni",
+    "@dcloudio/vite-plugin-uni": "link:../../vite-plugin-uni",
     "vite": "^4.1.0"
   },
   "resolutions": {

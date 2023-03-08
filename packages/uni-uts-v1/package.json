@@ -17,10 +17,10 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@dcloudio/uts": "3.0.0-3070320230222002",
+    "@dcloudio/uts": "workspace:3.0.0-3070320230222002",
     "@vue/shared": "3.2.47",
-    "android-versions": "^1.8.1",
     "adm-zip": "^0.5.9",
+    "android-versions": "^1.8.1",
     "fast-glob": "^3.2.11",
     "fs-extra": "^10.0.0",
     "jsonc-parser": "^3.0.0",

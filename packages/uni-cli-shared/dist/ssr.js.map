@@ -1,0 +1,1 @@
+{"version":3,"file":"ssr.js","sourceRoot":"","sources":["../src/ssr.ts"],"names":[],"mappings":";;;AAAa,QAAA,YAAY,GAAG;IAC1B,OAAO,EAAE,CAAC,SAAS,EAAE,SAAS,EAAE,UAAU,EAAE,UAAU,CAAC;IACvD,SAAS,EAAE;QACT,eAAe;QACf,WAAW;QACX,gBAAgB;QAChB,WAAW;QACX,aAAa;QACb,eAAe;QACf,kBAAkB;QAClB,oBAAoB;QACpB,iBAAiB;QACjB,aAAa;QACb,iBAAiB;QACjB,mBAAmB;KACpB;CACF,CAAA"}

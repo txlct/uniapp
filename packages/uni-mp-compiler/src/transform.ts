@@ -98,6 +98,10 @@ export interface TransformContext
     string,
     { type: BindingComponentTypes; name: string }
   >
+  bindingComponentPlaceholder: Record<
+    string,
+    { type: BindingComponentTypes; name: string; }
+  >
   identifiers: { [name: string]: number | undefined }
   cached: number
   scopes: {
@@ -366,6 +370,7 @@ export function createTransformContext(
     components: new Set(),
     imports: [],
     bindingComponents: Object.create(null),
+    bindingComponentPlaceholder: Object.create(null),
     cached: 0,
     identifiers,
     scope: rootScope,

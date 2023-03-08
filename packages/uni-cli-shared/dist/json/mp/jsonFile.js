@@ -118,7 +118,6 @@ function addMiniProgramAppJson(appJson) {
 exports.addMiniProgramAppJson = addMiniProgramAppJson;
 function addMiniProgramPageJson(filename, json) {
     jsonPagesCache.set(filename, json);
-    console.log('--------- jsonPagesCache', jsonPagesCache);
 }
 exports.addMiniProgramPageJson = addMiniProgramPageJson;
 function addMiniProgramComponentJson(filename, json) {

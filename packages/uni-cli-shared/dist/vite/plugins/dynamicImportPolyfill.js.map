@@ -1,0 +1,1 @@
+{"version":3,"file":"dynamicImportPolyfill.js","sourceRoot":"","sources":["../../../src/vite/plugins/dynamicImportPolyfill.ts"],"names":[],"mappings":";;;AACA,SAAgB,qBAAqB,CAAC,UAAmB,KAAK;IAC5D,OAAO;QACL,IAAI,EAAE,yBAAyB;QAC/B,mBAAmB;YACjB,OAAO;gBACL,IAAI,EAAE,OAAO,CAAC,CAAC,CAAC,kBAAkB,CAAC,CAAC,CAAC,GAAG;gBACxC,KAAK,EAAE,GAAG;aACX,CAAA;QACH,CAAC;KACF,CAAA;AACH,CAAC;AAVD,sDAUC"}

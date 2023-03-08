@@ -9,15 +9,15 @@
     "build:ssr": "uni build --ssr"
   },
   "dependencies": {
-    "@dcloudio/uni-app": "../../uni-app",
-    "@dcloudio/uni-components": "../../uni-components",
-    "@dcloudio/uni-h5": "../../uni-h5",
+    "@dcloudio/uni-app": "link:../../uni-app",
+    "@dcloudio/uni-components": "link:../../uni-components",
+    "@dcloudio/uni-h5": "link:../../uni-h5",
     "vue": "3.2.47",
     "vue-router": "^4.1.6",
     "vuex": "^4.1.0"
   },
   "devDependencies": {
-    "@dcloudio/vite-plugin-uni": "../../vite-plugin-uni",
+    "@dcloudio/vite-plugin-uni": "link:../../vite-plugin-uni",
     "compression": "^1.7.4",
     "cypress": "^10.7.0",
     "serve-static": "^1.15.0",
