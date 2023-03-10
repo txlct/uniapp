@@ -22,7 +22,7 @@
     "main": "dist/uni.compiler.js"
   },
   "dependencies": {
-    "@dcloudio/uni-cli-shared": "workspace:*",
+    "@dcloudio/uni-cli-shared": "3.0.0-3070320230222002",
     "detect-port": "^1.5.1",
     "express": "^4.17.1",
     "open": "^8.4.0",

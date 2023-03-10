@@ -21,7 +21,9 @@
     "postinstall": "simple-git-hooks",
     "e2e:ssr:dev": "cd packages/playground/ssr && npm run dev:ssr",
     "e2e:ssr:open": "cd packages/playground/ssr && npx cypress open",
-    "release": "node scripts/release.js"
+    "release": "node scripts/release.js",
+    "release:mp": "node scripts/release.js --skipTests uni-cli-shared vite-plugin-uni uni-mp-vue uni-mp-vite uni-mp-compiler uni-mp-weixin",
+    "release:version": "pnpm release --skipTests --dry"
   },
   "types": "test-dts/index.d.ts",
   "tsd": {
@@ -44,8 +46,8 @@
     "@babel/core": "^7.17.10",
     "@babel/preset-env": "^7.16.11",
     "@dcloudio/types": "3.2.11",
-    "@dcloudio/uni-api": "workspace:3.0.0-3070320230222002",
-    "@dcloudio/uni-app": "workspace:3.0.0-3070320230222002",
+    "@dcloudio/uni-api": "3.0.0-3070320230222002",
+    "@dcloudio/uni-app": "3.0.0-3070320230222002",
     "@jest/types": "^29.0.3",
     "@microsoft/api-extractor": "^7.33.6",
     "@rollup/plugin-alias": "^4.0.2",

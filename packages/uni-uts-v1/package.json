@@ -17,7 +17,7 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@dcloudio/uts": "workspace:3.0.0-3070320230222002",
+    "@dcloudio/uts": "3.0.0-3070320230222002",
     "@vue/shared": "3.2.47",
     "adm-zip": "^0.5.9",
     "android-versions": "^1.8.1",

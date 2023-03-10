@@ -18,6 +18,6 @@
     "@vue/shared": "3.2.47"
   },
   "devDependencies": {
-    "@dcloudio/uni-shared": "workspace:3.0.0-3070320230222002"
+    "@dcloudio/uni-shared": "3.0.0-3070320230222002"
   }
 }

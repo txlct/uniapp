@@ -95,11 +95,6 @@ async function main() {
     console.log('No changes to commit.')
   }
 
-  // publish packages
-  // step('\nPublishing packages...')
-  // for (const pkg of packages) {
-    // await publishPackage(pkg, targetVersion, runIfNotDry)
-  // }
 
   // push to GitHub
   // step('\nPushing to GitHub...')
@@ -155,48 +150,6 @@ function updateDeps(pkg, depType, version) {
       deps[dep] = version
     }
   })
-}
-
-async function publishPackage(pkgName, version, runIfNotDry) {
-  if (skippedPackages.includes(pkgName)) {
-    return
-  }
-  const pkgRoot = getPkgRoot(pkgName)
-  const pkgPath = path.resolve(pkgRoot, 'package.json')
-  const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
-  if (pkg.private) {
-    return
-  }
-
-  const releaseTag = 'vue3'
-
-  step(`Publishing ${pkgName}...`)
-  try {
-    await runIfNotDry(
-      // note: use of yarn is intentional here as we rely on its publishing
-      // behavior.
-      'yarn',
-      [
-        'publish',
-        '--new-version',
-        version,
-        ...(releaseTag ? ['--tag', releaseTag] : []),
-        '--access',
-        'public',
-      ],
-      {
-        cwd: pkgRoot,
-        stdio: 'pipe',
-      }
-    )
-    console.log(colors.green(`Successfully published ${pkgName}@${version}`))
-  } catch (e) {
-    if (e.stderr.match(/previously published/)) {
-      console.log(colors.red(`Skipping already published: ${pkgName}`))
-    } else {
-      throw e
-    }
-  }
 }
 
 main().catch((err) => {
