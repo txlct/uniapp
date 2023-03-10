@@ -46,8 +46,6 @@ const setTargetMap = ({ tag, repo }) => {
 
     targetMap.set(target, `${repo}${slash}${name}?${tag}`)
   });
-
-  console.log('--------- targetMap:>>>', targetMap);
 };  
 
 async function main() {
