@@ -6,8 +6,12 @@ const semver = require('semver')
 const currentVersion = require('../package.json').version
 const { prompt } = require('enquirer')
 const execa = require('execa')
-const { targets } = require('./utils')
+const { targets: packageTargets } = require('./utils')
 
+const remoteRepoUrlPrefix = 'https://gitpkg.now.sh/txlct/uniapp/packages/'
+// 参数
+const targetsArgs = args._ || [];
+const targets = targetsArgs.length ? targetsArgs : packageTargets;
 const isDryRun = args.dry
 const skipTests = args.skipTests
 const skipBuild = args.skipBuild
@@ -29,6 +33,23 @@ const runIfNotDry = isDryRun ? dryRun : run
 const getPkgRoot = (pkg) => path.resolve(__dirname, '../packages/' + pkg)
 const step = (msg) => console.log(colors.cyan(msg))
 
+const targetMap = new Map();
+
+const getPackageName = (name) => name.replace(/@dcloudio\//, '');
+
+const setTargetMap = ({ tag, repo }) => {
+  if (!tag || !repo) return;
+
+  targets.forEach(target => {
+    const name = getPackageName(target);
+    const slash = repo.endsWith('/') ? '' : '/';
+
+    targetMap.set(target, `${repo}${slash}${name}?${tag}`)
+  });
+
+  console.log('--------- targetMap:>>>', targetMap);
+};  
+
 async function main() {
   const targetVersion = (
     await prompt({
@@ -41,6 +62,36 @@ async function main() {
 
   if (!semver.valid(targetVersion)) {
     throw new Error(`invalid target version: ${targetVersion}`)
+  }
+
+  const { yes: isRemoteRepo } = (
+    await prompt({
+      type: 'confirm',
+      name: 'yes',
+      message: `是否远端分支?`
+    })
+  )
+
+  const { repo } = (
+    await prompt({
+      type: 'input',
+      name: 'repo',
+      message: 'Input target repository',
+      initial: isRemoteRepo ? remoteRepoUrlPrefix : '',
+    })
+  );
+
+  const { tag } = (
+    await prompt({
+      type: 'input',
+      name: 'tag',
+      message: 'input target tag',
+      initial: ''
+    })
+  );
+
+  if (repo && tag) {
+    setTargetMap({ tag, repo });
   }
 
   const { yes } = await prompt({
@@ -70,10 +121,21 @@ async function main() {
   step('\nBuilding all packages...')
   if (!skipBuild && !isDryRun) {
     let args = ['run', 'build']
+
+    // 仅打包部分代码
+    if (targets.length) {
+      args = [
+        ...args,
+        '--',
+        ...targets,
+      ];
+    }
+
     if (onlyDist) {
       const gitignore = fs.readFileSync(path.join(__dirname, '../.gitignore'), 'utf-8')
       args = args.concat(targets.filter(target => gitignore.includes(`packages/${target}/dist`)))
     }
+
     await run('pnpm', args)
     // test generated dts files
     step('\nVerifying type declarations...')
@@ -88,9 +150,9 @@ async function main() {
 
   const { stdout } = await run('git', ['diff'], { stdio: 'pipe' })
   if (stdout) {
-    step('\nCommitting changes...')
-    await runIfNotDry('git', ['add', '-A'])
-    await runIfNotDry('git', ['commit', '-m', `release: v${targetVersion}`])
+    // step('\nCommitting changes...')
+    // await runIfNotDry('git', ['add', '-A'])
+    // await runIfNotDry('git', ['commit', '-m', `release: v${targetVersion}`])
   } else {
     console.log('No changes to commit.')
   }
@@ -128,6 +190,10 @@ function updateVersions(version) {
 function updatePackage(pkgRoot, version) {
   const pkgPath = path.resolve(pkgRoot, 'package.json')
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
+  const name = getPackageName(pkg.name);
+
+  if (!targets.includes(name)) return;
+
   pkg.version = version
   updateDeps(pkg, 'dependencies', version)
   updateDeps(pkg, 'devDependencies', version)
@@ -140,14 +206,17 @@ function updateDeps(pkg, depType, version) {
   const deps = pkg[depType]
   if (!deps) return
   Object.keys(deps).forEach((dep) => {
+    const name = getPackageName(dep);
+
     if (
-      dep.startsWith('@dcloudio') &&
-      packages.includes(dep.replace(/^@dcloudio\//, ''))
+      dep.startsWith('@dcloudio')
+      && packages.includes(name)
+      && targets.includes(name)
     ) {
       console.log(
         colors.yellow(`${pkg.name} -> ${depType} -> ${dep}@${version}`)
       )
-      deps[dep] = version
+      deps[dep] = targetMap.get(name) || version
     }
   })
 }

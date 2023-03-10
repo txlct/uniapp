@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "3.0.0-3070320230222002",
+  "version": "3.0.0-3070320230222002-a",
   "workspaces": [
     "packages/*"
   ],
@@ -10,8 +10,8 @@
     "build": "node scripts/build.js",
     "build:h5": "node scripts/build.js uni-app uts uni-uts-v1 uni-cli-shared uni-h5 uni-i18n uni-stat uni-shared uni-h5-vite vite-plugin-uni",
     "build:app": "node scripts/build.js uni-app-plus uni-app-vite uni-app-vue",
-    "build:mp": "node scripts/build.js  uni-cli-shared vite-plugin-uni uni-mp-vue uni-mp-vite uni-mp-compiler uni-mp-weixin",
-    "dev:mp": "node scripts/build.js -d uni-cli-shared vite-plugin-uni uni-mp-vue uni-mp-vite uni-mp-compiler uni-mp-weixin",
+    "build:mp": "node scripts/build.js uni-cli-shared vite-plugin-uni uni-mp-vue uni-mp-vite uni-mp-compiler uni-mp-weixin",
+    "dev:mp": "node scripts/build.js uni-cli-shared vite-plugin-uni uni-mp-vue uni-mp-vite uni-mp-compiler uni-mp-weixin -d",
     "size": "npm run build size-check",
     "lint": "eslint packages/*/src/**/*.ts",
     "format": "prettier --write --parser typescript \"packages/**/*.ts?(x)\"",
@@ -22,7 +22,7 @@
     "e2e:ssr:dev": "cd packages/playground/ssr && npm run dev:ssr",
     "e2e:ssr:open": "cd packages/playground/ssr && npx cypress open",
     "release": "node scripts/release.js",
-    "release:mp": "node scripts/release.js --skipTests uni-cli-shared vite-plugin-uni uni-mp-vue uni-mp-vite uni-mp-compiler uni-mp-weixin",
+    "release:mp": "node scripts/release.js uni-cli-shared vite-plugin-uni uni-mp-vue uni-mp-vite uni-mp-compiler uni-mp-weixin --skipTests --skipBuild",
     "release:version": "pnpm release --skipTests --dry"
   },
   "types": "test-dts/index.d.ts",

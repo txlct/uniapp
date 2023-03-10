@@ -38,10 +38,36 @@ const priority = {
   'size-check': 0,
 }
 
+// 不执行编译的包
+const exclude = {
+  uts: true,
+  'uni-uts-v1': true,
+  'uni-shared': true,
+  'uni-i18n': true,
+  'uni-stat': true,
+  'uni-push': true,
+  'uni-mp-alipay': true,
+  'uni-mp-baidu': true,
+  'uni-mp-kuaishou': true,
+  'uni-mp-qq': true,
+  'uni-mp-lark': true,
+  'uni-mp-toutiao': true,
+  'uni-quickapp-webview': true,
+  'uni-app-vue': true,
+  'uni-nvue-styler': true,
+  'uni-app-plus': true,
+  'uni-app-vite': true,
+  'uni-cloud': true,
+  'uni-automator': true,
+  'uni-stacktracey': true,
+  'uni-vue-devtools': true,
+  'size-check': true,
+};
+
 exports.priority = priority
 
 const targets = (exports.targets = fs.readdirSync('packages').filter((f) => {
-  if (!fs.statSync(`packages/${f}`).isDirectory()) {
+  if (!fs.statSync(`packages/${f}`).isDirectory() || exclude[f]) {
     return false
   }
   try {
