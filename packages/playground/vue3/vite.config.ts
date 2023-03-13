@@ -10,7 +10,11 @@ const resolve = (dir) => path.resolve(process.cwd(), dir);
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
-    uni(),
+    uni({
+      mp: {
+        vendorConfig: /module\/index/,
+      },
+    }),
 
     mainTsPlugin({
       include: resolve('src/main.ts'),
@@ -18,6 +22,7 @@ export default defineConfig({
       post: `console.log('app', app);`
     }),
 
+  
     Inspect({
       build: process.argv?.includes('debug'),
       outputDir: '.vite-inspect',
