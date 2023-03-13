@@ -31,9 +31,9 @@
     "@vue/compiler-core": "3.2.47"
   },
   "dependencies": {
-    "@dcloudio/uni-cli-shared": "3.0.0-3070320230222002",
-    "@dcloudio/uni-mp-vite": "3.0.0-3070320230222002",
-    "@dcloudio/uni-mp-vue": "3.0.0-3070320230222002",
+    "@dcloudio/uni-cli-shared": "workspace:*",
+    "@dcloudio/uni-mp-vite": "workspace:*",
+    "@dcloudio/uni-mp-vue": "workspace:*",
     "@dcloudio/uni-shared": "3.0.0-3070320230222002",
     "@vue/shared": "3.2.47",
     "fs-extra": "^10.0.0"

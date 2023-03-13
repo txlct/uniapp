@@ -10,8 +10,8 @@
     "vuex": "^4.1.0"
   },
   "devDependencies": {
-    "@dcloudio/uni-cli-shared": "3.0.0-3070320230222002",
+    "@dcloudio/uni-cli-shared": "workspace:*",
     "@dcloudio/uni-components": "3.0.0-3070320230222002",
-    "@dcloudio/vite-plugin-uni": "3.0.0-3070320230222002"
+    "@dcloudio/vite-plugin-uni": "workspace:*"
   }
 }

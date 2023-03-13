@@ -28,7 +28,7 @@
     "@babel/core": "^7.20.5",
     "@babel/plugin-syntax-import-meta": "^7.10.4",
     "@babel/plugin-transform-typescript": "^7.20.2",
-    "@dcloudio/uni-cli-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?chore/next",
+    "@dcloudio/uni-cli-shared": "workspace:*",
     "@dcloudio/uni-shared": "3.0.0-3070320230222002",
     "@rollup/pluginutils": "^4.2.0",
     "@vitejs/plugin-legacy": "^4.0.1",

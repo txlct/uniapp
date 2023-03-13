@@ -15,7 +15,7 @@
   },
   "devDependencies": {
     "@dcloudio/uni-i18n": "3.0.0-3070320230222002",
-    "@dcloudio/uni-mp-vue": "3.0.0-3070320230222002",
+    "@dcloudio/uni-mp-vue": "workspace:*",
     "@dcloudio/uni-shared": "3.0.0-3070320230222002",
     "safe-area-insets": "^1.4.1"
   }

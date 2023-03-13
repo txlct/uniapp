@@ -23,6 +23,6 @@
     "@vue/shared": "3.2.47"
   },
   "devDependencies": {
-    "@dcloudio/uni-mp-vue": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?chore/next"
+    "@dcloudio/uni-mp-vue": "workspace:*"
   }
 }
