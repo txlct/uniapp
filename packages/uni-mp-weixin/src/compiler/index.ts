@@ -2,6 +2,7 @@ import type { Plugin } from 'vite'
 import { ASSETS_INLINE_LIMIT } from '@dcloudio/uni-cli-shared'
 import initMiniProgramPlugin from '@dcloudio/uni-mp-vite'
 import { options } from './options'
+import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni'
 
 const uniMiniProgramWeixinPlugin: Plugin = {
   name: 'uni:mp-weixin',
@@ -18,4 +19,6 @@ const uniMiniProgramWeixinPlugin: Plugin = {
   },
 }
 
-export default [uniMiniProgramWeixinPlugin, ...initMiniProgramPlugin(options)]
+export default (opt: VitePluginUniOptions) => {
+  return [uniMiniProgramWeixinPlugin, ...initMiniProgramPlugin(options, opt)]
+}

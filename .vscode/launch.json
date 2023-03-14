@@ -34,6 +34,22 @@
       ],
       "cwd": "${workspaceFolder}",
       "type": "node"
+    },
+    {
+      "name": "debug vue3 playground node 16.13.0",
+      "request": "launch",
+      "runtimeArgs": [
+        "dev:mp",
+        "devOnly",
+        "debug"
+      ],
+      "runtimeExecutable": "pnpm",
+      "runtimeVersion": "16.13.0",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "cwd": "${workspaceFolder}/packages/playground/vue3",
+      "type": "node"
     }
   ]
 }

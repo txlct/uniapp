@@ -12,6 +12,7 @@
     "build:app": "node scripts/build.js uni-app-plus uni-app-vite uni-app-vue",
     "build:mp": "node scripts/build.js uni-cli-shared vite-plugin-uni uni-mp-vue uni-mp-vite uni-mp-compiler uni-mp-weixin",
     "dev:mp": "node scripts/build.js uni-cli-shared vite-plugin-uni uni-mp-vue uni-mp-vite uni-mp-compiler uni-mp-weixin -d",
+    "dev:mp:p": "node scripts/build.js uni-cli-shared & node scripts/build.js vite-plugin-uni & node scripts/build.js uni-mp-vue & node scripts/build.js uni-mp-vite & node scripts/build.js uni-mp-compiler & node scripts/build.js uni-mp-weixin",
     "size": "npm run build size-check",
     "lint": "eslint packages/*/src/**/*.ts",
     "format": "prettier --write --parser typescript \"packages/**/*.ts?(x)\"",
