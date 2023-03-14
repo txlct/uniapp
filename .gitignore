@@ -8,7 +8,7 @@ packages/uni-h5-vite/dist
 packages/uni-nvue-styler/dist
 # packages/vite-plugin-uni/dist/**/*.map
 packages/uts/dist
-packages/uni-uts-v1/dist
+# packages/uni-uts-v1/dist
 
 
 .DS_Store
