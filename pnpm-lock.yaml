@@ -765,6 +765,7 @@ importers:
       '@dcloudio/uni-mp-compiler': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?chore/next
       '@dcloudio/uni-mp-vue': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?chore/next
       '@dcloudio/uni-shared': 3.0.0-3070320230222002
+      '@dcloudio/vite-plugin-uni': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?chore/next
       '@types/debug': ^4.1.7
       '@vue/compiler-sfc': 3.2.47
       '@vue/shared': 3.2.47
@@ -775,6 +776,7 @@ importers:
       '@dcloudio/uni-mp-compiler': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?chore/next'
       '@dcloudio/uni-mp-vue': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?chore/next'
       '@dcloudio/uni-shared': link:../uni-shared
+      '@dcloudio/vite-plugin-uni': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?chore/next'
       '@vue/compiler-sfc': 3.2.47
       '@vue/shared': 3.2.47
       debug: 4.3.4
@@ -977,7 +979,7 @@ importers:
       '@types/estree': ^0.0.51
       '@types/express': ^4.17.12
       '@types/fs-extra': ^9.0.13
-      '@types/sass': ^1.16.0
+      '@types/sass': 1.43.1
       '@vitejs/plugin-legacy': ^4.0.1
       '@vitejs/plugin-vue': ^4.0.0
       '@vitejs/plugin-vue-jsx': ^3.0.0
@@ -1030,7 +1032,7 @@ importers:
       '@types/estree': 0.0.51
       '@types/express': 4.17.17
       '@types/fs-extra': 9.0.13
-      '@types/sass': 1.45.0
+      '@types/sass': 1.43.1
       '@vue/babel-plugin-jsx': 1.1.1_@babel+core@7.21.0
       chokidar: 3.5.3
       vite: 4.1.1_terser@5.16.6
@@ -3907,13 +3909,6 @@ packages:
       '@types/node': 18.15.0
     dev: true
 
-  /@types/sass/1.45.0:
-    resolution: {integrity: sha512-jn7qwGFmJHwUSphV8zZneO3GmtlgLsmhs/LQyVvQbIIa+fzGMUiHI4HXJZL3FT8MJmgXWbLGiVVY7ElvHq6vDA==}
-    deprecated: This is a stub types definition. sass provides its own type definitions, so you do not need this installed.
-    dependencies:
-      sass: 1.59.2
-    dev: true
-
   /@types/serve-static/1.15.1:
     resolution: {integrity: sha512-NUo5XNiAdULrJENtJXZZ3fHtfMolzZwczzBbnAeBbqBwG+LaG6YaJtuwzwGSQZ2wsCrxjEhNNjAkKigy3n8teQ==}
     dependencies:
@@ -6394,10 +6389,6 @@ packages:
     engines: {node: '>= 4'}
     dev: true
 
-  /immutable/4.2.4:
-    resolution: {integrity: sha512-WDxL3Hheb1JkRN3sQkyujNlL/xRjAo3rJtaU5xeufUauG66JdMr32bLj4gF+vWl84DIA3Zxw7tiAjneYzRRw+w==}
-    dev: true
-
   /import-fresh/3.3.0:
     resolution: {integrity: sha512-veYYhQa+D1QBKznvhUHxb8faxlrwUnxseDAbAp457E0wLNio2bOSKnjYDhMj+YiAq61xrMGhQk9iXVk5FzgQMw==}
     engines: {node: '>=6'}
@@ -8557,16 +8548,6 @@ packages:
   /safer-buffer/2.1.2:
     resolution: {integrity: sha512-YZo3K82SD7Riyi0E1EQPojLz7kpepnSQI9IyPbHHg1XXXevb5dJI7tpyN2ADxGcQbHG7vcyRHk0cbwqcQriUtg==}
 
-  /sass/1.59.2:
-    resolution: {integrity: sha512-jJyO6SmbzkJexF8MUorHx5tAilcgabioYxT/BHbY4+OvoqmbHxsYlrjZ8Adhqcgl6Zqwie0TgMXLCAmPFxXOuw==}
-    engines: {node: '>=12.0.0'}
-    hasBin: true
-    dependencies:
-      chokidar: 3.5.3
-      immutable: 4.2.4
-      source-map-js: 1.0.2
-    dev: true
-
   /sax/1.2.4:
     resolution: {integrity: sha512-NqVDv9TpANUjFm0N8uM5GxL36UgKi9/atZw+x7YFnQ8ckwFGKrl4xX4yWtrey3UJm5nP1kUbnYgLopqWNSRhWw==}
     dev: false
@@ -9690,7 +9671,7 @@ packages:
   '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?chore/next':
     resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?chore/next}
     name: '@dcloudio/uni-cli-shared'
-    version: 3.0.0-3070320230222002-2
+    version: 3.0.0-3070320230222002-4
     engines: {node: ^14.18.0 || >=16.0.0}
     dependencies:
       '@ampproject/remapping': 2.2.0
@@ -9744,7 +9725,7 @@ packages:
     resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?chore/next}
     id: '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?chore/next'
     name: '@dcloudio/uni-cli-shared'
-    version: 3.0.0-3070320230222002-2
+    version: 3.0.0-3070320230222002-4
     engines: {node: ^14.18.0 || >=16.0.0}
     dependencies:
       '@ampproject/remapping': 2.2.0
@@ -9797,7 +9778,7 @@ packages:
   '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?chore/next':
     resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?chore/next}
     name: '@dcloudio/uni-mp-compiler'
-    version: 3.0.0-3070320230222002-2
+    version: 3.0.0-3070320230222002-4
     dependencies:
       '@babel/generator': 7.21.1
       '@babel/parser': 7.21.2
@@ -9818,7 +9799,7 @@ packages:
   '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?chore/next':
     resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?chore/next}
     name: '@dcloudio/uni-mp-vite'
-    version: 3.0.0-3070320230222002-2
+    version: 3.0.0-3070320230222002-4
     dependencies:
       '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?chore/next'
       '@dcloudio/uni-i18n': 3.0.0-3070320230222002
@@ -9838,7 +9819,7 @@ packages:
   '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?chore/next':
     resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?chore/next}
     name: '@dcloudio/uni-mp-vue'
-    version: 3.0.0-3070320230222002-2
+    version: 3.0.0-3070320230222002-4
     dependencies:
       '@dcloudio/uni-shared': 3.0.0-3070320230222002
       '@vue/shared': 3.2.47

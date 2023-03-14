@@ -11,7 +11,7 @@ export interface VitePluginUniOptions {
     }) | boolean;
     viteLegacyOptions?: ViteLegacyOptions | false;
     mp?: {
-        vonderConfig: Record<string, RegExp>;
+        vendorConfig: Record<string, RegExp>;
     };
 }
 export interface VitePluginUniResolvedOptions extends VitePluginUniOptions {

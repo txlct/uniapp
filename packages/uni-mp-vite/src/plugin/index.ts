@@ -104,7 +104,7 @@ export function uniMiniProgramPlugin(
     template,
     style,
   } = options
-  const { mp: { vonderConfig = {} } = {} } =
+  const { mp: { vendorConfig = {} } = {} } =
     opt as Required<VitePluginUniOptions>
 
   let nvueCssEmitted = false
@@ -156,7 +156,7 @@ export function uniMiniProgramPlugin(
         optimizeDeps: {
           disabled: true,
         },
-        build: buildOptions(vonderConfig),
+        build: buildOptions(vendorConfig),
       }
     },
     configResolved(config) {
