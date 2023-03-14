@@ -6,7 +6,7 @@ import {
   copyMiniProgramThemeJson,
 } from '@dcloudio/uni-cli-shared'
 import { options } from '@dcloudio/uni-mp-toutiao/src/compiler/options'
-
+import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni'
 const uniMiniProgramToutiaoPlugin: Plugin = {
   name: 'uni:mp-lark',
   config() {
@@ -36,4 +36,7 @@ options.template.slot.fallbackContent = false
 // <view tt:for="{{items}}" tt:for-item="item" tt:key="id" slot="{{item.slot}}">{{item.text}}</view>
 options.template.slot.dynamicSlotNames = false
 options.project!.config = ['project.lark.json']
-export default [uniMiniProgramToutiaoPlugin, ...initMiniProgramPlugin(options)]
+export default (opt: VitePluginUniOptions) => [
+  uniMiniProgramToutiaoPlugin,
+  ...initMiniProgramPlugin(options, opt),
+]

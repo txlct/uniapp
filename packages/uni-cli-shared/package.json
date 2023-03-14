@@ -1,6 +1,6 @@
 {
   "name": "@dcloudio/uni-cli-shared",
-  "version": "3.0.0-3070320230222002-2",
+  "version": "3.0.0-3070320230222002-4",
   "description": "@dcloudio/uni-cli-shared",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -74,7 +74,7 @@
     "@types/mime": "^2.0.3",
     "@types/module-alias": "^2.0.1",
     "@types/resolve": "^1.20.2",
-    "@types/sass": "^1.43.1",
+    "@types/sass": "1.43.1",
     "@types/stylus": "^0.48.36",
     "postcss": "^8.4.21",
     "vue": "3.2.47"

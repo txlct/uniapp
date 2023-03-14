@@ -30,7 +30,7 @@
     "@dcloudio/uni-mp-compiler": "3.0.0-3070320230222002",
     "@dcloudio/uni-mp-vite": "3.0.0-3070320230222002",
     "@dcloudio/uni-mp-vue": "3.0.0-3070320230222002",
-    "@dcloudio/uni-mp-weixin": "3.0.0-3070320230222002",
+    "@dcloudio/uni-mp-weixin": "workspace:*",
     "@dcloudio/uni-shared": "3.0.0-3070320230222002",
     "@vue/compiler-core": "3.2.47",
     "@vue/shared": "3.2.47"
