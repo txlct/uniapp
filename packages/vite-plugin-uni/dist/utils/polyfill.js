@@ -68,3 +68,4 @@ function initFixedEsbuildInitTSConfck(inputDir) {
     ];
 }
 exports.initFixedEsbuildInitTSConfck = initFixedEsbuildInitTSConfck;
+//# sourceMappingURL=polyfill.js.map

@@ -40,3 +40,4 @@ function uniResolveIdPlugin(options) {
     };
 }
 exports.uniResolveIdPlugin = uniResolveIdPlugin;
+//# sourceMappingURL=resolveId.js.map

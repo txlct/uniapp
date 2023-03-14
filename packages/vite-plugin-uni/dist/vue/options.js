@@ -133,3 +133,4 @@ function initPluginViteLegacyOptions(options) {
     return viteLegacyOptions;
 }
 exports.initPluginViteLegacyOptions = initPluginViteLegacyOptions;
+//# sourceMappingURL=options.js.map

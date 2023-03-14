@@ -1,0 +1,1 @@
+{"version":3,"file":"optimizeDeps.js","sourceRoot":"","sources":["../../src/config/optimizeDeps.ts"],"names":[],"mappings":";;;AAGA,SAAgB,kBAAkB,CAChC,QAAsC;IAEtC,OAAO;QACL,OAAO,EAAE;YACP,KAAK;YACL,MAAM;YACN,UAAU;YACV,YAAY;YACZ,mBAAmB;YACnB,0BAA0B;YAC1B,oBAAoB;YACpB,sBAAsB;YACtB,2BAA2B;YAC3B,OAAO;SACR;KACF,CAAA;AACH,CAAC;AAjBD,gDAiBC"}

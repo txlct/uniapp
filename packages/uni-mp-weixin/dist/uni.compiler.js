@@ -241,6 +241,8 @@ const uniMiniProgramWeixinPlugin = {
         };
     },
 };
-var index = [uniMiniProgramWeixinPlugin, ...initMiniProgramPlugin__default.default(options)];
+var index = (opt) => {
+    return [uniMiniProgramWeixinPlugin, ...initMiniProgramPlugin__default.default(options, opt)];
+};
 
 module.exports = index;

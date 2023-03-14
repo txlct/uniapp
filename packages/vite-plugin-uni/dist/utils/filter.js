@@ -13,3 +13,4 @@ function createPublicFileFilter(base = '/') {
     return (0, pluginutils_1.createFilter)([publicDir, uniModulesDir]);
 }
 exports.createPublicFileFilter = createPublicFileFilter;
+//# sourceMappingURL=filter.js.map

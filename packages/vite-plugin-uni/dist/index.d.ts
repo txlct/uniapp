@@ -10,6 +10,9 @@ export interface VitePluginUniOptions {
         babelPlugins?: any[];
     }) | boolean;
     viteLegacyOptions?: ViteLegacyOptions | false;
+    mp?: {
+        vonderConfig: Record<string, RegExp>;
+    };
 }
 export interface VitePluginUniResolvedOptions extends VitePluginUniOptions {
     base: string;

@@ -1,5 +1,6 @@
 import { AliasOptions } from 'vite';
 import { CopyOptions, UniVitePlugin, findMiniProgramTemplateFiles, MiniProgramCompilerOptions, AppJson } from '@dcloudio/uni-cli-shared';
+import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni';
 import type { CompilerOptions } from '@dcloudio/uni-mp-compiler';
 export interface UniMiniProgramPluginOptions {
     cdn?: number;
@@ -62,4 +63,4 @@ export interface UniMiniProgramPluginOptions {
         extname: string;
     };
 }
-export declare function uniMiniProgramPlugin(options: UniMiniProgramPluginOptions): UniVitePlugin;
+export declare function uniMiniProgramPlugin(options: UniMiniProgramPluginOptions, opt: VitePluginUniOptions): UniVitePlugin;

@@ -12,7 +12,7 @@ const renderjs_1 = require("./plugins/renderjs");
 const runtimeHooks_1 = require("./plugins/runtimeHooks");
 const subpackage_1 = require("./plugins/subpackage");
 const plugin_2 = require("./plugins/plugin");
-exports.default = (options) => {
+exports.default = (options, opt) => {
     if (!options.app.subpackages) {
         delete process.env.UNI_SUBPACKAGE;
     }
@@ -33,7 +33,7 @@ exports.default = (options) => {
         (0, uni_cli_shared_1.uniViteInjectPlugin)('uni:mp-inject', (0, shared_1.extend)({ exclude: [/uni.api.esm/, /uni.mp.esm/] }, options.vite.inject)),
         (0, renderjs_1.uniRenderjsPlugin)({ lang: options.template.filter?.lang }),
         (0, runtimeHooks_1.uniRuntimeHooksPlugin)(),
-        (0, plugin_1.uniMiniProgramPlugin)(options),
+        (0, plugin_1.uniMiniProgramPlugin)(options, opt),
         (options) => {
             return (0, usingComponents_1.uniUsingComponentsPlugin)({
                 normalizeComponentName,

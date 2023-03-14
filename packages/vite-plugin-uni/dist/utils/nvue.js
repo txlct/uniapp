@@ -23,3 +23,4 @@ function createNVueCompiler() {
     });
 }
 exports.createNVueCompiler = createNVueCompiler;
+//# sourceMappingURL=nvue.js.map

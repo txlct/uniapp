@@ -26,3 +26,4 @@ function uniMovePlugin({ apply, enforce, cwd, pattern, dest, }) {
     };
 }
 exports.uniMovePlugin = uniMovePlugin;
+//# sourceMappingURL=move.js.map
