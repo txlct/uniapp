@@ -1,11 +1,12 @@
 {
   "name": "@dcloudio/uni-mp-weixin",
-  "version": "3.0.0-3070320230222002-2",
+  "version": "3.0.0-3070320230222002-4",
   "description": "uni-app mp-weixin",
   "main": "dist/index.js",
   "files": [
     "dist",
-    "lib"
+    "lib",
+    "src"
   ],
   "repository": {
     "type": "git",

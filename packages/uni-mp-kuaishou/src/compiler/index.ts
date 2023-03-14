@@ -2,6 +2,7 @@ import type { Plugin } from 'vite'
 import { ASSETS_INLINE_LIMIT } from '@dcloudio/uni-cli-shared'
 import initMiniProgramPlugin from '@dcloudio/uni-mp-vite'
 import { options } from './options'
+import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni'
 
 const uniMiniProgramKuaishouPlugin: Plugin = {
   name: 'uni:mp-kuaishou',
@@ -18,4 +19,7 @@ const uniMiniProgramKuaishouPlugin: Plugin = {
   },
 }
 
-export default [uniMiniProgramKuaishouPlugin, ...initMiniProgramPlugin(options)]
+export default (opt: VitePluginUniOptions) => [
+  uniMiniProgramKuaishouPlugin,
+  ...initMiniProgramPlugin(options, opt),
+]

@@ -2,6 +2,7 @@ import type { Plugin, UserConfig } from 'vite'
 import initMiniProgramPlugin from '@dcloudio/uni-mp-vite'
 import { extend } from '@vue/shared'
 import { options } from './options'
+import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni'
 
 const uniMiniProgramAlipayPlugin: Plugin = {
   name: 'uni:mp-alipay',
@@ -36,4 +37,7 @@ const uniMiniProgramAlipayPlugin: Plugin = {
   },
 }
 
-export default [uniMiniProgramAlipayPlugin, ...initMiniProgramPlugin(options)]
+export default (opt: VitePluginUniOptions) => [
+  uniMiniProgramAlipayPlugin,
+  ...initMiniProgramPlugin(options, opt),
+]

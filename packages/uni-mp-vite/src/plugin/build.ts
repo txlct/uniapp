@@ -30,7 +30,7 @@ import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni'
 const debugChunk = debug('uni:chunk')
 
 export function buildOptions(
-  vendorConfig: VitePluginUniOptions['mp']['vendorConfig']
+  vendorConfig: Required<VitePluginUniOptions>['mp']['vonderConfig']
 ): UserConfig['build'] {
   const platform = process.env.UNI_PLATFORM
   const inputDir = process.env.UNI_INPUT_DIR
@@ -45,7 +45,7 @@ export function buildOptions(
 export function createBuildOptions(
   inputDir: string,
   platform: UniApp.PLATFORM,
-  vendorConfig: VitePluginUniOptions['mp']['vendorConfig']
+  vendorConfig: Required<VitePluginUniOptions>['mp']['vonderConfig']
 ): BuildOptions {
   const { renderDynamicImport } = dynamicImportPolyfill()
   return {
@@ -120,7 +120,7 @@ function isVueJs(id: string) {
 const chunkFileNameBlackList = ['main', 'pages.json', 'manifest.json']
 
 function createMoveToVendorChunkFn(
-  vendorConfig: VitePluginUniOptions['mp']['vendorConfig']
+  vendorConfig: Required<VitePluginUniOptions>['mp']['vonderConfig']
 ): GetManualChunk {
   const cache = new Map<string, boolean>()
   const inputDir = normalizePath(process.env.UNI_INPUT_DIR)

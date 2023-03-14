@@ -1,7 +1,7 @@
 import type { Plugin } from 'vite'
 import { ASSETS_INLINE_LIMIT } from '@dcloudio/uni-cli-shared'
 import initMiniProgramPlugin from '@dcloudio/uni-mp-vite'
-
+import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni'
 import { fix2648 } from './fix2648'
 import { options } from './options'
 
@@ -23,4 +23,7 @@ const uniMiniProgramQQPlugin: Plugin = {
   },
 }
 
-export default [uniMiniProgramQQPlugin, ...initMiniProgramPlugin(options)]
+export default (opt: VitePluginUniOptions) => [
+  uniMiniProgramQQPlugin,
+  ...initMiniProgramPlugin(options, opt),
+]
