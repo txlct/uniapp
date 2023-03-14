@@ -765,7 +765,7 @@ importers:
       '@dcloudio/uni-mp-compiler': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?chore/next
       '@dcloudio/uni-mp-vue': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?chore/next
       '@dcloudio/uni-shared': 3.0.0-3070320230222002
-      '@dcloudio/vite-plugin-uni': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?chore/next
+      '@dcloudio/vite-plugin-uni': https://gitpkg.now.sh/txlct/uniapp/packages/vite-plugin-uni?chore/next
       '@types/debug': ^4.1.7
       '@vue/compiler-sfc': 3.2.47
       '@vue/shared': 3.2.47
@@ -776,7 +776,7 @@ importers:
       '@dcloudio/uni-mp-compiler': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?chore/next'
       '@dcloudio/uni-mp-vue': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?chore/next'
       '@dcloudio/uni-shared': link:../uni-shared
-      '@dcloudio/vite-plugin-uni': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?chore/next'
+      '@dcloudio/vite-plugin-uni': '@gitpkg.now.sh/txlct/uniapp/packages/vite-plugin-uni?chore/next'
       '@vue/compiler-sfc': 3.2.47
       '@vue/shared': 3.2.47
       debug: 4.3.4
@@ -4031,7 +4031,6 @@ packages:
       terser: 5.16.6
     transitivePeerDependencies:
       - supports-color
-    dev: true
 
   /@vitejs/plugin-legacy/4.0.1_terser@5.16.6+vite@4.1.1:
     resolution: {integrity: sha512-/ZV63NagI1c9TB5E4ijGmycY//fNm/2L02nsnXXxACwYaF9W+/OyVlgIW24jYUIS+g0yQRtn+N5hzBc8RLNhGA==}
@@ -4049,6 +4048,20 @@ packages:
       systemjs: 6.14.0
       terser: 5.16.6
       vite: 4.1.1_terser@5.16.6
+    transitivePeerDependencies:
+      - supports-color
+    dev: false
+
+  /@vitejs/plugin-vue-jsx/3.0.0:
+    resolution: {integrity: sha512-vurkuzgac5SYuxd2HUZqAFAWGTF10diKBwJNbCvnWijNZfXd+7jMtqjPFbGt7idOJUn584fP1Ar9j/GN2jQ3Ew==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    peerDependencies:
+      vite: ^4.0.0
+      vue: ^3.0.0
+    dependencies:
+      '@babel/core': 7.21.0
+      '@babel/plugin-transform-typescript': 7.21.0_@babel+core@7.21.0
+      '@vue/babel-plugin-jsx': 1.1.1_@babel+core@7.21.0
     transitivePeerDependencies:
       - supports-color
     dev: false
@@ -4082,6 +4095,14 @@ packages:
     transitivePeerDependencies:
       - supports-color
     dev: true
+
+  /@vitejs/plugin-vue/4.0.0:
+    resolution: {integrity: sha512-e0X4jErIxAB5oLtDqbHvHpJe/uWNkdpYV83AOG2xo2tEVSzCzewgJMtREZM30wXnM5ls90hxiOtAuVU6H5JgbA==}
+    engines: {node: ^14.18.0 || >=16.0.0}
+    peerDependencies:
+      vite: ^4.0.0
+      vue: ^3.2.25
+    dev: false
 
   /@vitejs/plugin-vue/4.0.0_vite@4.1.1+vue@3.2.47:
     resolution: {integrity: sha512-e0X4jErIxAB5oLtDqbHvHpJe/uWNkdpYV83AOG2xo2tEVSzCzewgJMtREZM30wXnM5ls90hxiOtAuVU6H5JgbA==}
@@ -9823,3 +9844,43 @@ packages:
     dependencies:
       '@dcloudio/uni-shared': 3.0.0-3070320230222002
       '@vue/shared': 3.2.47
+
+  '@gitpkg.now.sh/txlct/uniapp/packages/vite-plugin-uni?chore/next':
+    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/vite-plugin-uni?chore/next}
+    name: '@dcloudio/vite-plugin-uni'
+    version: 3.0.0-3070320230222002-4
+    engines: {node: ^14.18.0 || >=16.0.0}
+    hasBin: true
+    peerDependencies:
+      vite: ^4.0.0
+    dependencies:
+      '@babel/core': 7.21.0
+      '@babel/plugin-syntax-import-meta': 7.10.4_@babel+core@7.21.0
+      '@babel/plugin-transform-typescript': 7.21.0_@babel+core@7.21.0
+      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?chore/next'
+      '@dcloudio/uni-shared': 3.0.0-3070320230222002
+      '@rollup/pluginutils': 4.2.1
+      '@vitejs/plugin-legacy': 4.0.1_terser@5.16.6
+      '@vitejs/plugin-vue': 4.0.0
+      '@vitejs/plugin-vue-jsx': 3.0.0
+      '@vue/compiler-core': 3.2.47
+      '@vue/compiler-dom': 3.2.47
+      '@vue/compiler-sfc': 3.2.47
+      '@vue/shared': 3.2.47
+      cac: 6.7.9
+      debug: 4.3.4
+      estree-walker: 2.0.2
+      express: 4.18.2
+      fast-glob: 3.2.12
+      fs-extra: 10.1.0
+      hash-sum: 2.0.0
+      jsonc-parser: 3.2.0
+      magic-string: 0.27.0
+      picocolors: 1.0.0
+      terser: 5.16.6
+    transitivePeerDependencies:
+      - postcss
+      - supports-color
+      - ts-node
+      - vue
+    dev: false

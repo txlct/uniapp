@@ -8,8 +8,8 @@ export default defineConfig({
     uni({
       mp: {
         vendorConfig: {
-          "common/module": /module\/index/,
-        } 
+          'common/vendor': /module\/index/,
+        },
       },
     }),
     Inspect({
