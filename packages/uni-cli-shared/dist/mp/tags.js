@@ -22,7 +22,7 @@ exports.HTML_TO_MINI_PROGRAM_TAGS = {
     del: 'view',
     ins: 'view',
     dfn: 'view',
-    em: 'view',
+    em: 'label',
     strong: 'view',
     samp: 'view',
     kbd: 'view',
