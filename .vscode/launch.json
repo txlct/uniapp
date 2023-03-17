@@ -5,15 +5,15 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "debug vue3 playground",
+      "name": "debug h5",
       "request": "launch",
       "runtimeArgs": [
-        "build:mp",
+        "dev",
         "devOnly",
         "debug"
       ],
       "runtimeExecutable": "pnpm",
-      "runtimeVersion": "16.19.0",
+      "runtimeVersion": "16",
       "skipFiles": [
         "<node_internals>/**"
       ],
@@ -26,25 +26,10 @@
       "runtimeArgs": [
         "dev:mp",
         "devOnly",
-      ],
-      "runtimeExecutable": "pnpm",
-      "runtimeVersion": "16.19.0",
-      "skipFiles": [
-        "<node_internals>/**"
-      ],
-      "cwd": "${workspaceFolder}",
-      "type": "node"
-    },
-    {
-      "name": "debug vue3 playground node 16.13.0",
-      "request": "launch",
-      "runtimeArgs": [
-        "dev:mp",
-        "devOnly",
         "debug"
       ],
       "runtimeExecutable": "pnpm",
-      "runtimeVersion": "16.13.0",
+      "runtimeVersion": "16",
       "skipFiles": [
         "<node_internals>/**"
       ],

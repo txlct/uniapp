@@ -1,3 +1,16 @@
 {
-    "typescript.tsdk": "node_modules/typescript/lib"
+    "typescript.tsdk": "node_modules/typescript/lib",
+    "files.exclude": {
+        "**/uni-app-plus": true,
+        "**/uni-mp-alipay": true,
+        "**/uni-mp-baidu": true,
+        "**/uni-mp-kuaishou": true,
+        "**/uni-mp-lark": true,
+        "**/uni-mp-toutiao": true,
+        "**/uni-mp-nvue-styler": true,
+        "**/uni-nvue-styler": true,
+        "**/uni-quickapp-webview": true,
+        "**/uni-cloud": true,
+        "**/uni-app-*": true
+    }
 }
