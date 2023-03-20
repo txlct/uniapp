@@ -24,7 +24,8 @@
     "e2e:ssr:open": "cd packages/playground/ssr && npx cypress open",
     "release": "node scripts/release.js",
     "release:mp": "node scripts/release.js uni-cli-shared vite-plugin-uni uni-mp-vue uni-mp-vite uni-mp-compiler uni-mp-weixin --skipTests --skipBuild",
-    "release:version": "pnpm release --skipTests --dry"
+    "release:version": "pnpm release --skipTests --dry",
+    "release:dev": "pnpm release --local --skipTests --dry"
   },
   "types": "test-dts/index.d.ts",
   "tsd": {

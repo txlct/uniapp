@@ -16,6 +16,7 @@ const isDryRun = args.dry
 const skipTests = args.skipTests
 const skipBuild = args.skipBuild
 const onlyDist = args.onlyDist
+const isLocal = args.local;
 const packages = fs
   .readdirSync(path.resolve(__dirname, '../packages'))
   .filter(
@@ -74,13 +75,17 @@ async function main() {
     throw new Error(`invalid target version: ${targetVersion}`)
   }
 
-  const { yes: isRemoteRepo } = (
-    await prompt({
-      type: 'confirm',
-      name: 'yes',
-      message: `是否远端分支?`
-    })
-  )
+  let isRemoteRepo = false;
+
+  if (!isLocal) {
+    ({ yes: isRemoteRepo } = (
+      await prompt({
+        type: 'confirm',
+        name: 'yes',
+        message: `是否远端分支?`
+      })
+    ))
+  }
 
   let repo = '';
 
@@ -93,7 +98,7 @@ async function main() {
         initial: remoteRepoUrlPrefix,
       })
     ));
-  }
+  } 
 
   const { tag } = (
     await prompt({
@@ -104,7 +109,7 @@ async function main() {
         : '请输入dependencies tag',
       initial: isRemoteRepo
         ? await getCurrentBranch()
-        : currentVersion
+        : isLocal ? 'workspace:*' : currentVersion
     })
   );
 
