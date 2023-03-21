@@ -8,7 +8,8 @@
     "all": "npm run lint && npm run format && npm run build && npm run test",
     "clean": "rm -rf node_modules **/*/node_modules && pnpm install",
     "build": "node scripts/build.js",
-    "build:h5": "node scripts/build.js uni-app uts uni-uts-v1 uni-cli-shared uni-h5 uni-i18n uni-stat uni-shared uni-h5-vite vite-plugin-uni",
+    "build:h5": "node scripts/build.js uni-app uni-cli-shared uni-h5 uni-h5-vite vite-plugin-uni",
+    "dev:h5": "node scripts/build.js -d uni-app uni-cli-shared uni-h5  uni-h5-vite vite-plugin-uni",
     "build:app": "node scripts/build.js uni-app-plus uni-app-vite uni-app-vue",
     "build:mp": "node scripts/build.js uni-cli-shared vite-plugin-uni uni-mp-vite uni-mp-compiler uni-mp-weixin",
     "dev:mp": "node scripts/build.js uni-cli-shared vite-plugin-uni uni-mp-vite uni-mp-compiler uni-mp-weixin -d",
@@ -24,6 +25,7 @@
     "e2e:ssr:open": "cd packages/playground/ssr && npx cypress open",
     "release": "node scripts/release.js",
     "release:mp": "node scripts/release.js uni-cli-shared vite-plugin-uni uni-mp-vue uni-mp-vite uni-mp-compiler uni-mp-weixin --skipTests --skipBuild",
+    "release:h5": "node scripts/release.js uni-app uni-cli-shared uni-h5 uni-h5-vite vite-plugin-uni --skipTests --skipBuild",
     "release:version": "pnpm release --skipTests --dry",
     "release:dev": "pnpm release --local --skipTests --dry"
   },

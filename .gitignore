@@ -2,7 +2,7 @@ packages/playground/*/dist
 packages/size-check/dist
 packages/uni-app-vite/dist
 # packages/uni-cli-shared/dist/**/*.map
-packages/uni-h5-vite/dist
+# packages/uni-h5-vite/dist
 # packages/uni-mp-vite/dist/**/*.map
 # packages/uni-mp-compiler/dist/**/*.map
 packages/uni-nvue-styler/dist
