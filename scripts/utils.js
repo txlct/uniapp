@@ -42,7 +42,6 @@ const priority = {
 const exclude = {
   uts: true,
   'uni-uts-v1': true,
-  'uni-shared': true,
   'uni-i18n': true,
   'uni-stat': true,
   'uni-push': true,
