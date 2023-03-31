@@ -8,7 +8,7 @@
     "all": "npm run lint && npm run format && npm run build && npm run test",
     "clean": "rm -rf node_modules **/*/node_modules && pnpm install",
     "build": "node scripts/build.js",
-    "build:h5": "node scripts/build.js uni-app uni-cli-shared uni-h5 uni-h5-vite vite-plugin-uni",
+    "build:h5": "node scripts/build.js uni-app uni-cli-shared uni-h5 uni-h5-vite vite-plugin-uni uni-shared",
     "dev:h5": "node scripts/build.js -d uni-app uni-cli-shared uni-h5  uni-h5-vite vite-plugin-uni",
     "build:app": "node scripts/build.js uni-app-plus uni-app-vite uni-app-vue",
     "build:mp": "node scripts/build.js uni-cli-shared vite-plugin-uni uni-mp-vite uni-mp-compiler uni-mp-weixin",

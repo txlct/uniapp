@@ -19,7 +19,6 @@ function uniMainJsPlugin() {
                         code = code.includes('createSSRApp')
                             ? createApp(code)
                             : createLegacyApp(code);
-                        console.log('--------- code', code);
                     }
                     else {
                         code = (0, utils_1.isSSR)(options)

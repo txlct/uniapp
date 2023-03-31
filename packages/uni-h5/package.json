@@ -1,6 +1,6 @@
 {
   "name": "@dcloudio/uni-h5",
-  "version": "3.0.0-3070320230222002",
+  "version": "3.0.0-3070320230222002-7",
   "description": "@dcloudio/uni-h5",
   "main": "./dist/uni-h5.cjs.js",
   "module": "./dist/uni-h5.es.js",
@@ -32,7 +32,7 @@
     "@dcloudio/uni-h5-vite": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vite?chore/next",
     "@dcloudio/uni-h5-vue": "3.0.0-3070320230222002",
     "@dcloudio/uni-i18n": "3.0.0-3070320230222002",
-    "@dcloudio/uni-shared": "3.0.0-3070320230222002",
+    "@dcloudio/uni-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?chore/next",
     "@vue/server-renderer": "3.2.47",
     "@vue/shared": "3.2.47",
     "debug": "^4.3.3",

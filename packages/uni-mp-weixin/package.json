@@ -1,6 +1,6 @@
 {
   "name": "@dcloudio/uni-mp-weixin",
-  "version": "3.0.0-3070320230222002-5",
+  "version": "3.0.0-3070320230222002-7",
   "description": "uni-app mp-weixin",
   "main": "dist/index.js",
   "files": [
@@ -33,7 +33,7 @@
     "@dcloudio/uni-cli-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?chore/next",
     "@dcloudio/uni-mp-vite": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?chore/next",
     "@dcloudio/uni-mp-vue": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?chore/next",
-    "@dcloudio/uni-shared": "3.0.0-3070320230222002",
+    "@dcloudio/uni-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?chore/next",
     "@vue/shared": "3.2.47",
     "jimp": "^0.10.1",
     "licia": "^1.29.0",
