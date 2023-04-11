@@ -11,6 +11,9 @@
         "**/uni-nvue-styler": true,
         "**/uni-quickapp-webview": true,
         "**/uni-cloud": true,
-        "**/uni-app-*": true
+        "**/uni-app-*": true,
+        "**/playground/nvue": true,
+        "**/playground/ssr": true,
+        "**/playground/uts": true,
     }
 }
