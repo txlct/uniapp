@@ -29,3 +29,4 @@ function esbuildPrePlugin() {
     };
 }
 exports.esbuildPrePlugin = esbuildPrePlugin;
+//# sourceMappingURL=esbuildPrePlugin.js.map

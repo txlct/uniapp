@@ -34,3 +34,4 @@ function uniTimestampMiddleware(server) {
     };
 }
 exports.uniTimestampMiddleware = uniTimestampMiddleware;
+//# sourceMappingURL=timestamp.js.map

@@ -100,3 +100,4 @@ function uniManifestJsonPlugin() {
     });
 }
 exports.uniManifestJsonPlugin = uniManifestJsonPlugin;
+//# sourceMappingURL=manifestJson.js.map

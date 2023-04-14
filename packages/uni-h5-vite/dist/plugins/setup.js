@@ -33,3 +33,4 @@ function uniSetupPlugin() {
     };
 }
 exports.uniSetupPlugin = uniSetupPlugin;
+//# sourceMappingURL=setup.js.map

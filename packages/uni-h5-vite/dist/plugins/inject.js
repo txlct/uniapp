@@ -66,3 +66,4 @@ function uniInjectPlugin() {
     };
 }
 exports.uniInjectPlugin = uniInjectPlugin;
+//# sourceMappingURL=inject.js.map

@@ -12,6 +12,8 @@ const utils_1 = require("../utils");
 const esbuildPrePlugin_1 = require("./esbuild/esbuildPrePlugin");
 const ssr_1 = require("./configureServer/ssr");
 const shared_1 = require("@vue/shared");
+const getFilePath = (filePath) => path_1.default.resolve(process.env.UNI_INPUT_DIR, '../', filePath);
+const checkIsFileExist = (filePath) => fs_1.default.existsSync(filePath);
 function createConfig(options) {
     return function config(config, env) {
         const inputDir = process.env.UNI_INPUT_DIR;
@@ -56,6 +58,18 @@ function createConfig(options) {
                 (0, shared_1.extend)(server.watch, userServer.watch);
             }
         }
+        const { name, entryName, assetsName } = (0, uni_cli_shared_1.getPlatformType)();
+        const getChunkName = (chunkInfo, isEntry = false, filename = '[name].[hash].js') => {
+            const { assetsDir } = options.resolvedConfig.build;
+            if (chunkInfo.facadeModuleId && !isEntry) {
+                const dirname = path_1.default.relative(inputDir, path_1.default.dirname(chunkInfo.facadeModuleId));
+                if (dirname) {
+                    return path_1.default.posix.join(assetsDir, name, (0, uni_cli_shared_1.normalizePath)(dirname).replace(/\//g, '-') +
+                        `-${filename}`);
+                }
+            }
+            return path_1.default.posix.join(assetsDir, isEntry ? '' : name, filename);
+        };
         return {
             css: {
                 postcss: {
@@ -78,19 +92,20 @@ function createConfig(options) {
             },
             build: {
                 rollupOptions: {
+                    input: {
+                        [entryName]: checkIsFileExist(getFilePath(`${entryName}.html`))
+                            ? getFilePath(`${entryName}.html`)
+                            : getFilePath('index.html')
+                    },
                     // resolveSSRExternal 会判定package.json，hbx 工程可能没有，通过 rollup 来配置
                     external: (0, uni_cli_shared_1.isSsr)(env.command, config) ? ssr_1.external : [],
                     output: {
+                        assetFileNames: `assets/${assetsName}[name]-[hash][extname]`,
+                        entryFileNames(chunkInfo) {
+                            return getChunkName(chunkInfo, true, `${entryName}.[hash].js`);
+                        },
                         chunkFileNames(chunkInfo) {
-                            const { assetsDir } = options.resolvedConfig.build;
-                            if (chunkInfo.facadeModuleId) {
-                                const dirname = path_1.default.relative(inputDir, path_1.default.dirname(chunkInfo.facadeModuleId));
-                                if (dirname) {
-                                    return path_1.default.posix.join(assetsDir, (0, uni_cli_shared_1.normalizePath)(dirname).replace(/\//g, '-') +
-                                        '-[name].[hash].js');
-                                }
-                            }
-                            return path_1.default.posix.join(assetsDir, '[name].[hash].js');
+                            return getChunkName(chunkInfo);
                         },
                     },
                 },
@@ -99,3 +114,4 @@ function createConfig(options) {
     };
 }
 exports.createConfig = createConfig;
+//# sourceMappingURL=config.js.map

@@ -17,3 +17,4 @@ const transformPageHead = (node, context) => {
     }
 };
 exports.transformPageHead = transformPageHead;
+//# sourceMappingURL=transformPageHead.js.map

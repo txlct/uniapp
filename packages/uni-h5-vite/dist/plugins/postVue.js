@@ -46,3 +46,4 @@ function parseHmrId(code) {
     const matches = code.match(/_sfc_main.__hmrId = "(.*)"/);
     return matches && matches[1];
 }
+//# sourceMappingURL=postVue.js.map

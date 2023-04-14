@@ -78,3 +78,4 @@ function uniStaticMiddleware(opts) {
     };
 }
 exports.uniStaticMiddleware = uniStaticMiddleware;
+//# sourceMappingURL=static.js.map

@@ -109,3 +109,4 @@ function addBuiltInImportDeclaration(importDeclarations, local, name) {
     resolveBuiltInCssImport(name).forEach((cssImport) => importDeclarations.push(`import '${cssImport}';`));
     return (0, uni_cli_shared_1.addImportDeclaration)(importDeclarations, local, H5_COMPONENTS_PATH, (0, shared_1.capitalize)((0, shared_1.camelize)(name)));
 }
+//# sourceMappingURL=easycom.js.map

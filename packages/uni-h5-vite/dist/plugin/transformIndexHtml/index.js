@@ -23,3 +23,4 @@ function createTransformIndexHtml() {
     };
 }
 exports.createTransformIndexHtml = createTransformIndexHtml;
+//# sourceMappingURL=index.js.map

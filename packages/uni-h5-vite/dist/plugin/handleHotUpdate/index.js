@@ -79,3 +79,4 @@ exports.createHandleHotUpdate = createHandleHotUpdate;
 function equal(obj1, obj2) {
     return JSON.stringify(obj1) === JSON.stringify(obj2);
 }
+//# sourceMappingURL=index.js.map

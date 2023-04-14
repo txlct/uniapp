@@ -43,3 +43,4 @@ function genWxsCode(name) {
   Comp.mixins.push({beforeCreate(){ this['${name}'] = _sfc_wxs }})
 }`;
 }
+//# sourceMappingURL=renderjs.js.map

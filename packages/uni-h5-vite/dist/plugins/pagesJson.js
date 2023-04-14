@@ -220,3 +220,4 @@ function generateConfig(globalName, pagesJson, config) {
 })
 `;
 }
+//# sourceMappingURL=pagesJson.js.map

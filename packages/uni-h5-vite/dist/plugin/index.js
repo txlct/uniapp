@@ -48,3 +48,4 @@ function rewriteReadFileSync() {
         return content;
     });
 }
+//# sourceMappingURL=index.js.map

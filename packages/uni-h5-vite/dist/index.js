@@ -30,3 +30,4 @@ exports.default = [
     (0, plugin_1.uniH5Plugin)(),
     (0, postVue_1.uniPostVuePlugin)(),
 ];
+//# sourceMappingURL=index.js.map

@@ -37,3 +37,4 @@ function uniResolveIdPlugin() {
     };
 }
 exports.uniResolveIdPlugin = uniResolveIdPlugin;
+//# sourceMappingURL=resolveId.js.map
