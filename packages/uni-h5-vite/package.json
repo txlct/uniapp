@@ -19,8 +19,8 @@
   "license": "Apache-2.0",
   "gitHead": "33e807d66e1fe47e2ee08ad9c59247e37b8884da",
   "dependencies": {
-    "@dcloudio/uni-cli-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?chore/next",
-    "@dcloudio/uni-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?chore/next",
+    "@dcloudio/uni-cli-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0-beta",
+    "@dcloudio/uni-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0-beta",
     "@rollup/pluginutils": "^4.2.0",
     "@vue/compiler-dom": "3.2.47",
     "@vue/compiler-sfc": "3.2.47",
