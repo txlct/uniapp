@@ -10,9 +10,6 @@ const pagesJson_1 = require("../plugins/pagesJson");
 const entry_1 = require("../plugins/entry");
 const debugNVueCss = (0, debug_1.default)('uni:nvue-css');
 const cssVars = `page{--status-bar-height:25px;--top-window-height:0px;--window-top:0px;--window-bottom:0px;--window-left:0px;--window-right:0px;--window-magin:0px}`;
-const genShadowCss = (cdn) => {
-    return `page::after{position:fixed;content:'';left:-1000px;top:-1000px;-webkit-animation:shadow-preload .1s;-webkit-animation-delay:3s;animation:shadow-preload .1s;animation-delay:3s}@-webkit-keyframes shadow-preload{0%{background-image:url(${cdn}/img/shadow-grey.png)}100%{background-image:url(${cdn}/img/shadow-grey.png)}}@keyframes shadow-preload{0%{background-image:url(${cdn}/img/shadow-grey.png)}100%{background-image:url(${cdn}/img/shadow-grey.png)}}`;
-};
 const genComponentCustomHiddenCss = (name) => `[${name.replace(':', '')}="true"]{display: none !important;}`;
 function createConfigResolved({ cdn, style: { extname }, template: { component }, }) {
     function normalizeCssChunkFilename(id, extname) {
@@ -52,7 +49,6 @@ function createConfigResolved({ cdn, style: { extname }, template: { component }
                         '';
                     if (config.isProduction) {
                         return (cssCode +
-                            genShadowCss(`https://cdn${cdn || ''}.dcloud.net.cn`) +
                             cssVars +
                             componentCustomHiddenCss);
                     }
