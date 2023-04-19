@@ -40,6 +40,7 @@ function getProvides () {
       provides.createApp = [uniPath, 'createSubpackageApp']
     } else if (process.env.UNI_MP_PLUGIN) {
       provides.createApp = [uniPath, 'createPlugin']
+      provides.getApp = [uniPath, 'getPluginInstance']
     } else {
       provides.createApp = [uniPath, 'createApp']
     }
