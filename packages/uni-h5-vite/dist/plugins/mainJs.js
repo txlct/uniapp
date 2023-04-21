@@ -37,7 +37,7 @@ function uniMainJsPlugin() {
 }
 exports.uniMainJsPlugin = uniMainJsPlugin;
 function createApp(code) {
-    return `import { plugin as __plugin } from '@dcloudio/uni-h5';${code.replace('createSSRApp', 'createVueApp as createSSRApp')};createApp().app.use(__plugin).mount("#app");`;
+    return `import { plugin as __plugin } from '@dcloudio/uni-h5';${code.replace('createSSRApp', 'createVueApp as createSSRApp')};const app = createApp().app; app.use(__plugin).mount("#app");`;
 }
 function createLegacyApp(code) {
     return `import { plugin as __plugin } from '@dcloudio/uni-h5';function createApp(rootComponent,rootProps){return createVueApp(rootComponent, rootProps).use(__plugin)};${code.replace('createApp', 'createVueApp')}`;

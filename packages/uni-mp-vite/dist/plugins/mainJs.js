@@ -39,7 +39,7 @@ function uniMainJsPlugin(options = {}) {
 }
 exports.uniMainJsPlugin = uniMainJsPlugin;
 function createApp(code) {
-    return `${code};createApp().app.mount("#app");`;
+    return `${code};const app = createApp().app; app.mount("#app");`;
 }
 function createLegacyApp(code) {
     return code;

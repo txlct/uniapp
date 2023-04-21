@@ -1,11 +1,12 @@
 {
   "name": "@dcloudio/uni-mp-vue",
-  "version": "3.0.0-3070320230222002-8",
+  "version": "3.0.0-3070320230222002-9",
   "description": "@dcloudio/uni-mp-vue",
   "main": "dist/vue.runtime.esm.js",
   "module": "dist/vue.runtime.esm.js",
   "files": [
-    "dist"
+    "dist",
+    "lib"
   ],
   "sideEffects": false,
   "repository": {
@@ -19,10 +20,10 @@
   },
   "gitHead": "33e807d66e1fe47e2ee08ad9c59247e37b8884da",
   "dependencies": {
-    "@dcloudio/uni-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0-beta",
+    "@dcloudio/uni-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.1-beta",
     "@vue/shared": "3.2.47"
   },
   "devDependencies": {
-    "@dcloudio/uni-mp-vue": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0-beta"
+    "@dcloudio/uni-mp-vue": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.1-beta"
   }
 }

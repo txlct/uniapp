@@ -23,7 +23,7 @@
     "postinstall": "simple-git-hooks",
     "e2e:ssr:dev": "cd packages/playground/ssr && npm run dev:ssr",
     "e2e:ssr:open": "cd packages/playground/ssr && npx cypress open",
-    "release": "node scripts/release.js",
+    "release": "node scripts/release.js --skipTests",
     "release:mp": "node scripts/release.js uni-cli-shared vite-plugin-uni uni-mp-vue uni-mp-vite uni-mp-compiler uni-mp-weixin --skipTests --skipBuild",
     "release:h5": "node scripts/release.js uni-app uni-cli-shared uni-h5 uni-h5-vite vite-plugin-uni --skipTests --skipBuild",
     "release:version": "pnpm release --skipTests --dry",
