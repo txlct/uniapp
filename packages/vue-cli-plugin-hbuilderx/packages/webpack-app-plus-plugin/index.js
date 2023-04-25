@@ -1,5 +1,6 @@
 const fs = require('fs')
 const path = require('path')
+const uniI18n = require('@dcloudio/uni-cli-i18n')
 
 const {
   log,
@@ -31,7 +32,7 @@ class WebpackAppPlusPlugin {
       compiler.hooks.invalid.tap('WebpackAppPlusPlugin', (fileName, changeTime) => {
         if (!compiling) {
           compiling = true
-          console.log('开始差量编译...')
+          console.log(uniI18n.__('performingHotReload'))
         }
       })
 
@@ -43,13 +44,10 @@ class WebpackAppPlusPlugin {
       })
 
       compiler.hooks.emit.tapAsync('WebpackAppPlusPlugin', (compilation, callback) => {
-        const changedChunks = compilation.chunks.filter(chunk => {
+        compilation.chunks.forEach(chunk => {
           const oldVersion = chunkVersions[chunk.name]
           chunkVersions[chunk.name] = chunk.hash
-          return chunk.hash !== oldVersion
-        })
-        changedChunks.map(chunk => {
-          if (Array.isArray(chunk.files)) {
+          if (chunk.hash !== oldVersion && Array.isArray(chunk.files)) {
             chunk.files.forEach(file => {
               if (isAppService) {
                 !serviceChangedFiles.includes(file) && (serviceChangedFiles.push(file))
@@ -64,7 +62,7 @@ class WebpackAppPlusPlugin {
         callback()
       })
 
-      compiler.hooks.done.tapPromise('WebpackAppPlusPlugin', compilation => {
+      compiler.hooks.done.tapPromise('WebpackAppPlusPlugin', stats => {
         return new Promise((resolve, reject) => {
           isAppNVue && (nvueCompiled = true)
           isAppService && (serviceCompiled = true)
@@ -76,15 +74,26 @@ class WebpackAppPlusPlugin {
                 ...viewChangedFiles,
                 ...nvueChangedFiles
               ])]
+              let utsChangedFiles = []
+              try {
+                utsChangedFiles = JSON.parse(process.env.UNI_APP_UTS_CHANGED_FILES || '[]')
+                if (utsChangedFiles.length) {
+                  changedFiles.push(...utsChangedFiles)
+                }
+                process.env.UNI_APP_UTS_CHANGED_FILES = ''
+              } catch (e) {}
               if (!isFirst && changedFiles.length > 0) {
-                if (serviceChangedFiles.length === 0 && viewChangedFiles.length === 0) {
+                if (serviceChangedFiles.length === 0 && viewChangedFiles.length === 0 && utsChangedFiles
+                  .length === 0) {
                   // 仅 nvue 页面发生变化
                   done('Build complete. PAGES:' + JSON.stringify(changedFiles))
                 } else {
                   done('Build complete. FILES:' + JSON.stringify(changedFiles))
                 }
               } else {
+                // if (!stats.hasErrors()) {
                 !process.env.UNI_AUTOMATOR_WS_ENDPOINT && done('Build complete. Watching for changes...')
+                // };
               }
               isFirst = false
             } else {
@@ -99,7 +108,7 @@ class WebpackAppPlusPlugin {
         })
       })
     } else {
-      compiler.hooks.done.tapPromise('WebpackAppPlusPlugin', compilation => {
+      compiler.hooks.done.tapPromise('WebpackAppPlusPlugin', stats => {
         return new Promise((resolve, reject) => {
           if (process.env.UNI_USING_NATIVE || process.env.UNI_USING_V3_NATIVE) {
             return resolve()

@@ -5,11 +5,12 @@ const Service = require('@vue/cli-service')
 const {
   initCustomScript
 } = require('@dcloudio/uni-cli-shared/lib/package')
+const uniI18n = require('@dcloudio/uni-cli-i18n')
 
 module.exports = function custom (argv) {
   const script = argv._[1]
   if (!script) {
-    console.error('请指定 package.json->uni-app->scripts 下的 script 名称')
+    console.error(uniI18n.__('pluginUni.pleaseConfigScriptName'))
     process.exit(0)
   }
 
@@ -32,7 +33,8 @@ module.exports = function custom (argv) {
     minimize: process.env.UNI_MINIMIZE === 'true',
     clean: false,
     subpackage: argv.subpackage,
-    plugin: argv.plugin
+    plugin: argv.plugin,
+    sourcemap: argv.sourcemap
   }).catch(err => {
     console.error(err)
     process.exit(1)

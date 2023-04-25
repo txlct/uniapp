@@ -1,4 +1,5 @@
 const t = require('@babel/types')
+const uniI18n = require('@dcloudio/uni-cli-i18n')
 
 const {
   METHOD_CREATE_ELEMENT,
@@ -10,7 +11,8 @@ const {
   METHOD_RESOLVE_SCOPED_SLOTS,
   IDENTIFIER_FILTER,
   IDENTIFIER_METHOD,
-  IDENTIFIER_GLOBAL
+  IDENTIFIER_GLOBAL,
+  IDENTIFIER_TEXT
 } = require('../../constants')
 
 const {
@@ -21,7 +23,10 @@ const {
   hasOwn,
   hyphenate,
   traverseFilter,
-  getComponentName
+  getComponentName,
+  hasEscapeQuote,
+  hasLengthProperty,
+  isRootElement
 } = require('../../util')
 
 const traverseData = require('./data')
@@ -77,7 +82,7 @@ function addVueId (path, state) {
         const scoped = scopeds[i]
         forIndexSet.add(scoped.forIndex)
         if (forIndexSet.size !== i + 1) {
-          state.errors.add(`v-for 嵌套时,索引名称 ${scoped.forIndex} 不允许重复`)
+          state.errors.add(uniI18n.__('templateCompiler.forNestedIndexNameNoArrowRepeat', { 0: 'v-for', 1: scoped.forIndex }))
           break
         }
       }
@@ -144,6 +149,19 @@ module.exports = {
     ) {
       path.skip()
     }
+    // 微信小程序平台无法观测 Array length 访问：https://developers.weixin.qq.com/community/develop/doc/000c8ee47d87a0d5b6685a8cb57000
+    if (this.options.platform.name === 'mp-weixin' && hasLengthProperty(path)) {
+      let newPath = path
+      while (newPath) {
+        path = newPath
+        newPath = path.findParent((path) => path.isLogicalExpression())
+      }
+      path.skip()
+      if (path.findParent((path) => path.shouldSkip || (this.options.scopedSlotsCompiler === 'legacy' && path.isCallExpression() && path.node.callee.name === METHOD_RESOLVE_SCOPED_SLOTS))) {
+        return
+      }
+      path.replaceWith(getMemberExpr(path, IDENTIFIER_GLOBAL, path.node, this))
+    }
   },
   CallExpression (path) {
     const callee = path.node.callee
@@ -164,7 +182,8 @@ module.exports = {
               tagNode.value = getComponentName(hyphenate(tagName))
 
               // 组件增加 vueId
-              if (this.options.platform.isComponent(tagNode.value)) {
+              // 跳过支付宝插件组件
+              if (this.options.platform.isComponent(tagNode.value) && !tagNode.$mpPlugin) {
                 addVueId(path, this)
               }
 
@@ -178,14 +197,23 @@ module.exports = {
             if (this.options.scopeId) {
               addStaticClass(path, this.options.scopeId)
             }
-
+            // 根节点无 attrs 时添加空对象，方便后续合并外层 attrs
+            if (this.options.mergeVirtualHostAttributes && !t.isObjectExpression(path.node.arguments[1]) && isRootElement(path)) {
+              path.node.arguments.splice(1, 0, t.objectExpression([]))
+            }
             const dataPath = path.get('arguments.1')
             dataPath && dataPath.isObjectExpression() && traverseData(dataPath, this, tagNode.value)
           }
           break
         case METHOD_TO_STRING:
           {
-            const stringNodes = path.node.arguments[0]
+            const stringPath = path.get('arguments.0')
+            if (hasEscapeQuote(stringPath)) {
+              // 属性中包含转义引号时部分小程序平台报错或显示异常
+              // TODO 简单情况翻转外层引号
+              stringPath.replaceWith(getMemberExpr(path, IDENTIFIER_TEXT, stringPath.node, this))
+            }
+            const stringNodes = stringPath.node
             stringNodes.$toString = true
             path.replaceWith(stringNodes)
           }
@@ -202,11 +230,17 @@ module.exports = {
                 path =>
                   path.isObjectProperty() && ['on', 'nativeOn'].includes(path.node.key.name)
               )
+              // path is model.callback
+              // || path.findParent(path => path.isObjectProperty() && path.node.key.name === 'callback' && t.isFunctionExpression(path.node.value) && t.isObjectProperty(path.parentPath.parentPath) && path.parentPath.parentPath.node.key.name === 'model')
             ) {
               // event
               return path.skip()
             }
-            path = path.findParent((path) => path.isLogicalExpression()) || path
+            let newPath = path
+            while (newPath) {
+              path = newPath
+              newPath = path.findParent((path) => path.isLogicalExpression())
+            }
             path.skip()
             if (path.findParent((path) => path.shouldSkip)) {
               return
@@ -241,6 +275,15 @@ module.exports = {
       t.isMemberExpression(callee) // message.split('').reverse().join('')
     ) {
       // Object.assign...
+      let newPath = path
+      while (newPath) {
+        path = newPath
+        newPath = path.findParent((path) => path.isLogicalExpression())
+      }
+      path.skip()
+      if (path.findParent((path) => path.shouldSkip)) {
+        return
+      }
       path.replaceWith(getMemberExpr(path, IDENTIFIER_GLOBAL, path.node, this))
     }
   },

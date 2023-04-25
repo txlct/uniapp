@@ -4,16 +4,10 @@ const webpack = require('webpack')
 
 const {
   normalizePath,
+  pathToRegexp,
   isInHBuilderX
 } = require('@dcloudio/uni-cli-shared/lib/util')
 
-const isWin = /^win/.test(process.platform)
-
-function genTranspileDepRegex (depPath) {
-  return new RegExp(isWin
-    ? depPath.replace(/\\/g, '\\\\') // double escape for windows style path
-    : depPath)
-}
 let sourceRoot = false
 
 function getSourceRoot () {
@@ -46,20 +40,21 @@ function moduleFilenameTemplate (info) {
 const exclude = [/pages\.json/, /node_modules/, /vue&type=template/, /vue&type=style/]
 
 module.exports = {
-  createSourceMapDevToolPlugin (filename = false) {
+  createSourceMapDevToolPlugin (filename = false, args) {
     const options = {
       test: [/\.js$/],
       exclude,
-      moduleFilenameTemplate
+      moduleFilenameTemplate,
+      ...args
     }
     if (filename) {
-      options.filename = '../.sourcemap/' + process.env.UNI_PLATFORM + '/[name].js.map'
+      options.filename = '../.sourcemap/' + process.env.UNI_PLATFORM + '/[file].map'
     }
     return new webpack.SourceMapDevToolPlugin(options)
   },
   createEvalSourceMapDevToolPlugin () {
     return new webpack.EvalSourceMapDevToolPlugin({
-      test: genTranspileDepRegex(process.env.UNI_INPUT_DIR),
+      test: pathToRegexp(process.env.UNI_INPUT_DIR, { start: true }),
       exclude,
       moduleFilenameTemplate
     })

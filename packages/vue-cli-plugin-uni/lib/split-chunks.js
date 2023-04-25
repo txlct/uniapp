@@ -4,6 +4,13 @@ const {
   normalizePath
 } = require('@dcloudio/uni-cli-shared')
 
+const subPkgsInfo = Object.values(process.UNI_SUBPACKAGES)
+const normalFilter = ({ independent }) => !independent
+const independentFilter = ({ independent }) => independent
+const map2Root = ({ root }) => root + '/'
+const normalSubPackageRoots = subPkgsInfo.filter(normalFilter).map(map2Root)
+const independentSubpackageRoots = subPkgsInfo.filter(independentFilter).map(map2Root)
+
 function createCacheGroups () {
   const cacheGroups = {}
   if (process.UNI_CONFUSION) { // 加密
@@ -82,8 +89,8 @@ module.exports = function getSplitChunks () {
             }
             if (module.resource && (
               module.resource.indexOf('.vue') !== -1 ||
-                module.resource.indexOf('.nvue') !== -1 ||
-                normalizePath(module.resource).indexOf(mainPath) === 0 // main.js
+              module.resource.indexOf('.nvue') !== -1 ||
+              normalizePath(module.resource).indexOf(mainPath) === 0 // main.js
             )) {
               return false
             }
@@ -113,6 +120,15 @@ module.exports = function getSplitChunks () {
     }
     return true
   }
+
+  function getModuleChunks (module, chunks) {
+    // webpack5
+    if ('chunkGraph' in chunks) {
+      chunks = chunks.chunkGraph.getModuleChunks(module)
+    }
+    return chunks
+  }
+
   // TODO 独立分包
 
   const cacheGroups = {
@@ -123,6 +139,7 @@ module.exports = function getSplitChunks () {
         if (!baseTest(module)) {
           return false
         }
+        chunks = getModuleChunks(module, chunks)
         const matchSubPackages = findSubPackages(chunks)
         const matchSubPackagesCount = matchSubPackages.size
         const isMainPackage = ( // 非分包 或 两个及以上分包 或 主包内有使用
@@ -152,7 +169,7 @@ module.exports = function getSplitChunks () {
   const findSubPackages = function (chunks) {
     return chunks.reduce((pkgs, item) => {
       const name = normalizePath(item.name)
-      const pkgRoot = subPackageRoots.find(root => name.indexOf(root) === 0)
+      const pkgRoot = normalSubPackageRoots.find(root => name.indexOf(root) === 0)
       pkgRoot && pkgs.add(pkgRoot)
       return pkgs
     }, new Set())
@@ -178,7 +195,12 @@ module.exports = function getSplitChunks () {
                 console.log('move module to main chunk:', module.resource,
                   'from', subPackageRoot, 'for component in main package:', resource)
               }
-              return true
+
+              // 独立分包除外
+              const independentRoot = independentSubpackageRoots.find(root => resource.indexOf(root) >= 0)
+              if (!independentRoot) {
+                return true
+              }
             }
           } else {
             return hasMainPackageComponent(m.module, subPackageRoot)
@@ -198,6 +220,7 @@ module.exports = function getSplitChunks () {
           if (!baseTest(module)) {
             return false
           }
+          chunks = getModuleChunks(module, chunks)
           const matchSubPackages = findSubPackages(chunks)
           if (
             matchSubPackages.size === 1 &&

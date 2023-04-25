@@ -35,6 +35,10 @@
             ]
         ]
     ],
+    "interceptors": [
+        "/core/service/api/base/interceptor.js",
+        []
+    ],
     "request": [
         "/platforms/h5/service/api/network/request.js",
         [
@@ -235,6 +239,10 @@
             [
                 "/core/helpers/protocol/location/get-location.js",
                 "getLocation"
+            ],
+            [
+                "/platforms/h5/service/api/network/request.js",
+                "request"
             ]
         ]
     ],
@@ -258,6 +266,10 @@
                 "ScrollView"
             ],
             [
+                "/platforms/h5/service/api/network/request.js",
+                "request"
+            ],
+            [
                 "/platforms/h5/service/api/location/get-location.js",
                 "getLocation"
             ],
@@ -273,6 +285,18 @@
             [
                 "/core/helpers/protocol/location/open-location.js",
                 "openLocation"
+            ],
+            [
+                "/platforms/h5/view/components/map/index.vue",
+                "Map"
+            ],
+            [
+                "/platforms/h5/service/api/network/request.js",
+                "request"
+            ],
+            [
+                "/platforms/h5/service/api/location/get-location.js",
+                "getLocation"
             ],
             [
                 "/platforms/h5/components/system-routes/open-location/index.vue",
@@ -292,6 +316,30 @@
                 "createMapContext"
             ]
         ]
+    ],
+    "onLocationChange": [
+        "/platforms/h5/service/api/location/location-change.js",
+        []
+    ],
+    "onLocationChangeError": [
+        "/platforms/h5/service/api/location/location-change.js",
+        []
+    ],
+    "startLocationUpdate": [
+        "/platforms/h5/service/api/location/location-change.js",
+        []
+    ],
+    "stopLocationUpdate": [
+        "/platforms/h5/service/api/location/location-change.js",
+        []
+    ],
+    "offLocationChange": [
+        "/platforms/h5/service/api/location/location-change.js",
+        []
+    ],
+    "offLocationChangeError": [
+        "/platforms/h5/service/api/location/location-change.js",
+        []
     ],
     "chooseImage": [
         "/platforms/h5/service/api/media/choose-image.js",
@@ -335,10 +383,18 @@
                 "MovableView"
             ],
             [
-                "/platforms/h5/components/system-routes/preview-image/index.vue",
+                "/platforms/h5/components/app/popup/preview-image/index.vue",
                 "PreviewImage"
+            ],
+            [
+                "/platforms/h5/components/app/popup/mixins/preview-image.js",
+                "PreviewImageMixin"
             ]
         ]
+    ],
+    "closePreviewImage": [
+        "/platforms/h5/service/api/media/preview-image.js",
+        []
     ],
     "getImageInfo": [
         "/platforms/h5/service/api/media/get-image-info.js",
@@ -402,6 +458,18 @@
         "/platforms/h5/service/api/device/get-system-info.js",
         [],
         true
+    ],
+    "getWindowInfo": [
+        "/platforms/h5/service/api/device/get-window-info.js",
+        []
+    ],
+    "getDeviceInfo": [
+        "/platforms/h5/service/api/device/get-system-info.js",
+        []
+    ],
+    "getAppBaseInfo": [
+        "/platforms/h5/service/api/device/get-system-info.js",
+        []
     ],
     "canIUse": [
         "/core/service/api/base/can-i-use.js",
@@ -488,6 +556,10 @@
         []
     ],
     "onThemeChange": [
+        "/core/service/api/device/theme.js",
+        []
+    ],
+    "offThemeChange": [
         "/core/service/api/device/theme.js",
         []
     ],
@@ -837,6 +909,18 @@
         "/platforms/h5/service/api/ui/windows.js",
         []
     ],
+    "getLocale": [
+        "/core/service/api/ui/locale.js",
+        []
+    ],
+    "setLocale": [
+        "/core/service/api/ui/locale.js",
+        []
+    ],
+    "onLocaleChange": [
+        "/core/service/api/ui/locale.js",
+        []
+    ],
     "$emit": [
         "/platforms/h5/service/api/base/event-bus.js",
         [
@@ -958,5 +1042,29 @@
                 "preloadPage"
             ]
         ]
+    ],
+    "getLaunchOptionsSync": [
+        "/platforms/h5/service/api/plugin/get-launch-options-sync.js",
+        []
+    ],
+    "getEnterOptionsSync": [
+        "/platforms/h5/service/api/plugin/get-launch-options-sync.js",
+        []
+    ],
+    "invokePushCallback": [
+        "/core/service/api/plugin/push.js",
+        []
+    ],
+    "getPushClientId": [
+        "/core/service/api/plugin/push.js",
+        []
+    ],
+    "onPushMessage": [
+        "/core/service/api/plugin/push.js",
+        []
+    ],
+    "offPushMessage": [
+        "/core/service/api/plugin/push.js",
+        []
     ]
 }

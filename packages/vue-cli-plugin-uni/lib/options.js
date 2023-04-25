@@ -1,17 +1,9 @@
 const fs = require('fs')
 const path = require('path')
-
+const webpack = require('webpack')
 const {
-  sassLoaderVersion
-} = require('@dcloudio/uni-cli-shared/lib/scss')
-
-const isWin = /^win/.test(process.platform)
-
-function genTranspileDepRegex (depPath) {
-  return new RegExp(isWin
-    ? depPath.replace(/\\/g, '\\\\') // double escape for windows style path
-    : depPath)
-}
+  pathToRegexp
+} = require('@dcloudio/uni-cli-shared/lib/util')
 
 module.exports = function initOptions (options) {
   const {
@@ -24,11 +16,15 @@ module.exports = function initOptions (options) {
   }
 
   // 增加 src/node_modules 解析
-  options.transpileDependencies.push(genTranspileDepRegex(path.resolve(process.env.UNI_INPUT_DIR, 'node_modules')))
+  options.transpileDependencies.push(pathToRegexp(path.resolve(process.env.UNI_INPUT_DIR, 'node_modules'), { start: true }))
   options.transpileDependencies.push('@dcloudio/uni-' + process.env.UNI_PLATFORM)
   options.transpileDependencies.push('@dcloudio/uni-i18n')
   options.transpileDependencies.push('@dcloudio/uni-stat')
+  options.transpileDependencies.push('@dcloudio/uni-push')
+  options.transpileDependencies.push('@dcloudio/vue-cli-plugin-uni/packages/uni-app')
   options.transpileDependencies.push('@dcloudio/vue-cli-plugin-uni/packages/uni-cloud')
+  options.transpileDependencies.push('@dcloudio/vue-cli-plugin-uni/packages/uni-stat')
+  options.transpileDependencies.push('@dcloudio/vue-cli-plugin-uni/packages/uni-push')
 
   if (process.env.UNI_PLATFORM !== 'mp-weixin') { // mp runtime
     options.transpileDependencies.push('@dcloudio/uni-mp-weixin')
@@ -59,8 +55,14 @@ module.exports = function initOptions (options) {
     options.css.loaderOptions.sass = {}
   }
 
-  if (!options.css.loaderOptions.postcss.config) {
-    options.css.loaderOptions.postcss.config = {}
+  if (webpack.version[0] > 4) {
+    if (!options.css.loaderOptions.postcss.postcssOptions) {
+      options.css.loaderOptions.postcss.postcssOptions = {}
+    }
+  } else {
+    if (!options.css.loaderOptions.postcss.config) {
+      options.css.loaderOptions.postcss.config = {}
+    }
   }
 
   // sass 全局变量
@@ -83,18 +85,12 @@ module.exports = function initOptions (options) {
   if (!outputStyle || outputStyle === 'compressed') {
     options.css.loaderOptions.sass.sassOptions.outputStyle = 'expanded'
   }
-
-  if (sassLoaderVersion < 8) {
-    options.css.loaderOptions.sass.data = sassData
-  } else {
-    const name = sassLoaderVersion >= 9 ? 'additionalData' : 'prependData'
-    options.css.loaderOptions.sass[name] = sassData
-  }
-
+  options.css.loaderOptions.sass.prependData = sassData
   const userPostcssConfigPath = path.resolve(process.env.UNI_INPUT_DIR, 'postcss.config.js')
-  if (fs.existsSync(userPostcssConfigPath)) {
-    options.css.loaderOptions.postcss.config.path = userPostcssConfigPath
+  const configPath = fs.existsSync(userPostcssConfigPath) ? userPostcssConfigPath : path.resolve(process.env.UNI_CLI_CONTEXT, 'postcss.config.js')
+  if (webpack.version[0] > 4) {
+    options.css.loaderOptions.postcss.postcssOptions.config = configPath
   } else {
-    options.css.loaderOptions.postcss.config.path = path.resolve(process.env.UNI_CLI_CONTEXT, 'postcss.config.js')
+    options.css.loaderOptions.postcss.config.path = configPath
   }
 }

@@ -12,7 +12,7 @@
         class="uni-tabbar-border"
       />
       <div
-        v-for="(item,index) in list"
+        v-for="(item,index) in visibleList"
         :key="item.isMidButton ? index : item.pagePath"
         :style="item.isMidButton ? {flex:'0 0 ' + item.width,position:'relative'} : {}"
         class="uni-tabbar__item"
@@ -36,22 +36,25 @@
           :style="{height:height}"
         >
           <div
-            v-if="item.iconPath || item.isMidButton"
+            v-if="getIconPath(item,index) || item.iconfont || item.iconPath || item.isMidButton"
             :class="{'uni-tabbar__icon__diff':!item.text}"
             class="uni-tabbar__icon"
             :style="{width: iconWidth,height:iconWidth}"
           >
-            <img
-              v-if="!item.isMidButton"
-              :src="_getRealPath(selectedIndex===index?item.selectedIconPath:item.iconPath)"
-            >
             <div
-              v-if="item.redDot"
-              :class="{'uni-tabbar__badge':!!item.badge}"
-              class="uni-tabbar__reddot"
+              v-if="item.iconfont"
+              :style="{
+                color:selectedIndex === index ? item.iconfont.selectedColor : item.iconfont.color,
+                fontSize: item.iconfont.fontSize || iconWidth
+              }"
+              class="uni-tabbar__iconfont"
             >
-              {{ item.badge }}
+              {{ selectedIndex === index ? item.iconfont.selectedText : item.iconfont.text }}
             </div>
+            <img
+              v-else-if="!item.isMidButton"
+              :src="_getRealPath(getIconPath(item,index))"
+            >
           </div>
           <div
             v-if="item.text"
@@ -64,13 +67,13 @@
             class="uni-tabbar__label"
           >
             {{ item.text }}
-            <div
-              v-if="item.redDot&&!item.iconPath"
-              :class="{'uni-tabbar__badge':!!item.badge}"
-              class="uni-tabbar__reddot"
-            >
-              {{ item.badge }}
-            </div>
+          </div>
+          <div
+            v-if="item.redDot"
+            :class="{'uni-tabbar__badge':!!item.badge}"
+            class="uni-tabbar__reddot"
+          >
+            {{ item.badge }}
           </div>
         </div>
       </div>
@@ -168,6 +171,10 @@
     height: 100%;
   }
 
+  uni-tabbar .uni-tabbar__iconfont {
+    font-family: 'UniTabbarIconFont';
+  }
+
   uni-tabbar .uni-tabbar__label {
     position: relative;
     text-align: center;
@@ -185,14 +192,14 @@
 
   uni-tabbar .uni-tabbar__reddot {
     position: absolute;
-    top: 0;
+    top: 2px;
     right: 0;
     width: 12px;
     height: 12px;
     border-radius: 50%;
     background-color: #f43530;
     color: #ffffff;
-    transform: translate(40%, -20%);
+    transform: translate(40%, 0%);
   }
 
   uni-tabbar .uni-tabbar__badge {
@@ -220,9 +227,11 @@
 import getRealPath from 'uni-platform/helpers/get-real-path'
 import { isPlainObject } from 'uni-shared'
 import { publish } from 'uni-platform/service/bridge'
+import { loadFontFace } from 'uni-core/view/bridge/subscribe/font'
 function cssSupports (css) {
   return window.CSS && CSS.supports && (CSS.supports(css) || CSS.supports.apply(CSS, css.split(':')))
 }
+const UNI_TABBAR_ICON_FONT = 'UniTabbarIconFont'
 export default {
   name: 'TabBar',
   props: {
@@ -247,6 +256,10 @@ export default {
     borderStyle: {
       type: String,
       default: 'black'
+    },
+    iconfontSrc: {
+      type: String,
+      default: ''
     },
     list: {
       type: Array,
@@ -287,7 +300,9 @@ export default {
   },
   data () {
     return {
-      selectedIndex: 0
+      selectedIndex: 0,
+      visibleList: [],
+      internalMidButton: {}
     }
   },
   computed: {
@@ -319,25 +334,57 @@ export default {
   watch: {
     $route: {
       immediate: true,
-      handler (to) {
-        if (to.meta.isTabBar) {
-          this.__path__ = to.path
-          const index = this.list.findIndex(item => to.meta.pagePath === item.pagePath)
-          if (index > -1) {
-            this.selectedIndex = index
-          }
-        }
+      handler () {
+      // 只在此做一次 visibleList 的初始化
+        if (!this.visibleList.length) this._initVisibleList()
+        this.setSelectedIndex()
       }
+    },
+    list: {
+      deep: true,
+      handler () {
+        this._initVisibleList()
+        this.setSelectedIndex()
+      }
+    },
+    midButton (config) {
+      this._initVisibleList()
     }
   },
   created () {
-    this._initMidButton()
+    this.list.forEach(item => {
+      if (item.visible === undefined) {
+        this.$set(item, 'visible', true)
+      }
+    })
+
+    if (this.iconfontSrc) {
+      loadFontFace({
+        options: {
+          family: UNI_TABBAR_ICON_FONT,
+          source: `url("${this.iconfontSrc}")`
+        }
+      })
+    }
   },
   beforeCreate () {
     this.__path__ = this.$route.path
   },
   methods: {
-    _getRealPath (filePath) {
+    getIconPath (item, index) {
+      return (this.selectedIndex === index ? item.selectedIconPath || item.iconPath : item.iconPath) || ''
+    },
+    setSelectedIndex () {
+      if (this.$route.meta.isTabBar) {
+        this.__path__ = this.$route.path
+        const index = this.visibleList.findIndex(item => this.$route.meta.pagePath === item.pagePath)
+        this.selectedIndex = index
+      }
+    },
+    _initVisibleList () {
+      this.visibleList = this._initMidButton(this.list.filter(item => item.visible !== false))
+    },
+    _getRealPath (filePath = '') {
       const SCHEME_RE = /^([a-z-]+:)?\/\//i
       const DATA_RE = /^data:.*,.*/
       if (!(SCHEME_RE.test(filePath) || DATA_RE.test(filePath)) && filePath.indexOf('/') !== 0) {
@@ -375,21 +422,22 @@ export default {
         UniServiceJSBridge.emit('onTabItemTap', detail)
       }
     },
-    _initMidButton () {
-      const listLength = this.list.length
+    _initMidButton (list) {
+      const listLength = list.length
       // 偶数则添加midButton
       if (listLength % 2 === 0 && isPlainObject(this.midButton)) {
-        // 给midButton赋值默认值
-        const DefaultMidButton = {
-          width: '50px',
-          height: '50px',
-          iconWidth: '24px'
-        }
-        for (const key in DefaultMidButton) {
-          this.midButton[key] = this.midButton[key] || DefaultMidButton[key]
-        }
-        this.list.splice(~~(listLength / 2), 0, Object.assign({}, this.midButton, { isMidButton: true }))
+        this.internalMidButton = Object.assign(
+          {
+            width: '50px',
+            height: '50px',
+            iconWidth: '24px'
+          },
+          this.internalMidButton,
+          this.midButton
+        )
+        list.splice(~~(listLength / 2), 0, Object.assign({}, this.internalMidButton, { isMidButton: true }))
       }
+      return list
     },
     _uniTabbarBdStyle (item) {
       return Object.assign({}, {

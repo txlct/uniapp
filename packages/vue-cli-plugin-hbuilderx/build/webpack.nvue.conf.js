@@ -3,15 +3,23 @@ const path = require('path')
 const webpack = require('webpack')
 const VueLoaderPlugin = require('@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib/plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
+const CopyWebpackPluginVersion = Number(require('copy-webpack-plugin/package.json').version.split('.')[0])
 const TerserPlugin = require('terser-webpack-plugin')
 
 const {
   getNVueMainEntry,
   nvueJsPreprocessOptions,
   nvueHtmlPreprocessOptions,
-  getTemplatePath
+  getTemplatePath,
+  uts
 } = require('@dcloudio/uni-cli-shared')
-
+const fileLoader = require('@dcloudio/uni-cli-shared/lib/file-loader')
+const {
+  compileI18nJsonStr
+} = require('@dcloudio/uni-i18n')
+const {
+  initI18nOptions
+} = require('@dcloudio/uni-cli-shared/lib/i18n')
 const WebpackAppPlusNVuePlugin = process.env.UNI_USING_V3
   ? require('../packages/webpack-app-plus-plugin')
   : require('../packages/webpack-app-plus-nvue-plugin')
@@ -79,10 +87,20 @@ const plugins = [
   new webpack.DefinePlugin({
     'process.env': {
       NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+      UNI_APP_ID: JSON.stringify(process.env.UNI_APP_ID),
+      UNI_APP_NAME: JSON.stringify(process.env.UNI_APP_NAME),
+      UNI_PLATFORM: JSON.stringify(process.env.UNI_PLATFORM),
       VUE_APP_PLATFORM: JSON.stringify(process.env.UNI_PLATFORM),
       UNI_CLOUD_PROVIDER: process.env.UNI_CLOUD_PROVIDER,
-      HBX_USER_TOKEN: JSON.stringify(process.env.HBX_USER_TOKEN || ''),
-      UNI_AUTOMATOR_WS_ENDPOINT: JSON.stringify(process.env.UNI_AUTOMATOR_WS_ENDPOINT)
+      UNI_SECURE_NETWORK_ENABLE: process.env.UNI_SECURE_NETWORK_ENABLE,
+      UNI_SECURE_NETWORK_CONFIG: process.env.UNI_SECURE_NETWORK_CONFIG || '[]',
+      UNICLOUD_DEBUG: process.env.UNICLOUD_DEBUG,
+      RUN_BY_HBUILDERX: process.env.RUN_BY_HBUILDERX,
+      UNI_AUTOMATOR_WS_ENDPOINT: JSON.stringify(process.env.UNI_AUTOMATOR_WS_ENDPOINT),
+      UNI_STAT_UNI_CLOUD: process.env.UNI_STAT_UNI_CLOUD || '""',
+      UNI_STATISTICS_CONFIG: process.env.UNI_STATISTICS_CONFIG || '""',
+      UNI_STAT_DEBUG: process.env.UNI_STAT_DEBUG || '""',
+      UNI_COMPILER_VERSION: JSON.stringify(process.env.UNI_COMPILER_VERSION)
     }
   }),
   new webpack.BannerPlugin({
@@ -104,7 +122,13 @@ if (process.env.NODE_ENV === 'development') {
 
 // const excludeModuleReg = /node_modules(?!(\/|\\).*(weex).*)/
 
-const rules = [{
+const rules = [webpack.version[0] > 4 ? {
+  test: /\.(woff2?|eot|ttf|otf)(\?.*)?$/i,
+  type: 'asset'
+} : {
+  test: /\.(png|jpg|gif|ttf|eot|woff|woff2)$/i,
+  use: [fileLoader]
+}, {
   test: path.resolve(process.env.UNI_INPUT_DIR, 'pages.json'),
   use: [{
     loader: '@dcloudio/webpack-uni-pages-loader'
@@ -156,6 +180,13 @@ const rules = [{
 {
   resourceQuery: /vue&type=template/,
   use: [htmlPreprocessorLoader]
+},
+{
+  type: 'javascript/auto',
+  resourceQuery: /uts-proxy/,
+  use: [{
+    loader: require.resolve('@dcloudio/uni-cli-shared/lib/uts/uts-loader.js')
+  }]
 }
 ].concat(cssLoaders)
 
@@ -183,7 +214,7 @@ rules.unshift({
 if (process.env.UNI_USING_V3_NATIVE) {
   try {
     const automatorJson = require.resolve('@dcloudio/uni-automator/dist/automator.json')
-    plugins.push(new CopyWebpackPlugin([{
+    const patterns = [{
       from: automatorJson,
       to: '../.automator/' + (process.env.UNI_SUB_PLATFORM || process.env.UNI_PLATFORM) +
         '/.automator.json',
@@ -196,30 +227,80 @@ if (process.env.UNI_USING_V3_NATIVE) {
         }
         return ''
       }
-    }]))
+    }]
+    plugins.push(new CopyWebpackPlugin(CopyWebpackPluginVersion > 5 ? {
+      patterns
+    } : patterns))
   } catch (e) {}
 }
 
 if (process.env.UNI_USING_NATIVE || process.env.UNI_USING_V3_NATIVE) {
   plugins.push(new WebpackUniMPPlugin())
-  const array = [{
-    from: path.resolve(process.env.UNI_INPUT_DIR, 'static'),
-    to: 'static'
+  const assetsDir = 'static'
+  const hybridDir = 'hybrid/html'
+  const patterns = [{
+    from: path.resolve(process.env.UNI_INPUT_DIR, assetsDir),
+    to: assetsDir
   }]
-  const hybridHtmlPath = path.resolve(process.env.UNI_INPUT_DIR, 'hybrid/html')
+  // 自动化测试时，不启用androidPrivacy.json
+  if (!process.env.UNI_AUTOMATOR_WS_ENDPOINT) {
+    const fileName = 'androidPrivacy.json'
+    const context = path.resolve(process.env.UNI_INPUT_DIR)
+    if (fs.existsSync(path.join(context, fileName))) {
+      patterns.push({
+        from: fileName,
+        context,
+        to: fileName,
+        transform (content) {
+          const options = initI18nOptions(
+            process.env.UNI_PLATFORM,
+            process.env.UNI_INPUT_DIR,
+            false,
+            true
+          )
+          if (!options) {
+            return content
+          }
+          return compileI18nJsonStr(content.toString(), options)
+        }
+      })
+    }
+  }
+  const hybridHtmlPath = path.resolve(process.env.UNI_INPUT_DIR, hybridDir)
   if (fs.existsSync(hybridHtmlPath)) {
-    array.push({
+    patterns.push({
       from: hybridHtmlPath,
-      to: 'hybrid/html'
+      to: hybridDir
     })
   }
+
+  global.uniModules.forEach(module => {
+    const modules = 'uni_modules/'
+    const assets = modules + module + '/' + assetsDir
+    const assetsPath = path.resolve(process.env.UNI_INPUT_DIR, assets)
+    if (fs.existsSync(assetsPath)) {
+      patterns.push({
+        from: assetsPath,
+        to: assets
+      })
+    }
+    const hybridHtml = modules + module + '/' + hybridDir
+    const hybridHtmlPath = path.resolve(process.env.UNI_INPUT_DIR, hybridHtml)
+    if (fs.existsSync(hybridHtmlPath)) {
+      patterns.push({
+        from: hybridHtmlPath,
+        to: hybridHtml
+      })
+    }
+  })
+
   if (process.env.UNI_USING_NVUE_COMPILER) {
-    array.push({
+    patterns.push({
       from: path.resolve(getTemplatePath(), 'common'),
       to: process.env.UNI_OUTPUT_DIR
     })
   } else if (process.env.UNI_USING_V3_NATIVE) {
-    array.push({
+    patterns.push({
       from: path.resolve(getTemplatePath(), 'weex'),
       to: process.env.UNI_OUTPUT_DIR
     })
@@ -231,7 +312,7 @@ if (process.env.UNI_USING_NATIVE || process.env.UNI_USING_V3_NATIVE) {
         'weapp-tools/template/v8'
       )
     }
-    array.push({
+    patterns.push({
       from: nativeTemplatePath,
       to: process.env.UNI_OUTPUT_DIR
     }, {
@@ -240,16 +321,32 @@ if (process.env.UNI_USING_NATIVE || process.env.UNI_USING_V3_NATIVE) {
         'weapp-tools/template/common'
       ),
       to: process.env.UNI_OUTPUT_DIR,
-      ignore: [
-        '*.js',
-        '*.json',
-        '__uniapppicker.html',
-        '__uniappview.html'
-      ]
+      globOptions: {
+        ignore: [
+          '*.js',
+          '*.json',
+          '__uniapppicker.html',
+          '__uniappview.html'
+        ]
+      }
     })
   }
-  plugins.push(new CopyWebpackPlugin(array))
+  plugins.push(new CopyWebpackPlugin(CopyWebpackPluginVersion > 5 ? {
+    patterns
+  } : patterns))
 }
+
+try {
+  if (process.env.UNI_HBUILDERX_PLUGINS) {
+    require(path.resolve(process.env.UNI_HBUILDERX_PLUGINS, 'uni_helpers/lib/bytenode'))
+    const {
+      W
+    } = require(path.resolve(process.env.UNI_HBUILDERX_PLUGINS, 'uni_helpers'))
+    plugins.push(new W({
+      dir: process.env.UNI_INPUT_DIR
+    }))
+  }
+} catch (e) {}
 
 module.exports = function () {
   return {
@@ -266,8 +363,7 @@ module.exports = function () {
     performance: {
       hints: false
     },
-    optimization: {
-      namedModules: false,
+    optimization: Object.assign({
       minimizer: [
         new TerserPlugin({
           terserOptions: {
@@ -277,7 +373,9 @@ module.exports = function () {
           }
         })
       ]
-    },
+    }, webpack.version[0] > 4 ? {} : {
+      namedModules: false
+    }),
     output: {
       path: process.env.UNI_OUTPUT_DIR,
       filename: '[name].js'
@@ -285,9 +383,12 @@ module.exports = function () {
     resolve: {
       extensions: ['.js', '.nvue', '.vue', '.json'],
       alias: {
+        '@/pages.json': path.resolve(process.env.UNI_INPUT_DIR, 'pages.json') + '?' + JSON.stringify({
+          type: 'origin-pages-json'
+        }),
         '@': process.env.UNI_INPUT_DIR,
+        'uni-polyfill': require.resolve('@dcloudio/uni-cli-shared/lib/uni-polyfill.js'),
         'uni-pages': path.resolve(process.env.UNI_INPUT_DIR, 'pages.json'),
-        '@dcloudio/uni-stat': require.resolve('@dcloudio/uni-stat'),
         'uni-app-style': path.resolve(process.env.UNI_INPUT_DIR, getNVueMainEntry()) + '?' + JSON.stringify({
           type: 'appStyle'
         }),
@@ -295,12 +396,16 @@ module.exports = function () {
           '?' +
           JSON.stringify({
             type: 'stat'
-          })
+          }),
+        '@vue/composition-api': require.resolve('@dcloudio/vue-cli-plugin-uni/packages/@vue/composition-api')
       },
       modules: [
         'node_modules',
         path.resolve(process.env.UNI_CLI_CONTEXT, 'node_modules'),
         path.resolve(process.env.UNI_INPUT_DIR, 'node_modules')
+      ],
+      plugins: [
+        new uts.UTSResolverPlugin()
       ]
     },
     resolveLoader: {
@@ -318,7 +423,7 @@ module.exports = function () {
       reasons: true,
       errorDetails: true
     },
-    node: {
+    node: webpack.version[0] > 4 ? false : {
       global: false,
       Buffer: false,
       __filename: false,

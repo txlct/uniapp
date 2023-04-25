@@ -33,12 +33,20 @@ const methods = ['getCenterLocation',
   'addMarkers',
   'removeMarkers',
   'moveAlong',
+  'setLocMarkerIcon',
   'openMapApp']
 
 export class MapContext {
   constructor (id, pageVm) {
     this.id = id
     this.pageVm = pageVm
+  }
+
+  on (name, callback) {
+    operateMapPlayer(this.id, this.pageVm, 'on', {
+      name,
+      callback
+    })
   }
 }
 

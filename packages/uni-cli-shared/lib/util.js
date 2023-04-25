@@ -1,6 +1,10 @@
 const path = require('path')
+const fs = require('fs')
 const hash = require('hash-sum')
 const crypto = require('crypto')
+const escapeStringRegexp = require('escape-string-regexp')
+const escapeGlob = require('glob-escape')
+const webpack = require('webpack')
 
 const isWin = /^win/.test(process.platform)
 
@@ -13,6 +17,24 @@ try {
 
 const isInHBuilderX = !!aboutPkg
 const isInHBuilderXAlpha = !!(isInHBuilderX && aboutPkg.alpha)
+
+function getCLIContext () {
+  var context = path.resolve(__dirname, '../../../../')
+  // const isInHBuilderX = fs.existsSync(path.resolve(context, 'bin/uniapp-cli.js'))
+  if (isInHBuilderX) {
+    return context
+  }
+  const pnpmFind = __dirname.match(/.+?[/\\].pnpm[/\\]/)
+  if (pnpmFind) {
+    const pnpm = pnpmFind[0]
+    context = path.resolve(pnpm, '../../')
+  }
+  const isInCLI = fs.existsSync(path.resolve(context, './src'))
+  if (isInCLI) {
+    return context
+  }
+  return process.cwd()
+}
 
 function removeExt (str, ext) {
   if (ext) {
@@ -106,9 +128,66 @@ function normalizeNodeModules (str) {
 
 const _hasOwnProperty = Object.prototype.hasOwnProperty
 
+/**
+ * pathToRegexp
+ * @param {string} pathString
+ * @param {{start:?boolean,end:?boolean,global:?boolean}?} options
+ * @returns {RegExp}
+ */
+function pathToRegexp (pathString, options = {}) {
+  return new RegExp((options.start ? '^' : '') + escapeStringRegexp(pathString) + (options.end ? '$' : ''), 'i' + (options.global ? 'g' : ''))
+}
+
+/**
+ * pathToGlob
+ * @param {string} pathString
+ * @param {string} glob
+ * @param {{windows:?boolean,escape:?boolean}?} options
+ * @returns {string}
+ */
+function pathToGlob (pathString, glob, options = {}) {
+  const isWindows = 'windows' in options ? options.windows : /^win/.test(process.platform)
+  const useEscape = options.escape
+  const str = isWindows ? pathString.replace(/\\/g, '/') : pathString
+  let safeStr = escapeGlob(str)
+  if (isWindows || !useEscape) {
+    safeStr = safeStr.replace(/\\(.)/g, '[$1]')
+  }
+  return path.posix.join(safeStr, glob)
+}
+/**
+ * 字节跳动小程序可以配置 ext:// 开头的插件页面模板，如 ext://microapp-trade-plugin/order-confirm
+ * @param pagePath
+ * @returns
+ */
+function isNormalPage (pagePath) {
+  return !pagePath.startsWith('ext://')
+}
+
+function createSource (content) {
+  return webpack.version[0] > 4 ? new webpack.sources.RawSource(content) : {
+    size () {
+      return Buffer.byteLength(content, 'utf8')
+    },
+    source () {
+      return content
+    }
+  }
+}
+
+function deleteAsset (compilation, name) {
+  if ('deleteAsset' in compilation) {
+    compilation.deleteAsset(name)
+  } else {
+    delete compilation.assets[name]
+  }
+}
+
 module.exports = {
+  isNormalPage,
   isInHBuilderX,
   isInHBuilderXAlpha,
+  getCLIContext,
   normalizeNodeModules,
   md5,
   hasOwn (obj, key) {
@@ -133,6 +212,8 @@ module.exports = {
   hyphenate,
   normalizePath,
   convertStaticStyle,
+  pathToRegexp,
+  pathToGlob,
   getComponentName: cached((str) => {
     if (str.indexOf('wx-') === 0) {
       return str.replace('wx-', 'weixin-')
@@ -141,5 +222,7 @@ module.exports = {
   }),
   getTemplatePath () {
     return path.join(__dirname, '../template')
-  }
+  },
+  createSource,
+  deleteAsset
 }

@@ -14,6 +14,10 @@ const {
   addPageUsingComponents
 } = require('@dcloudio/uni-cli-shared/lib/pages')
 
+const {
+  getTheme
+} = require('@dcloudio/uni-cli-shared/lib/theme')
+
 const compilerVersion = require('@dcloudio/webpack-uni-pages-loader/package.json')['uni-app'].compilerVersion
 
 const PLATFORMS = getPlatforms()
@@ -119,14 +123,27 @@ const getPageComponents = function (inputDir, pagesJson) {
       always: 'float'
     }
     let titleNView = pageStyle.titleNView
-    titleNView = Object.assign({}, {
-      type: pageStyle.navigationStyle === 'custom' ? 'none' : 'default'
-    }, pageStyle.transparentTitle in titleNViewTypeList ? {
-      type: titleNViewTypeList[pageStyle.transparentTitle],
-      backgroundColor: 'rgba(0,0,0,0)'
-    } : null, typeof titleNView === 'object' ? titleNView : (typeof titleNView === 'boolean' ? {
-      type: titleNView ? 'default' : 'none'
-    } : null))
+    titleNView = Object.assign(
+      {},
+      {
+        type: pageStyle.navigationStyle === 'custom' ? 'none' : 'default'
+      },
+      pageStyle.transparentTitle in titleNViewTypeList
+        ? {
+          type: titleNViewTypeList[pageStyle.transparentTitle],
+          backgroundColor: 'rgba(0,0,0,0)'
+        }
+        : null,
+      typeof titleNView === 'object'
+        ? titleNView
+        : (
+          typeof titleNView === 'boolean'
+            ? {
+              type: titleNView ? 'default' : 'none'
+            }
+            : null
+        )
+    )
     if (titleNView.type === 'none' || titleNView.type === 'transparent') {
       windowTop = 0
     }
@@ -177,7 +194,7 @@ const genRegisterPageVueComponentsCode = function (pageComponents) {
 
       return `Vue.component('${name}', resolve=>{
 const component = {
-  component:require.ensure([], () => resolve(require('${path}${ext}')), '${name}'),
+  component:require.ensure([], () => resolve(require(${JSON.stringify(path)}+'${ext}')), '${name}'),
   delay:__uniConfig['async'].delay,
   timeout: __uniConfig['async'].timeout
 }
@@ -255,32 +272,6 @@ meta:{${isQuit ? '\nid:' + (id++) + ',' : ''}
 
 const genSystemRoutes = function () {
   return [
-    `
-{
-path: '/preview-image',
-component: {
-  render (createElement) {
-    return createElement(
-      'Page',
-      {
-        props:{
-          navigationStyle:'custom'
-        }
-      },
-      [
-        createElement('system-preview-image', {
-          slot: 'page'
-        })
-      ]
-    )
-  }
-},
-meta:{
-  name:'preview-image',
-  pagePath:'/preview-image'
-}
-}
-    `,
     `
 {
 path: '/choose-location',
@@ -427,24 +418,34 @@ module.exports = function (pagesJson, manifestJson, loader) {
 
   const networkTimeoutConfig = getNetworkTimeout(manifestJson)
 
-  let qqMapKey = 'XVXBZ-NDMC4-JOGUS-XGIEE-QVHDZ-AMFV2'
-
   const sdkConfigs = h5.sdkConfigs || {}
-  if (
-    sdkConfigs.maps &&
-    sdkConfigs.maps.qqmap &&
-    sdkConfigs.maps.qqmap.key
-  ) {
-    qqMapKey = sdkConfigs.maps.qqmap.key
-  }
+
+  const qqMapKey = sdkConfigs.maps && sdkConfigs.maps.qqmap && sdkConfigs.maps.qqmap.key
+  const googleMapKey = sdkConfigs.maps && sdkConfigs.maps.google && sdkConfigs.maps.google.key
+  const aMapKey = sdkConfigs.maps && sdkConfigs.maps.amap && sdkConfigs.maps.amap.key
+  const aMapSecurityJsCode =
+    sdkConfigs.maps && sdkConfigs.maps.amap && sdkConfigs.maps.amap.securityJsCode
+  const aMapServiceHost =
+    sdkConfigs.maps && sdkConfigs.maps.amap && sdkConfigs.maps.amap.serviceHost
+
+  let locale = manifestJson.locale
+  locale = locale && locale.toUpperCase() !== 'AUTO' ? locale : ''
 
   return `
 import Vue from 'vue'
 ${genLayoutComponentsCode(pagesJson)}
+const locales = ${fs.existsSync(path.resolve(process.env.UNI_INPUT_DIR, 'locale')) ? 'require.context(\'./locale\', false, /.json$/)' : '{keys(){return []}}'}
 global['____${h5.appid}____'] = true;
 delete global['____${h5.appid}____'];
 global.__uniConfig = ${JSON.stringify(pagesJson)};
 global.__uniConfig.compilerVersion = '${compilerVersion}';
+global.__uniConfig.darkmode = ${JSON.stringify(h5.darkmode || false)};
+global.__uniConfig.themeConfig = ${JSON.stringify(getTheme())};
+global.__uniConfig.uniPlatform = '${process.env.UNI_PLATFORM}';
+global.__uniConfig.appId = '${process.env.UNI_APP_ID}';
+global.__uniConfig.appName = '${process.env.UNI_APP_NAME}';
+global.__uniConfig.appVersion = '${process.env.UNI_APP_VERSION_NAME}';
+global.__uniConfig.appVersionCode = '${process.env.UNI_APP_VERSION_CODE}';
 global.__uniConfig.router = ${JSON.stringify(h5.router)};
 global.__uniConfig.publicPath = ${JSON.stringify(h5.publicPath)};
 global.__uniConfig['async'] = ${JSON.stringify(h5.async)};
@@ -452,6 +453,13 @@ global.__uniConfig.debug = ${manifestJson.debug === true};
 global.__uniConfig.networkTimeout = ${JSON.stringify(networkTimeoutConfig)};
 global.__uniConfig.sdkConfigs = ${JSON.stringify(sdkConfigs)};
 global.__uniConfig.qqMapKey = ${JSON.stringify(qqMapKey)};
+global.__uniConfig.googleMapKey = ${JSON.stringify(googleMapKey)};
+global.__uniConfig.aMapKey = ${JSON.stringify(aMapKey)};
+global.__uniConfig.aMapSecurityJsCode = ${JSON.stringify(aMapSecurityJsCode)};
+global.__uniConfig.aMapServiceHost = ${JSON.stringify(aMapServiceHost)};
+global.__uniConfig.locale = ${JSON.stringify(locale)};
+global.__uniConfig.fallbackLocale = ${JSON.stringify(manifestJson.fallbackLocale)};
+global.__uniConfig.locales = locales.keys().reduce((res,key)=>{const locale=key.replace(/\\.\\/(uni-app.)?(.*).json/,'$2');const messages = locales(key);Object.assign(res[locale]||(res[locale]={}),messages.common||messages);return res},{});
 global.__uniConfig.nvue = ${JSON.stringify({ 'flex-direction': getFlexDirection(manifestJson['app-plus']) })}
 global.__uniConfig.__webpack_chunk_load__ = __webpack_chunk_load__
 ${genRegisterPageVueComponentsCode(pageComponents)}

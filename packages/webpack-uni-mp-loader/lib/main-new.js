@@ -37,6 +37,8 @@ const traverse = require('./babel/global-component-traverse')
 
 const babelPluginCreateApp = require.resolve('./babel/plugin-create-app')
 
+const uniI18n = require('@dcloudio/uni-cli-i18n')
+
 function addCreateApp (babelLoader) {
   babelLoader.options = babelLoader.options || {}
   if (!babelLoader.options.plugins) {
@@ -77,6 +79,12 @@ createPage(Page)
       type: jsPreprocessOptions.type
     })
 
+    if (process.env.UNI_USING_VUE3) {
+      if (content.indexOf('createSSRApp') !== -1) {
+        content = content + ';createApp().app.mount(\'#app\');'
+      }
+    }
+
     const resourcePath = 'app'
 
     const {
@@ -84,13 +92,25 @@ createPage(Page)
         components
       }
     } = traverse(parser.parse(content, getBabelParserOptions()), {
+      filename: this.resourcePath,
       components: []
     })
 
-    const babelLoader = findBabelLoader(this.loaders)
+    let babelLoader = findBabelLoader(this.loaders)
     if (!babelLoader) {
-      throw new Error('babel-loader 查找失败')
+      throw new Error(uniI18n.__('mpLoader.findFail', {
+        0: 'babel-loader'
+      }))
     } else {
+      const webpack = require('webpack')
+      if (webpack.version[0] > 4) {
+        // clone babelLoader and options
+        const index = this.loaders.indexOf(babelLoader)
+        const newBabelLoader = Object.assign({}, babelLoader)
+        Object.assign(newBabelLoader, { options: Object.assign({}, babelLoader.options) })
+        this.loaders.splice(index, 1, newBabelLoader)
+        babelLoader = newBabelLoader
+      }
       addCreateApp(babelLoader)
     }
 

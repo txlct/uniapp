@@ -7,6 +7,9 @@ const {
   getH5Options,
   getResolveEntry,
   getSubPagesWithEntry
+  getPlatformStat,
+  getPlatformPush,
+  getPlatformUniCloud
 } = require('@dcloudio/uni-cli-shared')
 
 const {
@@ -140,8 +143,9 @@ module.exports = {
   webpackConfig (webpackConfig) {
     let useBuiltIns = 'usage'
 
-    const statCode = process.env.UNI_USING_STAT ? 'import \'@dcloudio/uni-stat\';' : ''
-
+    const statCode = getPlatformStat()
+    const pushCode = getPlatformPush()
+    const uniCloudCode = getPlatformUniCloud()
     try {
       const babelConfig = require(path.resolve(process.env.UNI_CLI_CONTEXT, 'babel.config.js'))
       useBuiltIns = babelConfig.presets[0][1].useBuiltIns
@@ -152,7 +156,7 @@ module.exports = {
 
     return {
       resolve: {
-        extensions: ['.nvue'],
+        extensions: ['.uts', '.nvue'],
         alias: {
           'vue-router': resolve('packages/h5-vue-router'),
           'uni-h5': require.resolve('@dcloudio/uni-h5')
@@ -165,7 +169,7 @@ module.exports = {
             loader: path.resolve(__dirname, '../../packages/wrap-loader'),
             options: {
               before: [
-                beforeCode + require('../util').getAutomatorCode() + statCode +
+                beforeCode + require('../util').getAutomatorCode() + statCode + pushCode + uniCloudCode +
                 getGlobalUsingComponentsCode()
               ]
             }
@@ -204,7 +208,14 @@ module.exports = {
         }
       },
       plugins,
-      devServer: {
+      optimization: {
+        moduleIds: webpack.version[0] > 4 ? 'deterministic' : 'hashed'
+      },
+      devServer: webpack.version[0] > 4 ? {
+        watchFiles: {
+          options: require('../util').getWatchOptions()
+        }
+      } : {
         watchOptions: require('../util').getWatchOptions()
       }
     }

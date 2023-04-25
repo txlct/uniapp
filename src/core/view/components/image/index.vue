@@ -4,11 +4,6 @@
       ref="content"
       :style="style"
     />
-    <img
-      v-if="contentPath"
-      :src="contentPath"
-      :draggable="draggable"
-    >
     <v-uni-resize-sensor
       v-if="mode === 'widthFix' || mode === 'heightFix'"
       ref="sensor"
@@ -43,7 +38,7 @@ export default {
     },
     draggable: {
       type: Boolean,
-      default: true
+      default: false
     }
   },
   data () {
@@ -128,6 +123,12 @@ export default {
       if (newValue === 'widthFix' || newValue === 'heightFix') {
         this._fixSize()
       }
+    },
+    contentPath (val) {
+      if (!val && this.__img) {
+        this.__img.remove()
+        delete this.__img
+      }
     }
   },
   mounted () {
@@ -171,16 +172,22 @@ export default {
         const img = this._img = this._img || new Image()
         img.onload = $event => {
           this._img = null
-          this.originalWidth = img.width
-          this.originalHeight = img.height
+          const width = this.originalWidth = img.width
+          const height = this.originalHeight = img.height
 
           this._fixSize()
 
           this.contentPath = realImagePath
+          img.draggable = this.draggable
+          if (this.__img) {
+            this.__img.remove()
+          }
+          this.__img = img
+          this.$el.appendChild(img)
 
           this.$trigger('load', $event, {
-            width: img.width,
-            height: img.height
+            width,
+            height
           })
         }
         img.onerror = $event => {
@@ -224,12 +231,12 @@ uni-image[hidden] {
   display: none;
 }
 
-uni-image > div {
+uni-image>div {
   width: 100%;
   height: 100%;
 }
 
-uni-image > img {
+uni-image>img {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -242,7 +249,7 @@ uni-image > img {
   opacity: 0;
 }
 
-uni-image > .uni-image-will-change {
+uni-image>.uni-image-will-change {
   will-change: transform;
 }
 </style>

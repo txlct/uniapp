@@ -18,6 +18,10 @@ export * from './device/scan-code'
 export * from './device/soter-authentication'
 export * from './device/system'
 export * from './device/vibrate'
+export * from './device/get-window-info'
+export * from './device/get-system-setting'
+export * from './device/get-app-authorize-setting'
+export * from './device/open-app-authorize-setting'
 
 export * from './file/file'
 export * from './file/open-document'
@@ -25,6 +29,7 @@ export * from './file/open-document'
 export * from './location/choose-location'
 export * from './location/get-location'
 export * from './location/open-location'
+export * from './location/location-change'
 
 export * from './media/audio'
 export * from './media/choose-image'
@@ -50,10 +55,24 @@ export * from './plugin/push'
 export * from './plugin/require-native-plugin'
 export * from './plugin/share'
 export * from './plugin/restore-global'
+export * from './plugin/require-global'
 export * from './plugin/sub-nvue'
 export * from './plugin/on-native-event-receive'
 export * from './plugin/send-native-event'
 export * from './plugin/load-sub-package'
+export * from './plugin/sdk'
+export * from './plugin/get-launch-options-sync'
+
+// 内部使用
+export {
+  initUTSProxyClass,
+  initUTSProxyFunction,
+  initUTSIndexClassName,
+  initUTSClassName,
+  initUTSPackageName,
+  requireUTSPlugin,
+  registerUTSPlugin
+} from './plugin/uts'
 
 export * from './route/navigate-back'
 export * from './route/navigate-to'

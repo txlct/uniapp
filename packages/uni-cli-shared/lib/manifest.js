@@ -1,4 +1,7 @@
 const path = require('path')
+const {
+  hasOwn
+} = require('./util')
 
 const {
   getJson,
@@ -85,8 +88,8 @@ function getH5Options (manifestJson) {
   }
 
   /* eslint-disable no-mixed-operators */
-  h5.template = h5.template && path.resolve(process.env.UNI_INPUT_DIR, h5.template) || path.resolve(__dirname,
-    '../../../../public/index.html')
+  h5.template = h5.template && path.resolve(process.env.UNI_INPUT_DIR, h5.template) || path.resolve(require('./util')
+    .getCLIContext(), 'public/index.html')
 
   h5.devServer = h5.devServer || {}
 
@@ -98,9 +101,70 @@ function getH5Options (manifestJson) {
   return h5
 }
 
+function isEnableUniPushV1 (manifestJson, platform) {
+  if (!manifestJson) {
+    manifestJson = getManifestJson()
+  }
+  if (isEnableUniPushV2(manifestJson, platform)) {
+    return false
+  }
+  if (platform === 'app-plus') {
+    const platformOptions = manifestJson[platform]
+    const sdkConfigs = platformOptions && platformOptions.distribute && platformOptions.distribute.sdkConfigs
+    const push = sdkConfigs && sdkConfigs.push
+    if (push && hasOwn(push, 'unipush')) {
+      return true
+    }
+  }
+  return false
+}
+
+function isEnableUniPushV2 (manifestJson, platform) {
+  if (!manifestJson) {
+    manifestJson = getManifestJson()
+  }
+  const platformOptions = manifestJson[platform]
+  if (platform === 'app-plus') {
+    const sdkConfigs = platformOptions && platformOptions.distribute && platformOptions.distribute.sdkConfigs
+    const unipush = sdkConfigs && sdkConfigs.push && sdkConfigs.push.unipush
+    return (
+      /* eslint-disable eqeqeq */
+      unipush && unipush.version == '2'
+    )
+  }
+  return platformOptions && platformOptions.unipush && platformOptions.unipush.enable === true
+}
+
+function isEnableSecureNetwork (manifestJson, platform) {
+  if (!manifestJson) {
+    manifestJson = getManifestJson()
+  }
+  const platformOptions = manifestJson[platform]
+  if (platform === 'app-plus') {
+    return !!(
+      platformOptions && platformOptions.modules && platformOptions.modules.SecureNetwork
+    )
+  }
+  return platformOptions && platformOptions.secureNetwork && platformOptions.secureNetwork.enable === true
+}
+
+function isUniPushOffline (manifestJson) {
+  if (!manifestJson) {
+    manifestJson = getManifestJson()
+  }
+  const platformOptions = manifestJson['app-plus']
+  const sdkConfigs = platformOptions && platformOptions.distribute && platformOptions.distribute.sdkConfigs
+  const unipush = sdkConfigs && sdkConfigs.push && sdkConfigs.push.unipush
+  return unipush && unipush.offline === true
+}
+
 module.exports = {
   getManifestJson,
   parseManifestJson,
   getNetworkTimeout,
-  getH5Options
+  getH5Options,
+  isEnableUniPushV1,
+  isEnableUniPushV2,
+  isUniPushOffline,
+  isEnableSecureNetwork
 }

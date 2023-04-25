@@ -18,7 +18,8 @@ const {
 
 const {
   initTheme,
-  parseTheme
+  parseTheme,
+  darkmode
 } = require('@dcloudio/uni-cli-shared/lib/theme')
 
 const {
@@ -26,21 +27,30 @@ const {
   initAutoImportComponents
 } = require('@dcloudio/uni-cli-shared/lib/pages')
 
+const uniI18n = require('@dcloudio/uni-cli-i18n')
+
 const parseStyle = require('./util').parseStyle
+
+const {
+  initI18nOptions
+} = require('@dcloudio/uni-cli-shared/lib/i18n')
+const {
+  parseI18nJson
+} = require('@dcloudio/uni-i18n')
 
 // 将开发者手动设置的 usingComponents 调整名称，方便与自动解析到的 usingComponents 做最后合并
 function renameUsingComponents (jsonObj) {
-  if (jsonObj.usingComponents) {
-    jsonObj.customUsingComponents = jsonObj.usingComponents
+  if (jsonObj.usingComponents || jsonObj.usingSwanComponents) {
+    // 暂定 usingComponents 优先级高于 usingSwanComponents
+    jsonObj.customUsingComponents = Object.assign({}, jsonObj.usingSwanComponents, jsonObj.usingComponents)
     delete jsonObj.usingComponents
+    delete jsonObj.usingSwanComponents
   }
   return jsonObj
 }
 
 module.exports = function (content, map) {
   this.cacheable && this.cacheable()
-
-  initTheme()
 
   let isAppView = false
   if (this.resourceQuery) {
@@ -49,31 +59,62 @@ module.exports = function (content, map) {
   }
 
   // const pagesJsonJsPath = path.resolve(process.env.UNI_INPUT_DIR, pagesJsonJsFileName)
-  const manifestJsonPath = path.resolve(process.env.UNI_INPUT_DIR, 'manifest.json')
-  const manifestJson = parseManifestJson(fs.readFileSync(manifestJsonPath, 'utf8'))
+  const manifestJsonPath = path.resolve(
+    process.env.UNI_INPUT_DIR,
+    'manifest.json'
+  )
+  const manifestJson = parseManifestJson(
+    fs.readFileSync(manifestJsonPath, 'utf8')
+  )
+
+  initTheme(manifestJson)
 
   // this.addDependency(pagesJsonJsPath)
+  const localePath = path.resolve(process.env.UNI_INPUT_DIR, 'locale')
+  // 路径不存在时会触发 webpack5 差量编译
+  if (fs.existsSync(localePath)) {
+    this.addContextDependency(localePath)
+  }
   this.addDependency(manifestJsonPath)
 
-  let pagesJson = parsePagesJson(content, {
-    addDependency: (file) => {
-      (process.UNI_PAGES_DEPS || (process.UNI_PAGES_DEPS = new Set())).add(normalizePath(file))
+  const pagesJson = parsePagesJson(content, {
+    addDependency: file => {
+      (process.UNI_PAGES_DEPS || (process.UNI_PAGES_DEPS = new Set())).add(
+        normalizePath(file)
+      )
       this.addDependency(file)
     }
   })
 
   if (!pagesJson.pages || pagesJson.pages.length === 0) {
-    console.error('pages.json中的pages不能为空')
+    console.error(uniI18n.__('pagesLoader.pagesNodeCannotNull'))
     process.exit(0)
   }
 
+  if (this.resourceQuery) {
+    const queryParam = loaderUtils.parseQuery(this.resourceQuery)
+    if (queryParam) {
+      if (queryParam.type === 'origin-pages-json') {
+        return `export default ${JSON.stringify(pagesJson)}`
+      }
+    }
+  }
+
+  const platformManifestJson = manifestJson[process.env.UNI_PLATFORM] || {}
+
   if (global.uniPlugin.defaultTheme) {
-    pagesJson = parseTheme(pagesJson)
-    this.addDependency(path.resolve(process.env.UNI_INPUT_DIR, 'theme.json'))
+    this.addDependency(
+      path.resolve(
+        process.env.UNI_INPUT_DIR,
+        platformManifestJson.themeLocation || 'theme.json'
+      )
+    )
   }
 
   // 组件自动导入配置
-  process.UNI_AUTO_SCAN_COMPONENTS = !(pagesJson.easycom && pagesJson.easycom.autoscan === false)
+  process.UNI_AUTO_SCAN_COMPONENTS = !(
+    pagesJson.easycom && pagesJson.easycom.autoscan === false
+  )
   initAutoImportComponents(pagesJson.easycom)
 
   // TODO 与 usingComponents 放在一块读取设置
@@ -83,24 +124,72 @@ module.exports = function (content, map) {
     process.UNI_TRANSFORM_PX = true
   }
 
+  if (
+    (process.env.UNI_PLATFORM.indexOf('mp') !== -1 && !darkmode()) ||
+     process.env.VUE_APP_DARK_MODE !== 'true'
+  ) {
+    const { pages, globalStyle, tabBar } = parseTheme(pagesJson)
+    Object.assign(pagesJson, JSON.parse(JSON.stringify({ pages, globalStyle, tabBar })))
+  }
+
   if (process.env.UNI_PLATFORM === 'h5') {
-    return this.callback(null, require('./platforms/h5')(pagesJson, manifestJson, this), map)
+    return this.callback(
+      null,
+      require('./platforms/h5')(
+        pagesJson,
+        manifestJson,
+        this
+      ),
+      map
+    )
   }
   if (process.env.UNI_PLATFORM === 'quickapp-native') {
-    return this.callback(null, require('./platforms/quickapp-native')(pagesJson, manifestJson, this), map)
+    return this.callback(
+      null,
+      require('./platforms/quickapp-native')(pagesJson, manifestJson, this),
+      map
+    )
   }
-
+  // 仅限小程序
+  if (process.env.UNI_PLATFORM !== 'app-plus') {
+    const i18nOptions = initI18nOptions(
+      process.env.UNI_PLATFORM,
+      process.env.UNI_INPUT_DIR,
+      true,
+      true
+    )
+    if (i18nOptions) {
+      const {
+        locale,
+        locales,
+        delimiters
+      } = i18nOptions
+      parseI18nJson(pagesJson, locales[locale], delimiters)
+    }
+  }
   if (!process.env.UNI_USING_V3) {
-    parsePages(pagesJson, function (page) {
-      updatePageJson(page.path, renameUsingComponents(parseStyle(page.style)))
-    }, function (root, page) {
-      updatePageJson(normalizePath(path.join(root, page.path)), renameUsingComponents(
-        parseStyle(page.style, root)
-      ))
-    })
+    parsePages(
+      pagesJson,
+      function (page) {
+        updatePageJson(
+          page.path,
+          renameUsingComponents(parseStyle(page.style))
+        )
+      },
+      function (root, page) {
+        updatePageJson(
+          normalizePath(path.join(root, page.path)),
+          renameUsingComponents(parseStyle(page.style, root))
+        )
+      }
+    )
   }
 
-  const jsonFiles = require('./platforms/' + process.env.UNI_PLATFORM)(pagesJson, manifestJson, isAppView)
+  const jsonFiles = require('./platforms/' + process.env.UNI_PLATFORM)(
+    pagesJson,
+    manifestJson,
+    isAppView
+  )
 
   if (jsonFiles && jsonFiles.length) {
     if (process.env.UNI_USING_V3) {
@@ -109,8 +198,15 @@ module.exports = function (content, map) {
         if (jsonFile) {
           if (!isAppView && jsonFile.name === 'manifest.json') {
             const content = JSON.parse(jsonFile.content)
-            if (!content.launch_path && content.plus['uni-app'].nvueLaunchMode === 'fast') {
-              console.log('Nvue 首页启动模式: fast 详见: https://ask.dcloud.net.cn/article/36749')
+            if (
+              !content.launch_path &&
+              content.plus['uni-app'].nvueLaunchMode === 'fast'
+            ) {
+              console.log(
+                uniI18n.__('pagesLoader.nvueFirstPageStartModeIsFast', {
+                  0: 'https://ask.dcloud.net.cn/article/36749'
+                })
+              )
             }
           }
           if (jsonFile.name === 'define-pages.js') {
@@ -127,7 +223,10 @@ module.exports = function (content, map) {
       let appConfigContent = ''
       jsonFiles.forEach(jsonFile => {
         if (jsonFile) {
-          if (jsonFile.name === 'app-config.js' || jsonFile.name === 'define-pages.js') {
+          if (
+            jsonFile.name === 'app-config.js' ||
+            jsonFile.name === 'define-pages.js'
+          ) {
             appConfigContent = jsonFile.content
           } else {
             this.emitFile(jsonFile.name, jsonFile.content)

@@ -28,6 +28,18 @@ const PLATFORMS = {
     prefix: 'ks',
     title: '快手小程序'
   },
+  'mp-lark': {
+    prefix: 'tt',
+    title: '飞书小程序'
+  },
+  'mp-jd': {
+    prefix: 'jd',
+    title: '京东小程序'
+  },
+  'mp-xhs': {
+    prefix: 'xhs',
+    title: '小红书小程序'
+  },
   'quickapp-webview': {
     prefix: 'qa',
     title: '快应用(Webview)版'
@@ -57,6 +69,15 @@ module.exports = {
   plugins: [
     alias({
       entries: [{
+        find: '@dcloudio',
+        replacement: path.resolve(__dirname, '../packages')
+      }, {
+        find: 'uni-core',
+        replacement: path.resolve(__dirname, '../src/core')
+      }, {
+        find: 'uni-api-protocol',
+        replacement: path.resolve(__dirname, '../src/core/helpers/protocol')
+      }, {
         find: 'uni-shared/query',
         replacement: path.resolve(__dirname, '../src/shared/query.js')
       }, {
@@ -81,5 +102,5 @@ module.exports = {
       __PLATFORM__: JSON.stringify(process.env.UNI_PLATFORM)
     })
   ],
-  external: ['vue']
+  external: ['vue', '@dcloudio/uni-i18n']
 }

@@ -29,7 +29,8 @@ const traverse = require('./babel/scoped-component-traverse')
 
 const {
   resolve,
-  normalizeNodeModules
+  normalizeNodeModules,
+  getIssuer
 } = require('./shared')
 
 const {
@@ -38,6 +39,7 @@ const {
 } = require('./babel/util')
 
 const isObject = val => Object.prototype.toString.call(val) === '[object Object]'
+const uniI18n = require('@dcloudio/uni-cli-i18n')
 
 module.exports = function (content, map) {
   this.cacheable && this.cacheable()
@@ -56,13 +58,18 @@ module.exports = function (content, map) {
     type = 'Page'
   }
   // <script src=""/>
-  if (!type && this._module.issuer && this._module.issuer.issuer) {
-    resourcePath = normalizeNodeModules(removeExt(normalizePath(path.relative(process.env.UNI_INPUT_DIR, this._module
-      .issuer.issuer.resource))))
-    if (resourcePath === 'App') {
-      type = 'App'
-    } else if (process.UNI_ENTRY[resourcePath]) {
-      type = 'Page'
+  if (!type) {
+    const moduleIssuer = getIssuer(this._compilation, this._module)
+    if (moduleIssuer) {
+      const moduleIssuerIssuer = getIssuer(this._compilation, moduleIssuer)
+      if (moduleIssuerIssuer) {
+        resourcePath = normalizeNodeModules(removeExt(normalizePath(path.relative(process.env.UNI_INPUT_DIR, moduleIssuerIssuer.resource))))
+        if (resourcePath === 'App') {
+          type = 'App'
+        } else if (process.UNI_ENTRY[resourcePath]) {
+          type = 'Page'
+        }
+      }
     }
   }
 
@@ -86,7 +93,8 @@ module.exports = function (content, map) {
   } = traverse(parser.parse(content, getBabelParserOptions()), {
     type,
     components: [],
-    componentPlaceholder: []
+    componentPlaceholder: [],
+    filename: this.resourcePath
   })
 
   const callback = this.async()
@@ -134,10 +142,21 @@ module.exports = function (content, map) {
       usingComponents[name] = `${prefix}${source}`
     })
 
-    const babelLoader = findBabelLoader(this.loaders)
+    let babelLoader = findBabelLoader(this.loaders)
     if (!babelLoader) {
-      callback(new Error('babel-loader 查找失败'), content)
+      callback(new Error(uniI18n.__('mpLoader.findFail', {
+        0: 'babel-loader'
+      })), content)
     } else {
+      const webpack = require('webpack')
+      if (webpack.version[0] > 4) {
+        // clone babelLoader and options
+        const index = this.loaders.indexOf(babelLoader)
+        const newBabelLoader = Object.assign({}, babelLoader)
+        Object.assign(newBabelLoader, { options: Object.assign({}, babelLoader.options) })
+        this.loaders.splice(index, 1, newBabelLoader)
+        babelLoader = newBabelLoader
+      }
       addDynamicImport(babelLoader, resourcePath, dynamicImports)
 
       updateUsingComponents(resourcePath, usingComponents, type)

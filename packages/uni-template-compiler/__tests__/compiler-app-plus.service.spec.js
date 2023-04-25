@@ -178,6 +178,10 @@ describe('codegen', () => {
       '<div><slot name="one"></slot></div>',
       `with(this){return _c('div',[_t("one",null,{"_i":1})],2)}`
     )
+    assertCodegen(
+      '<div><slot :name="one"></slot></div>',
+      `with(this){return _c('div',[_t(_$s(1,'name',one),null,{"_i":1})],2)}`
+    )
   })
 
   it('generate slot fallback content', () => {
@@ -191,6 +195,17 @@ describe('codegen', () => {
     assertCodegen(
       '<p slot="one">hello world</p>',
       `with(this){return _c('p',{slot:"one"})}`
+    )
+  })
+
+  it('generate slot with v-for', () => {
+    assertCodegen(
+      '<div><slot v-for="item in list"></slot></div>',
+      `with(this){return _c('div',[_l((_$s(1,'f',{forItems:list})),function(item,$10,$20,$30){return _t("default",null,{"_i":("1-"+$30),"key":_$s(1,'f',{forIndex:$20,key:1+'-'+$30})})})],2)}`
+    )
+    assertCodegen(
+      '<div><template v-for="item in list"><slot></slot></template></div>',
+      `with(this){return _c('div',[_l((_$s(1,'f',{forItems:list})),function(item,$10,$20,$30){return [_t("default",null,{"_i":("2-"+$30),"key":_$s(1,'f',{forIndex:$20,keyIndex:0,key:1+'-0'+$30})})]})],2)}`
     )
   })
 

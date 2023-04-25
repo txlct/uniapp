@@ -1,9 +1,15 @@
 const path = require('path')
+const webpack = require('webpack')
 
 const {
   runByHBuilderX,
-  isInHBuilderX
+  isInHBuilderX,
+  parseJson,
+  parsePagesJson,
+  parseManifestJson
 } = require('@dcloudio/uni-cli-shared')
+
+const uniI18n = require('@dcloudio/uni-cli-i18n')
 
 const defaults = {
   clean: true,
@@ -29,7 +35,9 @@ module.exports = (api, options) => {
       '--auto-host': 'specify automator host',
       '--auto-port': 'specify automator port',
       '--subpackage': 'specify subpackage',
-      '--plugin': 'specify plugin'
+      '--plugin': 'specify mp plugin',
+      '--manifest': 'build manifest.json',
+      '--sourcemap': 'generate sourcemap'
     }
   }, async (args) => {
     for (const key in defaults) {
@@ -38,17 +46,24 @@ module.exports = (api, options) => {
       }
     }
 
-    const platforms = ['mp-weixin', 'mp-qq', 'mp-baidu', 'mp-alipay', 'mp-toutiao']
+    if (args.manifest && process.env.UNI_PLATFORM === 'app-plus') {
+      return buildManifestJson()
+    }
+
+    const platforms = ['mp-weixin', 'mp-qq', 'mp-jd', 'mp-baidu', 'mp-alipay', 'mp-toutiao', 'mp-lark']
     if (args.subpackage && platforms.includes(process.env.UNI_PLATFORM)) {
       process.env.UNI_SUBPACKGE = args.subpackage
     }
 
+    const mpPluginPlatforms = ['mp-weixin', 'mp-alipay']
     if (args.plugin) {
-      if (process.env.UNI_PLATFORM === 'mp-weixin') {
+      if (mpPluginPlatforms.includes(process.env.UNI_PLATFORM)) {
         process.env.UNI_MP_PLUGIN = args.plugin
         analysisPluginDir()
       } else {
-        console.error('编译到小程序插件只支持微信小程序')
+        console.log()
+        console.error(uniI18n.__('pluginUni.compileToMpPluginOnlySupportPlatform'))
+        console.log()
         process.exit(0)
       }
     }
@@ -58,6 +73,8 @@ module.exports = (api, options) => {
     args.entry = args.entry || args._[0]
 
     process.env.VUE_CLI_BUILD_TARGET = args.target
+
+    if (args.sourcemap) process.env.SOURCEMAP = args.sourcemap
 
     await build(args, api, options)
 
@@ -82,14 +99,18 @@ function getWebpackConfig (api, args, options) {
   if (args.minimize && process.env.NODE_ENV !== 'production') {
     modifyConfig(webpackConfig, config => {
       config.optimization.minimize = true
-      config.optimization.namedModules = false
+      if (webpack.version[0] <= 4) {
+        config.optimization.namedModules = false
+      }
     })
   } else {
     modifyConfig(webpackConfig, config => {
       if (!config.optimization) {
         config.optimization = {}
       }
-      config.optimization.namedModules = false
+      if (webpack.version[0] <= 4) {
+        config.optimization.namedModules = false
+      }
     })
   }
   return webpackConfig
@@ -115,7 +136,6 @@ function getWebpackConfigs (api, args, options) {
 async function build (args, api, options) {
   const fs = require('fs-extra')
   const chalk = require('chalk')
-  const webpack = require('webpack')
 
   const {
     log,
@@ -129,7 +149,10 @@ async function build (args, api, options) {
   log()
 
   if (!runByHBuilderX && !runByAliIde) {
-    logWithSpinner(`开始编译当前项目至 ${process.env.UNI_SUB_PLATFORM || process.env.UNI_PLATFORM} 平台...`)
+    logWithSpinner(uniI18n.__('pluginUni.startCompileProjectToPlatform', {
+      0: process.env.UNI_SUB_PLATFORM || process.env.UNI_PLATFORM,
+      1: process.env.UNI_MP_PLUGIN ? uniI18n.__('plugin') : uniI18n.__('platform')
+    }))
   }
 
   const targetDir = api.resolve(options.outputDir)
@@ -155,7 +178,8 @@ async function build (args, api, options) {
     process.env.UNI_USING_V3_NATIVE ||
     (process.UNI_NVUE_ENTRY && Object.keys(process.UNI_NVUE_ENTRY).length)
   ) {
-    webpackConfigs.push(require('@dcloudio/vue-cli-plugin-hbuilderx/build/webpack.nvue.conf.js')(process.UNI_NVUE_ENTRY))
+    webpackConfigs.push(require('@dcloudio/vue-cli-plugin-hbuilderx/build/webpack.nvue.conf.js')(process
+      .UNI_NVUE_ENTRY))
   }
 
   return new Promise((resolve, reject) => {
@@ -172,7 +196,8 @@ async function build (args, api, options) {
         return reject('Build failed with errors.')
       }
 
-      if (!args.silent && (process.env.UNI_PLATFORM !== 'app-plus' || process.env.UNI_AUTOMATOR_WS_ENDPOINT)) {
+      if (!args.silent && (process.env.UNI_PLATFORM !== 'app-plus' || process.env
+        .UNI_AUTOMATOR_WS_ENDPOINT)) {
         const targetDirShort = path.relative(
           api.service.context,
           process.env.UNI_OUTPUT_DIR
@@ -185,11 +210,11 @@ async function build (args, api, options) {
 
           if (process.env.UNI_PLATFORM === 'h5' && !isInHBuilderX) {
             console.log()
-            console.log('欢迎将H5站部署到uniCloud前端网页托管平台，高速、免费、安全、省心，详见：')
-            console.log('https://uniapp.dcloud.io/uniCloud/hosting')
+            console.log('欢迎将web站点部署到uniCloud前端网页托管平台，高速、免费、安全、省心，详见：https://uniapp.dcloud.io/uniCloud/hosting')
           }
         } else {
-          const dirMsg = runByHBuilderX ? '' : `The ${chalk.cyan(targetDirShort)} directory is ready. `
+          const dirMsg = runByHBuilderX ? ''
+            : `The ${chalk.cyan(targetDirShort)} directory is ready. `
           done(`Build complete. ${dirMsg}Watching for changes...`)
         }
       }
@@ -214,40 +239,54 @@ function analysisPluginDir () {
   const pluginJsonPath = path.resolve(process.env.UNI_INPUT_DIR, pluginJsonName)
 
   if (!fs.pathExistsSync(pluginJsonPath)) {
-    console.error(`${pluginJsonName}文件不存在，请检查后重试`)
+    console.log()
+    console.error(uniI18n.__('pluginUni.fileNoExistsCheckAfterRetry', {
+      0: pluginJsonName
+    }))
+    console.log()
     process.exit(0)
   }
 
-  const pluginJson = require(pluginJsonPath)
+  const pluginJson = parseJson(fs.readFileSync(pluginJsonPath, 'utf-8'), true)
 
-  // index.js 入口文件是否存在
-  process.env.UNI_MP_PLUGIN_MAIN = pluginJson.main
-  const UNI_MP_PLUGIN_MAIN = process.env.UNI_MP_PLUGIN_MAIN
-  const mainFilePath = path.resolve(process.env.UNI_INPUT_DIR, UNI_MP_PLUGIN_MAIN)
+  // main 入口文件是否存在
+  if (pluginJson.main) {
+    process.env.UNI_MP_PLUGIN_MAIN = pluginJson.main
+    const UNI_MP_PLUGIN_MAIN = process.env.UNI_MP_PLUGIN_MAIN
+    const mainFilePath = path.resolve(process.env.UNI_INPUT_DIR, UNI_MP_PLUGIN_MAIN)
 
-  if (UNI_MP_PLUGIN_MAIN && !fs.pathExistsSync(mainFilePath)) {
-    console.error(`${UNI_MP_PLUGIN_MAIN}入口文件不存在，请检查后重试`)
-    process.exit(0)
+    if (UNI_MP_PLUGIN_MAIN && !fs.pathExistsSync(mainFilePath)) {
+      console.log()
+      console.error(uniI18n.__('pluginUni.entryDileNoExistsCheckAfterRetry', {
+        0: UNI_MP_PLUGIN_MAIN
+      }))
+      console.log()
+      process.exit(0)
+    }
   }
+}
 
-  // 目前编译到小程序插件，需要在 pages.json 中配置页面，在main.js中引入使用一下组件，因此先不做一下校验
-  // 配置的路径是否存在
-  /* const pages = pluginJson.pages || {}
-  const publicComponents = pluginJson.publicComponents || {}
-  const allFilesPath = Object.values(pages).map(item => item + '.vue').concat(Object.values(publicComponents).map(item => item + '.vue'))
-  const inexistenceFiles = []
-  if (allFilesPath.length) {
-    allFilesPath.forEach(pagePath => {
-      const curentPageAbsolutePath = path.resolve(process.env.UNI_INPUT_DIR, pagePath)
-      if (!fs.pathExistsSync(curentPageAbsolutePath)) {
-        inexistenceFiles.push(curentPageAbsolutePath)
-      }
-    })
+function buildManifestJson () {
+  const fs = require('fs-extra')
+  const inputDir = process.env.UNI_INPUT_DIR
+  const outputDir = process.env.UNI_OUTPUT_DIR
+  const pagesJsonPath = path.resolve(inputDir, 'pages.json')
+  const manifestJsonPath = path.resolve(inputDir, 'manifest.json')
+
+  const pagesJson = parsePagesJson(fs.readFileSync(pagesJsonPath, 'utf8'))
+  const manifestJson = parseManifestJson(fs.readFileSync(manifestJsonPath, 'utf8'))
+
+  const res = require('@dcloudio/webpack-uni-pages-loader/lib/platforms/app-plus/index.js')(pagesJson,
+    manifestJson,
+    false)
+  if (res && res[0]) {
+    fs.outputFileSync(
+      path.resolve(outputDir, 'manifest.json'),
+      res[0].content
+    )
   }
-  if (inexistenceFiles.length) {
-    inexistenceFiles.forEach(path => {
-      console.error(`${path}文件不存在，请检查后重试`)
-    })
-    process.exit(0)
-  } */
+  const {
+    done
+  } = require('@vue/cli-shared-utils')
+  done('Build complete.')
 }

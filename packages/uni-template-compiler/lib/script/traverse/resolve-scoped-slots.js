@@ -2,22 +2,35 @@ const t = require('@babel/types')
 
 const {
   METHOD_BUILT_IN,
-  METHOD_CREATE_EMPTY_VNODE
+  METHOD_CREATE_EMPTY_VNODE,
+  METHOD_CREATE_ELEMENT
 } = require('../../constants')
 
 function needSlotMode (path, ids) {
   let need
   path.traverse({
     noScope: false,
+    Property (path) {
+      // 跳过事件
+      if (path.node.key.name === 'on') {
+        const parentPath = path.parentPath.parentPath
+        if (t.isCallExpression(parentPath) && parentPath.node.callee.name === METHOD_CREATE_ELEMENT) {
+          path.skip()
+        }
+      }
+    },
     Identifier (path) {
       const name = path.node.name
       if (path.key !== 'key' && (path.key !== 'property' || path.parent.computed)) {
-        // 使用方法或作用域外数据
+        // 使用作用域内方法或作用域外数据
         if (name in ids) {
           need = path.key === 'callee' ? true : need
         } else if (!path.scope.hasBinding(name) && !METHOD_BUILT_IN.includes(name)) {
           need = true
         }
+      } else if (path.key === 'property' && name === 'length') {
+        // 微信小程序平台无法观测 Array length 访问：https://developers.weixin.qq.com/community/develop/doc/000c8ee47d87a0d5b6685a8cb57000
+        need = true
       }
     }
   })
@@ -26,11 +39,12 @@ function needSlotMode (path, ids) {
 
 function replaceId (path, ids) {
   let replaced
+  const fnPath = path.parentPath
   path.traverse({
-    noScope: true,
+    noScope: false,
     Identifier (path) {
       const name = path.node.name
-      if (name in ids && path.key !== 'key' && (path.key !== 'property' || path.parent.computed)) {
+      if (name in ids && path.key !== 'key' && (path.key !== 'property' || path.parent.computed) && path.scope.path === fnPath) {
         path.replaceWith(ids[name])
         replaced = true
       }
@@ -40,7 +54,12 @@ function replaceId (path, ids) {
 }
 
 module.exports = function getResolveScopedSlots (parent, state) {
-  const properties = parent.get('arguments.0.elements.0.properties')
+  let objectPath = parent.get('arguments.0.elements.0')
+  // TODO v-else
+  if (objectPath.isConditionalExpression()) {
+    objectPath = objectPath.get('consequent')
+  }
+  const properties = objectPath.get('properties')
   const fn = properties.find(path => path.get('key').isIdentifier({ name: 'fn' }))
   const params = fn.get('value.params.0')
   if (!params) {
@@ -72,7 +91,7 @@ module.exports = function getResolveScopedSlots (parent, state) {
       const test = t.callExpression(t.identifier('$hasScopedSlotsParams'), [vueId])
       orgin.replaceWith(t.arrayExpression([t.conditionalExpression(test, node, t.callExpression(t.identifier(METHOD_CREATE_EMPTY_VNODE), []))]))
       // scopedSlotsCompiler auto
-      parent.get('arguments.0.elements.0').node.scopedSlotsCompiler = 'augmented'
+      objectPath.node.scopedSlotsCompiler = 'augmented'
     }
   }
 }

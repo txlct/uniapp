@@ -12,6 +12,7 @@ import {
 import {
   handleRef,
   handleLink,
+  handleWrap,
   initBehavior,
   initRelation,
   triggerEvent,
@@ -20,6 +21,29 @@ import {
   initChildVues,
   initSpecialMethods
 } from './util'
+
+function initSlots (vm, vueSlots) {
+  const $slots = Object.create(null)
+  // 未启用小程序基础库 2.0 时，组件实例支持支持访问 $slots、$scopedSlots
+  Object.defineProperty(vm, '$slots', {
+    get () {
+      const $scope = this.$scope
+      return ($scope && $scope.props.$slots) || ($scope && $scope.props.$scopedSlots ? {} : $slots)
+    }
+  })
+  Object.defineProperty(vm, '$scopedSlots', {
+    get () {
+      const $scope = this.$scope
+      return ($scope && $scope.props.$scopedSlots) || ($scope && $scope.props.$slots ? {} : $slots)
+    }
+  })
+  // 处理$slots,$scopedSlots（暂不支持动态变化$slots）
+  if (Array.isArray(vueSlots) && vueSlots.length) {
+    vueSlots.forEach(slotName => {
+      $slots[slotName] = true
+    })
+  }
+}
 
 function initVm (VueComponent) {
   if (this.$vm) {
@@ -45,6 +69,8 @@ function initVm (VueComponent) {
     // 初始化 vue 实例
     this.$vm = new VueComponent(options)
 
+    initSlots(this.$vm, properties.vueSlots)
+
     // 触发首次 setData
     this.$vm.$mount()
   } else {
@@ -60,6 +86,9 @@ function initVm (VueComponent) {
       // 初始化 vue 实例
       this.$vm = new VueComponent(options)
       handleRef.call(options.parent.$scope, this)
+
+      initSlots(this.$vm, properties.vueSlots)
+
       // 触发首次 setData
       this.$vm.$mount()
 
@@ -72,7 +101,7 @@ function initVm (VueComponent) {
   }
 }
 
-export default function parseComponent (vueComponentOptions) {
+export default function parseComponent (vueComponentOptions, needVueOptions) {
   const [VueComponent, vueOptions] = initVueComponent(Vue, vueComponentOptions)
 
   const properties = initProperties(vueOptions.props, false, vueOptions.__file)
@@ -82,9 +111,7 @@ export default function parseComponent (vueComponentOptions) {
   }
 
   Object.keys(properties).forEach(key => {
-    if (key !== 'vueSlots') {
-      props[key] = properties[key].value
-    }
+    props[key] = properties[key].value
   })
 
   const componentOptions = {
@@ -115,6 +142,7 @@ export default function parseComponent (vueComponentOptions) {
       __r: handleRef,
       __e: handleEvent,
       __l: handleLink,
+      __w: handleWrap,
       triggerEvent
     }
   }
@@ -136,5 +164,5 @@ export default function parseComponent (vueComponentOptions) {
     })
   }
 
-  return componentOptions
+  return needVueOptions ? [componentOptions, vueOptions] : componentOptions
 }

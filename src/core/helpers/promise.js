@@ -8,7 +8,7 @@ import {
 } from './interceptor'
 
 const SYNC_API_RE =
-  /^\$|Window$|WindowStyle$|sendNativeEvent|restoreGlobal|getCurrentSubNVue|getMenuButtonBoundingClientRect|^report|interceptors|Interceptor$|getSubNVueById|requireNativePlugin|upx2px|hideKeyboard|canIUse|^create|Sync$|Manager$|base64ToArrayBuffer|arrayBufferToBase64/
+  /^\$|Window$|WindowStyle$|sendHostEvent|sendNativeEvent|restoreGlobal|requireGlobal|getCurrentSubNVue|getMenuButtonBoundingClientRect|^report|interceptors|Interceptor$|getSubNVueById|requireNativePlugin|upx2px|hideKeyboard|canIUse|^create|Sync$|Manager$|base64ToArrayBuffer|arrayBufferToBase64|getLocale|setLocale|invokePushCallback|getWindowInfo|getDeviceInfo|getAppBaseInfo|getSystemSetting|getAppAuthorizeSetting|initUTS|requireUTS|registerUTS/
 
 const CONTEXT_API_RE = /^create|Manager$/
 
@@ -18,7 +18,7 @@ const CONTEXT_API_RE_EXC = ['createBLEConnection']
 const TASK_APIS = ['request', 'downloadFile', 'uploadFile', 'connectSocket']
 
 // 同步例外情况
-const ASYNC_API = ['createBLEConnection']
+const ASYNC_API = ['createBLEConnection', 'createPushMessage']
 
 const CALLBACK_API_RE = /^on|^off/
 
@@ -69,7 +69,7 @@ if (!Promise.prototype.finally) {
 }
 
 export function promisify (name, api) {
-  if (!shouldPromise(name)) {
+  if (!shouldPromise(name) || !isFn(api)) {
     return api
   }
   return function promiseApi (options = {}, ...params) {

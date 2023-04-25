@@ -6,10 +6,13 @@ import {
 } from 'uni-shared'
 
 import {
-  handleLink as handleBaseLink
+  handleLink as handleBaseLink,
+  toSkip
 } from '../../../mp-weixin/runtime/wrapper/util'
 
 import deepEqual from './deep-equal'
+
+export { markMPComponent } from '../../../mp-weixin/runtime/wrapper/util'
 
 const customizeRE = /:/g
 
@@ -108,46 +111,46 @@ export function initChildVues (mpInstance) {
   delete mpInstance._$childVues
 }
 
+export function handleProps (ref) {
+  const eventProps = {}
+  let refProps = ref.props
+  const eventList = (refProps['data-event-list'] || '').split(',')
+  // 初始化支付宝小程序组件事件
+  eventList.forEach(key => {
+    const handler = refProps[key]
+    const res = key.match(/^on([A-Z])(\S*)/)
+    const event = res && (res[1].toLowerCase() + res[2])
+    refProps[key] = eventProps[key] = function () {
+      const props = Object.assign({}, refProps)
+      props[key] = handler
+      // 由于支付宝事件可能包含多个参数，不使用微信小程序事件格式
+      delete props['data-com-type']
+      triggerEvent.bind({ props })(event, {
+        __args__: [...arguments]
+      })
+    }
+  })
+  // 处理 props 重写
+  Object.defineProperty(ref, 'props', {
+    get () {
+      return refProps
+    },
+    set (value) {
+      refProps = Object.assign(value, eventProps)
+    }
+  })
+}
+
 export function handleRef (ref) {
-  if (!ref) {
+  if (!(ref && this.$vm)) {
     return
-  }
-  if (ref.props['data-com-type'] === 'wx') {
-    const eventProps = {}
-    let refProps = ref.props
-    // 初始化支付宝小程序组件事件
-    Object.keys(refProps).forEach(key => {
-      const handler = refProps[key]
-      const res = key.match(/^on([A-Z])(\S*)/)
-      if (res && typeof handler === 'function' && handler.name === 'bound handleEvent') {
-        const event = res && (res[1].toLowerCase() + res[2])
-        refProps[key] = eventProps[key] = function () {
-          const props = Object.assign({}, refProps)
-          props[key] = handler
-          // 由于支付宝事件可能包含多个参数，不使用微信小程序事件格式
-          delete props['data-com-type']
-          triggerEvent.bind({ props })(event, {
-            __args__: [...arguments]
-          })
-        }
-      }
-    })
-    // 处理 props 重写
-    Object.defineProperty(ref, 'props', {
-      get () {
-        return refProps
-      },
-      set (value) {
-        refProps = Object.assign(value, eventProps)
-      }
-    })
   }
   const refName = ref.props['data-ref']
   const refInForName = ref.props['data-ref-in-for']
   if (refName) {
-    this.$vm.$refs[refName] = ref.$vm || ref
+    this.$vm.$refs[refName] = ref.$vm || toSkip(ref)
   } else if (refInForName) {
-    (this.$vm.$refs[refInForName] || (this.$vm.$refs[refInForName] = [])).push(ref.$vm || ref)
+    (this.$vm.$refs[refInForName] || (this.$vm.$refs[refInForName] = [])).push(ref.$vm || toSkip(ref))
   }
 }
 
@@ -219,3 +222,21 @@ export const handleLink = (function () {
     (this._$childVues || (this._$childVues = [])).unshift(detail)
   }
 })()
+
+export const handleWrap = function (mp, destory) {
+  const vueId = mp.props.vueId
+  const list = (mp.props['data-event-list'] || '').split(',')
+  list.forEach(eventName => {
+    const key = `${eventName}${vueId}`
+    if (destory) {
+      delete this[key]
+    } else {
+      this[key] = function () {
+        mp.props[eventName].apply(this, arguments)
+      }
+    }
+  })
+  if (!destory) {
+    handleProps(mp)
+  }
+}

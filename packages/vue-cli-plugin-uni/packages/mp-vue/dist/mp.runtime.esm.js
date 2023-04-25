@@ -1,6 +1,6 @@
 /*!
  * Vue.js v2.6.11
- * (c) 2014-2021 Evan You
+ * (c) 2014-2022 Evan You
  * Released under the MIT License.
  */
 /*  */
@@ -991,7 +991,8 @@ function observe (value, asRootData) {
     !isServerRendering() &&
     (Array.isArray(value) || isPlainObject(value)) &&
     Object.isExtensible(value) &&
-    !value._isVue
+    !value._isVue &&
+    !value.__v_isMPComponent
   ) {
     ob = new Observer(value);
   }
@@ -4616,7 +4617,7 @@ function initProps (vm, propsOptions) {
       defineReactive$$1(props, key, value, function () {
         if (!isRoot && !isUpdatingChildComponent) {
           {
-            if(vm.mpHost === 'mp-baidu'){//百度 observer 在 setData callback 之后触发，直接忽略该 warn
+            if(vm.mpHost === 'mp-baidu' || vm.mpHost === 'mp-kuaishou' || vm.mpHost === 'mp-xhs'){//百度、快手、小红书 observer 在 setData callback 之后触发，直接忽略该 warn
                 return
             }
             //fixed by xxxxxx __next_tick_pending,uni://form-field 时不告警
@@ -5420,6 +5421,8 @@ Vue.version = '2.6.11';
  */
 var ARRAYTYPE = '[object Array]';
 var OBJECTTYPE = '[object Object]';
+var NULLTYPE = '[object Null]';
+var UNDEFINEDTYPE = '[object Undefined]';
 // const FUNCTIONTYPE = '[object Function]'
 
 function diff(current, pre) {
@@ -5453,6 +5456,16 @@ function syncKeys(current, pre) {
     }
 }
 
+function nullOrUndefined(currentType, preType) {
+    if(
+        (currentType === NULLTYPE || currentType === UNDEFINEDTYPE) && 
+        (preType === NULLTYPE || preType === UNDEFINEDTYPE)
+    ) {
+        return false
+    }
+    return true
+}
+
 function _diff(current, pre, path, result) {
     if (current === pre) { return }
     var rootCurrentType = type(current);
@@ -5467,8 +5480,7 @@ function _diff(current, pre, path, result) {
                 var currentType = type(currentValue);
                 var preType = type(preValue);
                 if (currentType != ARRAYTYPE && currentType != OBJECTTYPE) {
-                    // NOTE 此处将 != 修改为 !==。涉及地方太多恐怕测试不到，如果出现数据对比问题，将其修改回来。
-                    if (currentValue !== pre[key]) {
+                    if (currentValue !== pre[key] && nullOrUndefined(currentType, preType)) {
                         setResult(result, (path == '' ? '' : path + ".") + key, currentValue);
                     }
                 } else if (currentType == ARRAYTYPE) {
@@ -5586,6 +5598,16 @@ function nextTick$1(vm, cb) {
 
 /*  */
 
+function clearInstance(key, value) {
+  // 简易去除 Vue 和小程序组件实例
+  if (value) {
+    if (value._isVue || value.__v_isMPComponent) {
+      return {}
+    }
+  }
+  return value
+}
+
 function cloneWithData(vm) {
   // 确保当前 vm 所有数据被同步
   var ret = Object.create(null);
@@ -5617,7 +5639,7 @@ function cloneWithData(vm) {
     ret['value'] = vm.value;
   }
 
-  return JSON.parse(JSON.stringify(ret))
+  return JSON.parse(JSON.stringify(ret, clearInstance))
 }
 
 var patch = function(oldVnode, vnode) {
@@ -5827,9 +5849,16 @@ function internalMixin(Vue) {
 
   Vue.prototype.$emit = function(event) {
     if (this.$scope && event) {
-      this.$scope['triggerEvent'](event, {
-        __args__: toArray(arguments, 1)
-      });
+      var triggerEvent = this.$scope['_triggerEvent'] || this.$scope['triggerEvent'];
+      if (triggerEvent) {
+        try {
+          triggerEvent.call(this.$scope, event, {
+            __args__: toArray(arguments, 1)
+          });
+        } catch (error) {
+
+        }
+      }
     }
     return oldEmit.apply(this, arguments)
   };
@@ -5893,14 +5922,16 @@ function internalMixin(Vue) {
     if (!target) {
       target = this;
     }
-    target[key] = value;
+    // 解决动态属性添加
+    Vue.set(target, key, value);
   };
 
   Vue.prototype.__set_sync = function(target, key, value) {
     if (!target) {
       target = this;
     }
-    target[key] = value;
+    // 解决动态属性添加
+    Vue.set(target, key, value);
   };
 
   Vue.prototype.__get_orig = function(item) {
@@ -5994,7 +6025,8 @@ var LIFECYCLE_HOOKS$1 = [
     // 'onReady', // 兼容旧版本，应该移除该事件
     'onPageShow',
     'onPageHide',
-    'onPageResize'
+    'onPageResize',
+    'onUploadDouyinVideo'
 ];
 function lifecycleMixin$1(Vue) {
 

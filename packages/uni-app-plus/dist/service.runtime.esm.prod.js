@@ -4794,8 +4794,8 @@ var Comment = /*@__PURE__*/(function (Node$$1) {
 
 function appendBody(doc, node, before) {
   var documentElement = doc.documentElement;
-
-  if (documentElement.pureChildren.length > 0 || node.parentNode) {
+  // fix append comment
+  if ((documentElement.pureChildren.length > 0 && node.nodeType === 1) || node.parentNode) {
     return
   }
   var children = documentElement.children;
@@ -6208,6 +6208,7 @@ function updateWxsProps(oldVnode, vnode) {
     vnode.$wxsWatches[prop] = oldWxsWatches[prop] || vnode.context.$watch(watchProp, function() {
       this.$forceUpdate();
     }, {
+      immediate: true, // 当 prop 的值被设置 WXS 函数就会触发，而不只是值发生改变，所以在页面初始化的时候会调用一次 WxsPropObserver 的函数
       deep: true
     });
   });
@@ -6346,7 +6347,7 @@ function updateDOMListeners (oldVnode, vnode) {
 
   var parent = vnode.parent;
   while (parent && parent.componentInstance) { // 使用组件外壳节点id
-    var parentId = parent.data.attrs && parent.data.attrs['_i'];
+    var parentId = parent.componentInstance.$attrs && parent.componentInstance.$attrs['_i'];
     isDef(parentId) && (nid = 'r-' + parentId);
     parent = parent.parent;
   }

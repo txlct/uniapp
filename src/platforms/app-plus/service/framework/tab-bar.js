@@ -7,8 +7,9 @@ import {
   requireNativePlugin
 } from '../bridge'
 
+import { useTabBarThemeChange } from './theme'
+
 const TABBAR_HEIGHT = 50
-const isIOS = plus.os.name === 'iOS'
 let config
 
 /**
@@ -17,6 +18,10 @@ let config
 let visible = true
 
 let tabBar
+
+function setTabBarItems (style) {
+  tabBar && tabBar.setTabBarItems(style)
+}
 
 /**
  * 设置角标
@@ -49,7 +54,7 @@ function setTabBarBadge (type, index, text) {
 /**
  * 动态设置 tabBar 某一项的内容
  */
-function setTabBarItem (index, text, iconPath, selectedIconPath) {
+function setTabBarItem (index, text, iconPath, selectedIconPath, visible, iconfont) {
   const item = {
     index
   }
@@ -62,7 +67,20 @@ function setTabBarItem (index, text, iconPath, selectedIconPath) {
   if (selectedIconPath) {
     item.selectedIconPath = getRealPath(selectedIconPath)
   }
-  tabBar && tabBar.setTabBarItem(item)
+  if (iconfont !== undefined) {
+    item.iconfont = iconfont
+  }
+  if (visible !== undefined) {
+    item.visible = config.list[index].visible = visible
+    delete item.index
+
+    const tabbarItems = config.list.map(item => ({ visible: item.visible }))
+    tabbarItems[index] = item
+
+    setTabBarItems({ list: tabbarItems })
+  } else {
+    tabBar && tabBar.setTabBarItem(item)
+  }
 }
 /**
  * 动态设置 tabBar 的整体样式
@@ -116,8 +134,11 @@ export default {
     tabBar && tabBar.onMidButtonClick(() => {
       publish('onTabBarMidButtonTap', {})
     })
+
+    useTabBarThemeChange(tabBar, options)
   },
   indexOf (page) {
+    const config = this.config
     const itemLength = config && config.list && config.list.length
     if (itemLength) {
       for (let i = 0; i < itemLength; i++) {
@@ -158,16 +179,21 @@ export default {
       }
     })
   },
+  get config () {
+    return config || __uniConfig.tabBar
+  },
   get visible () {
     return visible
   },
   get height () {
+    const config = this.config
     return (config && config.height ? parseFloat(config.height) : TABBAR_HEIGHT) + plus.navigator.getSafeAreaInsets().deviceBottom
   },
   // tabBar是否遮挡内容区域
   get cover () {
+    const config = this.config
     const array = ['extralight', 'light', 'dark']
-    return isIOS && array.indexOf(config.blurEffect) >= 0
+    return config && array.indexOf(config.blurEffect) >= 0
   },
   setStyle ({ mask }) {
     tabBar.setMask({

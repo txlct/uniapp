@@ -4,11 +4,16 @@ const {
 
 const {
   SELF_CLOSING_TAGS,
-  INTERNAL_EVENT_LINK
+  INTERNAL_EVENT_LINK,
+  VIRTUAL_HOST_STYLE,
+  VIRTUAL_HOST_CLASS
 } = require('../constants')
+const uniI18n = require('@dcloudio/uni-cli-i18n')
 
 function processElement (ast, state, isRoot) {
-  const platformName = state.options.platform.name
+  const platform = state.options.platform
+  const platformName = platform.name
+  const mergeVirtualHostAttributes = state.options.mergeVirtualHostAttributes
   // <template slot="f"></template>
   if (ast.type === 'template' && hasOwn(ast.attr, 'slot')) {
     ast.type = 'view'
@@ -35,53 +40,72 @@ function processElement (ast, state, isRoot) {
     }]
     delete ast.attr.innerHTML
   }
-  if (state.options.platform.isComponent(ast.type)) {
+  if (platform.isComponent(ast.type)) {
     if (platformName === 'mp-alipay') {
       ast.attr.onVueInit = INTERNAL_EVENT_LINK
     } else if (platformName !== 'mp-baidu') {
       ast.attr['bind:' + INTERNAL_EVENT_LINK] = INTERNAL_EVENT_LINK
     }
-
-    const children = ast.children
-    // default slot
-    let defaultSlot = false
-    const slots = []
-    for (let i = children.length - 1; i >= 0; i--) {
-      const childElement = children[i]
-      /**
-       * 仅百度、字节支持使用 block 作为命名插槽根节点
-       * 此处为了统一仅忽略默认插槽
-       * <block slot="left"></block> => <view slot="left"></view>
-       */
-      if (typeof childElement !== 'string' && childElement.attr.slot) {
-        const slot = childElement.attr.slot
-        if (slot && slot !== 'default' && childElement.type === 'block') {
-          childElement.type = 'view'
+    // TODO 过滤小程序原生组件
+    {
+      // 处理自定义组件虚拟节点样式
+      if (mergeVirtualHostAttributes) {
+        const obj = {
+          style: VIRTUAL_HOST_STYLE,
+          class: VIRTUAL_HOST_CLASS
         }
-        slots.push(slot)
-      } else {
-        defaultSlot = true
+        Object.keys(obj).forEach(key => {
+          if (key in ast.attr) {
+            ast.attr[obj[key]] = ast.attr[key]
+          }
+          // 支付宝小程序自定义组件外部属性始终无效
+          if (platformName === 'mp-alipay') {
+            delete ast.attr[key]
+          }
+        })
       }
-    }
-    if (defaultSlot) {
-      slots.push('default')
-    }
-    if (ast.attr.generic) {
-      Object.keys(ast.attr.generic).forEach(scopedSlotName => {
-        slots.push(scopedSlotName)
-      })
-      if (platformName === 'mp-toutiao') {
-        // 用于字节跳动小程序模拟抽象节点
-        ast.attr.generic = `{{${JSON.stringify(ast.attr.generic)}}}`.replace(/"/g, '\'')
-      } else {
-        delete ast.attr.generic
+      // 标记自定义组件插槽
+      const children = ast.children
+      // default slot
+      let defaultSlot = false
+      const slots = []
+      for (let i = children.length - 1; i >= 0; i--) {
+        const childElement = children[i]
+        /**
+         * 仅百度、字节支持使用 block 作为命名插槽根节点
+         * 此处为了统一仅忽略默认插槽
+         * <block slot="left"></block> => <view slot="left"></view>
+         */
+        if (typeof childElement !== 'string' && childElement.attr.slot) {
+          const slot = childElement.attr.slot
+          if (slot && slot !== 'default' && childElement.type === 'block') {
+            childElement.type = 'view'
+          }
+          slots.push(slot)
+        } else {
+          defaultSlot = true
+        }
       }
-    }
-    if (slots.length && platformName !== 'mp-alipay') { // 标记 slots
-      ast.attr['vue-slots'] = '{{[' + slots.reverse().map(slotName => `'${slotName}'`).join(',') + ']}}'
+      if (defaultSlot) {
+        slots.push('default')
+      }
+      if (ast.attr.generic) {
+        Object.keys(ast.attr.generic).forEach(scopedSlotName => {
+          slots.push(scopedSlotName)
+        })
+        if (platformName === 'mp-toutiao' || platformName === 'mp-lark') {
+          // 用于字节跳动|飞书小程序模拟抽象节点
+          ast.attr.generic = `{{${JSON.stringify(ast.attr.generic)}}}`.replace(/"/g, '\'')
+        } else {
+          delete ast.attr.generic
+        }
+      }
+      if (slots.length) { // 标记 slots
+        ast.attr['vue-slots'] = '{{[' + slots.reverse().map(slotName => `'${slotName}'`).join(',') + ']}}'
+      }
     }
     if (ast.attr.id && ast.attr.id.indexOf('{{') === 0) {
-      state.tips.add(`id 作为属性保留名,不允许在自定义组件 ${ast.type} 中定义为 props`)
+      state.tips.add(uniI18n.__('templateCompiler.idAttribNotAllowInCustomComponentProps', { 0: ast.type }))
     }
     if (hasOwn(ast.attr, 'data') && platformName !== 'mp-toutiao') { // 百度中会出现异常情况
       // TODO 暂不输出

@@ -1,8 +1,5 @@
 const path = require('path')
-
-const {
-  sassLoaderVersion
-} = require('@dcloudio/uni-cli-shared/lib/scss')
+const webpack = require('webpack')
 
 const {
   getPartialIdentifier
@@ -23,11 +20,38 @@ module.exports = function chainWebpack (platformOptions, vueOptions, api) {
     const urlLoader = require('@dcloudio/uni-cli-shared/lib/url-loader')
     const staticTypes = ['images', 'media', 'fonts']
     staticTypes.forEach(staticType => {
-      webpackConfig.module
-        .rule(staticType)
-        .use('url-loader')
-        .loader(urlLoader.loader)
-        .tap(options => Object.assign(options, urlLoader.options()))
+      const newOptions = urlLoader.options()
+      if (webpack.version[0] > 4) {
+        if ('limit' in newOptions) {
+          webpackConfig.module.rule(staticType).parser({
+            dataUrlCondition: {
+              maxSize: newOptions.limit
+            }
+          })
+        }
+        if (newOptions.fallback && newOptions.fallback.options) {
+          const generator = {}
+          const oldOptions = newOptions.fallback.options
+          const keys = ['publicPath', 'outputPath']
+          keys.forEach(key => {
+            generator[key] = pathData => {
+              const outputPath = oldOptions.outputPath(null, pathData.module.request)
+              const basename = path.basename(outputPath)
+              return outputPath.substring(0, outputPath.length - basename.length)
+            }
+          })
+          generator.filename = pathData => {
+            return path.basename(pathData.module.request)
+          }
+          webpackConfig.module.rule(staticType).set('generator', generator)
+        }
+      } else {
+        webpackConfig.module
+          .rule(staticType)
+          .use('url-loader')
+          .loader(urlLoader.loader)
+          .tap(options => Object.assign(options, newOptions))
+      }
     })
     // 条件编译 vue 文件统一直接过滤html,js,css三种类型,单独资源文件引用各自过滤
 
@@ -56,6 +80,29 @@ module.exports = function chainWebpack (platformOptions, vueOptions, api) {
             ))
             .before('css-loader')
         }
+        if (webpack.version[0] > 4) {
+          langRule.oneOf(type)
+            .use('css-loader')
+            .tap(options => {
+              options.url = {
+                filter: function (url) {
+                  return url[0] !== '/'
+                }
+              }
+              return options
+            })
+          const platformExcludes = ['app-plus', 'h5', 'mp-360']
+          const platform = process.env.UNI_PLATFORM
+          if (!platformExcludes.includes(platform)) {
+            // remove warning https://github.com/vuejs/vue-loader/issues/1742
+            langRule.oneOf(type)
+              .use('extract-css-loader')
+              .tap(options => {
+                options.esModule = false
+                return options
+              })
+          }
+        }
         langRule.oneOf(type)
           .use('uniapp-preprocss')
           .loader(resolve('packages/webpack-preprocess-loader'))
@@ -72,32 +119,44 @@ module.exports = function chainWebpack (platformOptions, vueOptions, api) {
       })
     })
 
-    if (sassLoaderVersion >= 8) { // check indentedSyntax
-      // vue cli 3 and sass-loader 8
-      cssTypes.forEach(type => {
-        webpackConfig.module.rule('sass').oneOf(type).use('sass-loader').tap(options => {
-          if (options.indentedSyntax) {
-            if (!options.sassOptions) {
-              options.sassOptions = {}
-            }
-            options.sassOptions.indentedSyntax = true
-            delete options.indentedSyntax
+    // vue cli 3 and sass-loader 8
+    cssTypes.forEach(type => {
+      webpackConfig.module.rule('sass').oneOf(type).use('sass-loader').tap(options => {
+        if (options.indentedSyntax) {
+          if (!options.sassOptions) {
+            options.sassOptions = {}
           }
-          return options
-        })
+          options.sassOptions.indentedSyntax = true
+          delete options.indentedSyntax
+        }
+        return options
       })
-    }
+    })
 
     platformOptions.chainWebpack(webpackConfig, vueOptions, api)
     // define
     const deferredCreated = process.env.UNI_PLATFORM === 'mp-toutiao' ||
       process.env.UNI_PLATFORM === 'quickapp-webview'
     const defines = {
+      // UNI_ENV好像没用
+      __UNI_FEATURE_PROMISE__: JSON.stringify(false),
       'process.env.UNI_ENV': JSON.stringify(process.env.UNI_PLATFORM),
+      'process.env.UNI_APP_ID': JSON.stringify(process.env.UNI_APP_ID),
+      'process.env.UNI_APP_NAME': JSON.stringify(process.env.UNI_APP_NAME),
+      'process.env.UNI_PLATFORM': JSON.stringify(process.env.UNI_PLATFORM),
+      'process.env.UNI_SUB_PLATFORM': JSON.stringify(process.env.UNI_SUB_PLATFORM),
       'process.env.UNI_CLOUD_PROVIDER': process.env.UNI_CLOUD_PROVIDER,
+      'process.env.UNI_SECURE_NETWORK_ENABLE': process.env.UNI_SECURE_NETWORK_ENABLE,
+      'process.env.UNI_SECURE_NETWORK_CONFIG': process.env.UNI_SECURE_NETWORK_CONFIG || '[]',
       'process.env.UNICLOUD_DEBUG': process.env.UNICLOUD_DEBUG,
       'process.env.RUN_BY_HBUILDERX': process.env.RUN_BY_HBUILDERX,
-      'process.env.UNI_AUTOMATOR_WS_ENDPOINT': JSON.stringify(process.env.UNI_AUTOMATOR_WS_ENDPOINT)
+      'process.env.UNI_AUTOMATOR_WS_ENDPOINT': JSON.stringify(process.env.UNI_AUTOMATOR_WS_ENDPOINT),
+      'process.env.UNI_STATISTICS_CONFIG': process.env.UNI_STATISTICS_CONFIG,
+      'process.env.UNI_STAT_UNI_CLOUD': process.env.UNI_STAT_UNI_CLOUD,
+      'process.env.UNI_STAT_DEBUG': process.env.UNI_STAT_DEBUG,
+      'process.env.UNI_COMPILER_VERSION': JSON.stringify(process.env.UNI_COMPILER_VERSION),
+      'process.env.UNI_APP_VERSION_NAME': JSON.stringify(process.env.UNI_APP_VERSION_NAME),
+      'process.env.UNI_APP_VERSION_CODE': JSON.stringify(process.env.UNI_APP_VERSION_CODE)
     }
     if (process.env.UNI_USING_VUE3) {
       Object.assign(defines, {
@@ -105,12 +164,21 @@ module.exports = function chainWebpack (platformOptions, vueOptions, api) {
         __UNI_WXS_API__: JSON.stringify(process.env.UNI_USING_WXS_API === 'true'),
         __UNI_PROMISE_API__: JSON.stringify(process.env.UNI_USING_PROMISE_API === 'true'),
         __VUE_OPTIONS_API__: JSON.stringify(process.env.UNI_USING_VUE3_OPTIONS_API === 'true'),
-        __VUE_CREATED_DEFERRED__: JSON.stringify(deferredCreated)
+        __VUE_CREATED_DEFERRED__: JSON.stringify(deferredCreated),
+        __VUE_PROD_DEVTOOLS__: JSON.stringify(false)
       })
     }
     if (process.env.UNI_PLATFORM === 'h5') {
       // TODO manifest.json
       defines.__UNI_ROUTER_MODE__ = JSON.stringify('hash')
+    }
+
+    if (process.env.UNI_CLOUD_PROVIDER && process.env.NODE_ENV !== 'development') {
+      webpackConfig.optimization.minimizer('terser').tap((args) => {
+        // reduce_vars 优化常量
+        args[0].terserOptions.compress.reduce_vars = true
+        return args
+      })
     }
 
     webpackConfig
@@ -138,5 +206,24 @@ module.exports = function chainWebpack (platformOptions, vueOptions, api) {
     if (process.env.BUILD_ENV === 'ali-ide') {
       webpackConfig.plugins.delete('progress')
     }
+
+    // webpack4 support import mjs
+    if (webpack.version[0] < 5) {
+      webpackConfig.module
+        .rule('mjs')
+        .test(/.mjs$/)
+        .type('javascript/auto')
+    }
+
+    webpackConfig.resolve.alias
+      .delete('@')
+      .set(
+        '@/pages.json',
+        path.resolve(process.env.UNI_INPUT_DIR, 'pages.json') +
+        '?' + JSON.stringify({
+          type: 'origin-pages-json'
+        })
+      )
+      .set('@', path.resolve(process.env.UNI_INPUT_DIR))
   }
 }

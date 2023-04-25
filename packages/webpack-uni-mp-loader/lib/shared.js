@@ -1,7 +1,10 @@
+const webpack = require('webpack')
 const {
   removeExt,
   getPlatformExts,
-  getPlatformTarget
+  getPlatformTarget,
+  createSource,
+  deleteAsset
 } = require('@dcloudio/uni-cli-shared')
 
 const {
@@ -37,6 +40,14 @@ function restoreNodeModules (str) {
   }
   str = str.replace('node-modules', 'node_modules')
   return str
+}
+
+function getIssuer (compilation, module) {
+  return webpack.version[0] > 4 ? compilation.moduleGraph.getIssuer(module) : module.issuer
+}
+
+function getModuleId (compilation, module) {
+  return webpack.version[0] > '4' ? compilation.chunkGraph.getModuleId(module) : module.id
 }
 
 module.exports = {
@@ -100,5 +111,9 @@ module.exports = {
     return ''
   },
   getPlatformExts,
-  getPlatformTarget
+  getPlatformTarget,
+  createSource,
+  deleteAsset,
+  getIssuer,
+  getModuleId
 }

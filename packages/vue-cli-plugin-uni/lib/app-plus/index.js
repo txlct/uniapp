@@ -2,7 +2,10 @@ const path = require('path')
 const webpack = require('webpack')
 
 const {
-  getMainEntry
+  getMainEntry,
+  getPlatformStat,
+  getPlatformPush,
+  getPlatformUniCloud
 } = require('@dcloudio/uni-cli-shared')
 
 const vueLoader = require('@dcloudio/uni-cli-shared/lib/vue-loader')
@@ -58,15 +61,20 @@ const v3 = {
     const isAppService = !!vueOptions.pluginOptions['uni-app-plus'].service
     const isAppView = !!vueOptions.pluginOptions['uni-app-plus'].view
 
-    const statCode = process.env.UNI_USING_STAT ? 'import \'@dcloudio/uni-stat\';' : ''
+    const statCode = getPlatformStat()
+    const pushCode = getPlatformPush()
+    const uniCloudCode = getPlatformUniCloud()
 
     const beforeCode = 'import \'uni-pages\';'
-
     if (!webpackConfig.optimization) {
       webpackConfig.optimization = {}
     }
     // disable noEmitOnErrors
-    webpackConfig.optimization.noEmitOnErrors = false
+    if (webpack.version[0] > 4) {
+      webpackConfig.optimization.emitOnErrors = true
+    } else {
+      webpackConfig.optimization.noEmitOnErrors = false
+    }
 
     if (isAppService) {
       webpackConfig.optimization.runtimeChunk = {
@@ -130,7 +138,8 @@ const v3 = {
       output: {
         filename: '[name].js',
         chunkFilename: '[id].js',
-        globalObject: 'this'
+        // webpack5 use strict
+        globalObject: webpack.version[0] > 4 ? '(new Function("return this")())' : 'this'
       },
       performance: {
         hints: false
@@ -153,7 +162,7 @@ const v3 = {
             options: {
               compiler: vueLoader.compiler,
               before: [
-                beforeCode + require('../util').getAutomatorCode() + statCode +
+                beforeCode + require('../util').getAutomatorCode() + statCode + pushCode + uniCloudCode +
                   getGlobalUsingComponentsCode()
               ]
             }
@@ -167,6 +176,13 @@ const v3 = {
           }, {
             loader: path.resolve(__dirname,
               '../../packages/webpack-uni-app-loader/page-meta')
+          }]
+        },
+        {
+          type: 'javascript/auto',
+          resourceQuery: /uts-proxy/,
+          use: [{
+            loader: require.resolve('@dcloudio/uni-cli-shared/lib/uts/uts-loader.js')
           }]
         },
         ...rules
@@ -255,6 +271,8 @@ const v3 = {
         webpackConfig.module.rules.delete(cssLang)
       })
     }
+
+    webpackConfig.plugin('vue-loader').use(require(vueLoader.loader).VueLoaderPlugin)
 
     webpackConfig.plugins.delete('hmr')
     webpackConfig.plugins.delete('html')

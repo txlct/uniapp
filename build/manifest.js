@@ -28,18 +28,32 @@ const DEPS = {
     ['/platforms/h5/view/components/map/index.vue', 'Map'],
     ['/core/view/components/input/index.vue', 'Input'],
     ['/core/view/components/scroll-view/index.vue', 'ScrollView'],
+    ['/platforms/h5/service/api/network/request.js', 'request'],
     ['/platforms/h5/service/api/location/get-location.js', 'getLocation'],
     ['/platforms/h5/components/system-routes/choose-location/index.vue', 'ChooseLocation']
   ],
   openLocation: [
+    ['/platforms/h5/view/components/map/index.vue', 'Map'],
+    ['/platforms/h5/service/api/network/request.js', 'request'],
+    ['/platforms/h5/service/api/location/get-location.js', 'getLocation'],
     ['/platforms/h5/components/system-routes/open-location/index.vue', 'OpenLocation']
+  ],
+  getLocation: [
+    ['/platforms/h5/service/api/network/request.js', 'request']
   ],
   previewImage: [
     ['/core/view/components/swiper/index.vue', 'Swiper'],
     ['/core/view/components/swiper-item/index.vue', 'SwiperItem'],
     ['/core/view/components/movable-area/index.vue', 'MovableArea'],
     ['/core/view/components/movable-view/index.vue', 'MovableView'],
-    ['/platforms/h5/components/system-routes/preview-image/index.vue', 'PreviewImage']
+    [
+      '/platforms/h5/components/app/popup/preview-image/index.vue',
+      'PreviewImage'
+    ],
+    [
+      '/platforms/h5/components/app/popup/mixins/preview-image.js',
+      'PreviewImageMixin'
+    ]
   ],
   showToast: TOAST_DEPS,
   hideToast: TOAST_DEPS,

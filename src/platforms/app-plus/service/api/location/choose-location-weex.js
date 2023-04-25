@@ -4,7 +4,9 @@ import {
 
 import {
   showPage
-} from '../page.js'
+} from '../../../helpers/page.js'
+
+import { getLocale } from 'uni-core/helpers/i18n'
 
 function getStatusBarStyle () {
   let style = plus.navigator.getStatusBarStyle()
@@ -23,7 +25,9 @@ export function chooseLocation (options, callbackId) {
   let result
   const page = showPage({
     url: '__uniappchooselocation',
-    data: options,
+    data: Object.assign({}, options, {
+      locale: getLocale()
+    }),
     style: {
       animationType: options.animationType || 'slide-in-bottom',
       titleNView: false,

@@ -13,7 +13,8 @@ var serviceContext = (function () {
     'base64ToArrayBuffer',
     'arrayBufferToBase64',
     'addInterceptor',
-    'removeInterceptor'
+    'removeInterceptor',
+    'interceptors'
   ];
 
   const network = [
@@ -27,7 +28,8 @@ var serviceContext = (function () {
     'onSocketMessage',
     'closeSocket',
     'onSocketClose',
-    'getUpdateManager'
+    'getUpdateManager',
+    'configMTLS'
   ];
 
   const route = [
@@ -55,13 +57,20 @@ var serviceContext = (function () {
     'getLocation',
     'chooseLocation',
     'openLocation',
-    'createMapContext'
+    'createMapContext',
+    'onLocationChange',
+    'onLocationChangeError',
+    'startLocationUpdate',
+    'stopLocationUpdate',
+    'offLocationChange',
+    'offLocationChangeError'
   ];
 
   const media = [
     'chooseImage',
     'chooseFile',
     'previewImage',
+    'closePreviewImage',
     'getImageInfo',
     'getVideoInfo',
     'saveImageToPhotosAlbum',
@@ -82,6 +91,9 @@ var serviceContext = (function () {
   const device = [
     'getSystemInfo',
     'getSystemInfoSync',
+    'getWindowInfo',
+    'getDeviceInfo',
+    'getAppBaseInfo',
     'canIUse',
     'onMemoryWarning',
     'getNetworkType',
@@ -138,7 +150,11 @@ var serviceContext = (function () {
     'checkIsSoterEnrolledInDevice',
     'startSoterAuthentication',
     'onThemeChange',
-    'onUIStyleChange'
+    'offThemeChange',
+    'onUIStyleChange',
+    'getSystemSetting',
+    'getAppAuthorizeSetting',
+    'openAppAuthorizeSetting'
   ];
 
   const keyboard = [
@@ -192,7 +208,10 @@ var serviceContext = (function () {
     'getRightWindowStyle',
     'setTopWindowStyle',
     'setLeftWindowStyle',
-    'setRightWindowStyle'
+    'setRightWindowStyle',
+    'getLocale',
+    'setLocale',
+    'onLocaleChange'
   ];
 
   const event = [
@@ -228,6 +247,8 @@ var serviceContext = (function () {
     'getUserProfile',
     'preLogin',
     'closeAuthView',
+    'getCheckBoxState',
+    'getUniverifyManager',
     'share',
     'shareWithSystem',
     'showShareMenu',
@@ -240,14 +261,27 @@ var serviceContext = (function () {
     'requireNativePlugin',
     'upx2px',
     'restoreGlobal',
+    'requireGlobal',
     'getSubNVueById',
     'getCurrentSubNVue',
     'setPageMeta',
+    'onHostEventReceive',
     'onNativeEventReceive',
     'sendNativeEvent',
     'preloadPage',
     'unPreloadPage',
-    'loadSubPackage'
+    'loadSubPackage',
+    'sendHostEvent',
+    'navigateToMiniProgram',
+    'getLaunchOptionsSync',
+    'getEnterOptionsSync',
+    'initUTSProxyClass',
+    'initUTSProxyFunction',
+    'initUTSIndexClassName',
+    'initUTSClassName',
+    'initUTSPackageName',
+    'requireUTSPlugin',
+    'registerUTSPlugin',
   ];
 
   const ad = [
@@ -255,6 +289,14 @@ var serviceContext = (function () {
     'createFullScreenVideoAd',
     'createInterstitialAd',
     'createInteractiveAd'
+  ];
+
+  const plugin = [
+    'invokePushCallback',
+    'getPushClientId',
+    'onPushMessage',
+    'offPushMessage',
+    'createPushMessage'
   ];
 
   const apis = [
@@ -271,7 +313,8 @@ var serviceContext = (function () {
     ...file,
     ...canvas,
     ...third,
-    ...ad
+    ...ad,
+    ...plugin
   ];
 
   var apis_1 = apis;
@@ -288,8 +331,36 @@ var serviceContext = (function () {
     window.addEventListener('test-passive', null, opts);
   } catch (e) {}
 
+  let realAtob;
+
+  const b64 = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
+  const b64re = /^(?:[A-Za-z\d+/]{4})*?(?:[A-Za-z\d+/]{2}(?:==)?|[A-Za-z\d+/]{3}=?)?$/;
+
+  if (typeof atob !== 'function') {
+    realAtob = function (str) {
+      str = String(str).replace(/[\t\n\f\r ]+/g, '');
+      if (!b64re.test(str)) { throw new Error("Failed to execute 'atob' on 'Window': The string to be decoded is not correctly encoded.") }
+
+      // Adding the padding if missing, for semplicity
+      str += '=='.slice(2 - (str.length & 3));
+      var bitmap; var result = ''; var r1; var r2; var i = 0;
+      for (; i < str.length;) {
+        bitmap = b64.indexOf(str.charAt(i++)) << 18 | b64.indexOf(str.charAt(i++)) << 12 |
+                      (r1 = b64.indexOf(str.charAt(i++))) << 6 | (r2 = b64.indexOf(str.charAt(i++)));
+
+        result += r1 === 64 ? String.fromCharCode(bitmap >> 16 & 255)
+          : r2 === 64 ? String.fromCharCode(bitmap >> 16 & 255, bitmap >> 8 & 255)
+            : String.fromCharCode(bitmap >> 16 & 255, bitmap >> 8 & 255, bitmap & 255);
+      }
+      return result
+    };
+  } else {
+    // 注意atob只能在全局对象上调用，例如：`const Base64 = {atob};Base64.atob('xxxx')`是错误的用法
+    realAtob = atob;
+  }
+
   function b64DecodeUnicode (str) {
-    return decodeURIComponent(atob(str).split('').map(function (c) {
+    return decodeURIComponent(realAtob(str).split('').map(function (c) {
       return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)
     }).join(''))
   }
@@ -341,8 +412,14 @@ var serviceContext = (function () {
   const _toString = Object.prototype.toString;
   const hasOwnProperty = Object.prototype.hasOwnProperty;
 
+  const extend = Object.assign;
+
   function isFn (fn) {
     return typeof fn === 'function'
+  }
+
+  function isStr (str) {
+    return typeof str === 'string'
   }
 
   function isObject (obj) {
@@ -357,7 +434,7 @@ var serviceContext = (function () {
     return hasOwnProperty.call(obj, key)
   }
 
-  function noop () {}
+  function noop () { }
 
   function toRawType (val) {
     return _toString.call(val).slice(8, -1)
@@ -380,6 +457,13 @@ var serviceContext = (function () {
   const camelizeRE = /-(\w)/g;
   const camelize = cached((str) => {
     return str.replace(camelizeRE, (_, c) => c ? c.toUpperCase() : '')
+  });
+
+  /**
+   * Capitalize a string.
+   */
+  const capitalize = cached((str) => {
+    return str.charAt(0).toUpperCase() + str.slice(1)
   });
 
   function getLen (str = '') {
@@ -437,6 +521,16 @@ var serviceContext = (function () {
     } else {
       return false
     }
+  }
+
+  function sortObject (obj) {
+    const sortObj = {};
+    if (isPlainObject(obj)) {
+      Object.keys(obj).sort().forEach(key => {
+        sortObj[key] = obj[key];
+      });
+    }
+    return !Object.keys(sortObj) ? obj : sortObj
   }
 
   const encodeReserveRE = /[!'()*]/g;
@@ -563,6 +657,49 @@ var serviceContext = (function () {
     warp,
     invoke
   };
+
+  const borderStyles = {
+    black: 'rgba(0,0,0,0.4)',
+    white: 'rgba(255,255,255,0.4)'
+  };
+
+  function normalizeTabBarStyles (borderStyle) {
+    if (borderStyle && borderStyle in borderStyles) {
+      return borderStyles[borderStyle]
+    }
+    return borderStyle
+  }
+
+  function normallizeStyles (pageStyle, themeConfig = {}, mode = 'light') {
+    const modeStyle = themeConfig[mode];
+    const styles = {};
+    if (!modeStyle) {
+      return styles
+    }
+    Object.keys(pageStyle).forEach((key) => {
+      const styleItem = pageStyle[key]; // Object Array String
+      styles[key] = (() => {
+        if (isPlainObject(styleItem)) {
+          return normallizeStyles(styleItem, themeConfig, mode)
+        } else if (Array.isArray(styleItem)) {
+          return styleItem.map((item) => isPlainObject(item)
+            ? normallizeStyles(item, themeConfig, mode)
+            : item)
+        } else if (isStr(styleItem) && styleItem.startsWith('@')) {
+          const _key = styleItem.replace('@', '');
+          let _styleItem = modeStyle[_key] || styleItem;
+          switch (key) {
+            case 'borderStyle':
+              _styleItem = normalizeTabBarStyles(_styleItem);
+              break
+          }
+          return _styleItem
+        }
+        return styleItem
+      })();
+    });
+    return styles
+  }
 
   /**
    * 框架内 try-catch
@@ -693,7 +830,7 @@ var serviceContext = (function () {
         }
         if (res === false) {
           return {
-            then () {}
+            then () { }
           }
         }
       }
@@ -773,16 +910,20 @@ var serviceContext = (function () {
       if (!isPromise(res)) {
         return res
       }
-      return res.then(res => {
-        return res[1]
-      }).catch(res => {
-        return res[0]
+      return new Promise((resolve, reject) => {
+        res.then(res => {
+          if (res[0]) {
+            reject(res[0]);
+          } else {
+            resolve(res[1]);
+          }
+        });
       })
     }
   };
 
   const SYNC_API_RE =
-    /^\$|Window$|WindowStyle$|sendNativeEvent|restoreGlobal|getCurrentSubNVue|getMenuButtonBoundingClientRect|^report|interceptors|Interceptor$|getSubNVueById|requireNativePlugin|upx2px|hideKeyboard|canIUse|^create|Sync$|Manager$|base64ToArrayBuffer|arrayBufferToBase64/;
+    /^\$|Window$|WindowStyle$|sendHostEvent|sendNativeEvent|restoreGlobal|requireGlobal|getCurrentSubNVue|getMenuButtonBoundingClientRect|^report|interceptors|Interceptor$|getSubNVueById|requireNativePlugin|upx2px|hideKeyboard|canIUse|^create|Sync$|Manager$|base64ToArrayBuffer|arrayBufferToBase64|getLocale|setLocale|invokePushCallback|getWindowInfo|getDeviceInfo|getAppBaseInfo|getSystemSetting|getAppAuthorizeSetting|initUTS|requireUTS|registerUTS/;
 
   const CONTEXT_API_RE = /^create|Manager$/;
 
@@ -792,7 +933,7 @@ var serviceContext = (function () {
   const TASK_APIS = ['request', 'downloadFile', 'uploadFile', 'connectSocket'];
 
   // 同步例外情况
-  const ASYNC_API = ['createBLEConnection'];
+  const ASYNC_API = ['createBLEConnection', 'createPushMessage'];
 
   const CALLBACK_API_RE = /^on|^off/;
 
@@ -843,7 +984,7 @@ var serviceContext = (function () {
   }
 
   function promisify (name, api) {
-    if (!shouldPromise(name)) {
+    if (!shouldPromise(name) || !isFn(api)) {
       return api
     }
     return function promiseApi (options = {}, ...params) {
@@ -857,6 +998,18 @@ var serviceContext = (function () {
         }), ...params);
       })))
     }
+  }
+
+  function getApiCallbacks (params) {
+    const apiCallbacks = {};
+    for (const name in params) {
+      const param = params[name];
+      if (isFn(param)) {
+        apiCallbacks[name] = tryCatch(param);
+        delete params[name];
+      }
+    }
+    return apiCallbacks
   }
 
   const base64ToArrayBuffer = [{
@@ -1112,6 +1265,23 @@ var serviceContext = (function () {
     createCanvasContext: createCanvasContext
   });
 
+  const addPhoneContact = {
+    firstName: {
+      type: String,
+      required: true,
+      validator (firstName) {
+        if (!firstName) {
+          return 'addPhoneContact:fail parameter error: parameter.firstName should not be empty String;'
+        }
+      }
+    }
+  };
+
+  var require_context_module_0_7 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    addPhoneContact: addPhoneContact
+  });
+
   const makePhoneCall = {
     phoneNumber: {
       type: String,
@@ -1124,7 +1294,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_7 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_8 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     makePhoneCall: makePhoneCall
   });
@@ -1138,26 +1308,36 @@ var serviceContext = (function () {
     },
     autoDecodeCharSet: {
       type: Boolean
+    },
+    sound: {
+      type: String,
+      default: 'none'
+    },
+    autoZoom: {
+      type: Boolean,
+      default: true
     }
   };
 
-  var require_context_module_0_8 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_9 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     scanCode: scanCode
   });
 
+  const isArray = Array.isArray;
   const isObject$1 = (val) => val !== null && typeof val === 'object';
+  const defaultDelimiters = ['{', '}'];
   class BaseFormatter {
       constructor() {
           this._caches = Object.create(null);
       }
-      interpolate(message, values) {
+      interpolate(message, values, delimiters = defaultDelimiters) {
           if (!values) {
               return [message];
           }
           let tokens = this._caches[message];
           if (!tokens) {
-              tokens = parse(message);
+              tokens = parse(message, delimiters);
               this._caches[message] = tokens;
           }
           return compile(tokens, values);
@@ -1165,24 +1345,24 @@ var serviceContext = (function () {
   }
   const RE_TOKEN_LIST_VALUE = /^(?:\d)+/;
   const RE_TOKEN_NAMED_VALUE = /^(?:\w)+/;
-  function parse(format) {
+  function parse(format, [startDelimiter, endDelimiter]) {
       const tokens = [];
       let position = 0;
       let text = '';
       while (position < format.length) {
           let char = format[position++];
-          if (char === '{') {
+          if (char === startDelimiter) {
               if (text) {
                   tokens.push({ type: 'text', value: text });
               }
               text = '';
               let sub = '';
               char = format[position++];
-              while (char !== undefined && char !== '}') {
+              while (char !== undefined && char !== endDelimiter) {
                   sub += char;
                   char = format[position++];
               }
-              const isClosed = char === '}';
+              const isClosed = char === endDelimiter;
               const type = RE_TOKEN_LIST_VALUE.test(sub)
                   ? 'list'
                   : isClosed && RE_TOKEN_NAMED_VALUE.test(sub)
@@ -1190,12 +1370,12 @@ var serviceContext = (function () {
                       : 'unknown';
               tokens.push({ value: sub, type });
           }
-          else if (char === '%') {
-              // when found rails i18n syntax, skip text capture
-              if (format[position] !== '{') {
-                  text += char;
-              }
-          }
+          //  else if (char === '%') {
+          //   // when found rails i18n syntax, skip text capture
+          //   if (format[position] !== '{') {
+          //     text += char
+          //   }
+          // }
           else {
               text += char;
           }
@@ -1206,7 +1386,7 @@ var serviceContext = (function () {
   function compile(tokens, values) {
       const compiled = [];
       let index = 0;
-      const mode = Array.isArray(values)
+      const mode = isArray(values)
           ? 'list'
           : isObject$1(values)
               ? 'named'
@@ -1244,6 +1424,11 @@ var serviceContext = (function () {
       return compiled;
   }
 
+  const LOCALE_ZH_HANS = 'zh-Hans';
+  const LOCALE_ZH_HANT = 'zh-Hant';
+  const LOCALE_EN = 'en';
+  const LOCALE_FR = 'fr';
+  const LOCALE_ES = 'es';
   const hasOwnProperty$1 = Object.prototype.hasOwnProperty;
   const hasOwn$1 = (val, key) => hasOwnProperty$1.call(val, key);
   const defaultFormatter = new BaseFormatter();
@@ -1258,31 +1443,31 @@ var serviceContext = (function () {
           return;
       }
       locale = locale.trim().replace(/_/g, '-');
-      if (messages[locale]) {
+      if (messages && messages[locale]) {
           return locale;
       }
       locale = locale.toLowerCase();
       if (locale.indexOf('zh') === 0) {
-          if (locale.indexOf('-hans') !== -1) {
-              return 'zh-Hans';
+          if (locale.indexOf('-hans') > -1) {
+              return LOCALE_ZH_HANS;
           }
-          if (locale.indexOf('-hant') !== -1) {
-              return 'zh-Hant';
+          if (locale.indexOf('-hant') > -1) {
+              return LOCALE_ZH_HANT;
           }
           if (include(locale, ['-tw', '-hk', '-mo', '-cht'])) {
-              return 'zh-Hant';
+              return LOCALE_ZH_HANT;
           }
-          return 'zh-Hans';
+          return LOCALE_ZH_HANS;
       }
-      const lang = startsWith(locale, ['en', 'fr', 'es']);
+      const lang = startsWith(locale, [LOCALE_EN, LOCALE_FR, LOCALE_ES]);
       if (lang) {
           return lang;
       }
   }
   class I18n {
       constructor({ locale, fallbackLocale, messages, watcher, formater, }) {
-          this.locale = 'en';
-          this.fallbackLocale = 'en';
+          this.locale = LOCALE_EN;
+          this.fallbackLocale = LOCALE_EN;
           this.message = {};
           this.messages = {};
           this.watchers = [];
@@ -1290,8 +1475,8 @@ var serviceContext = (function () {
               this.fallbackLocale = fallbackLocale;
           }
           this.formater = formater || defaultFormatter;
-          this.messages = messages;
-          this.setLocale(locale);
+          this.messages = messages || {};
+          this.setLocale(locale || LOCALE_EN);
           if (watcher) {
               this.watchLocale(watcher);
           }
@@ -1299,10 +1484,17 @@ var serviceContext = (function () {
       setLocale(locale) {
           const oldLocale = this.locale;
           this.locale = normalizeLocale(locale, this.messages) || this.fallbackLocale;
+          if (!this.messages[this.locale]) {
+              // 可能初始化时不存在
+              this.messages[this.locale] = {};
+          }
           this.message = this.messages[this.locale];
-          this.watchers.forEach((watcher) => {
-              watcher(this.locale, oldLocale);
-          });
+          // 仅发生变化时，通知
+          if (oldLocale !== this.locale) {
+              this.watchers.forEach((watcher) => {
+                  watcher(this.locale, oldLocale);
+              });
+          }
       }
       getLocale() {
           return this.locale;
@@ -1313,13 +1505,26 @@ var serviceContext = (function () {
               this.watchers.splice(index, 1);
           };
       }
-      mergeLocaleMessage(locale, message) {
-          if (this.messages[locale]) {
-              Object.assign(this.messages[locale], message);
+      add(locale, message, override = true) {
+          const curMessages = this.messages[locale];
+          if (curMessages) {
+              if (override) {
+                  Object.assign(curMessages, message);
+              }
+              else {
+                  Object.keys(message).forEach((key) => {
+                      if (!hasOwn$1(curMessages, key)) {
+                          curMessages[key] = message[key];
+                      }
+                  });
+              }
           }
           else {
               this.messages[locale] = message;
           }
+      }
+      f(message, values, delimiters) {
+          return this.formater.interpolate(message, values, delimiters).join('');
       }
       t(key, locale, values) {
           let message = this.message;
@@ -1338,70 +1543,104 @@ var serviceContext = (function () {
       }
   }
 
-  function initLocaleWatcher(appVm, i18n) {
-      appVm.$i18n &&
-          appVm.$i18n.vm.$watch('locale', (newLocale) => {
+  function watchAppLocale(appVm, i18n) {
+      // 需要保证 watch 的触发在组件渲染之前
+      if (appVm.$watchLocale) {
+          // vue2
+          appVm.$watchLocale((newLocale) => {
               i18n.setLocale(newLocale);
-          }, {
-              immediate: true,
           });
+      }
+      else {
+          appVm.$watch(() => appVm.$locale, (newLocale) => {
+              i18n.setLocale(newLocale);
+          });
+      }
   }
   function getDefaultLocale() {
-      if (typeof navigator !== 'undefined') {
-          return navigator.userLanguage || navigator.language;
+      if (typeof uni !== 'undefined' && uni.getLocale) {
+          return uni.getLocale();
       }
-      if (typeof plus !== 'undefined') {
-          // TODO 待调整为最新的获取语言代码
-          return plus.os.language;
+      // 小程序平台，uni 和 uni-i18n 互相引用，导致访问不到 uni，故在 global 上挂了 getLocale
+      if (typeof global !== 'undefined' && global.getLocale) {
+          return global.getLocale();
       }
-      return uni.getSystemInfoSync().language;
+      return LOCALE_EN;
   }
-  function initVueI18n(messages, fallbackLocale = 'en', locale) {
+  function initVueI18n(locale, messages = {}, fallbackLocale, watcher) {
+      // 兼容旧版本入参
+      if (typeof locale !== 'string') {
+          [locale, messages] = [
+              messages,
+              locale,
+          ];
+      }
+      if (typeof locale !== 'string') {
+          // 因为小程序平台，uni-i18n 和 uni 互相引用，导致此时访问 uni 时，为 undefined
+          locale = getDefaultLocale();
+      }
+      if (typeof fallbackLocale !== 'string') {
+          fallbackLocale =
+              (typeof __uniConfig !== 'undefined' && __uniConfig.fallbackLocale) ||
+                  LOCALE_EN;
+      }
       const i18n = new I18n({
-          locale: locale || fallbackLocale,
+          locale,
           fallbackLocale,
           messages,
+          watcher,
       });
       let t = (key, values) => {
           if (typeof getApp !== 'function') {
-              // app-plus view
+              // app view
               /* eslint-disable no-func-assign */
               t = function (key, values) {
                   return i18n.t(key, values);
               };
           }
           else {
-              const appVm = getApp().$vm;
-              if (!appVm.$t || !appVm.$i18n) {
-                  if (!locale) {
-                      i18n.setLocale(getDefaultLocale());
-                  }
-                  /* eslint-disable no-func-assign */
-                  t = function (key, values) {
-                      return i18n.t(key, values);
-                  };
-              }
-              else {
-                  initLocaleWatcher(appVm, i18n);
-                  /* eslint-disable no-func-assign */
-                  t = function (key, values) {
-                      const $i18n = appVm.$i18n;
-                      const silentTranslationWarn = $i18n.silentTranslationWarn;
-                      $i18n.silentTranslationWarn = true;
-                      const msg = appVm.$t(key, values);
-                      $i18n.silentTranslationWarn = silentTranslationWarn;
-                      if (msg !== key) {
-                          return msg;
+              let isWatchedAppLocale = false;
+              t = function (key, values) {
+                  const appVm = getApp().$vm;
+                  // 可能$vm还不存在，比如在支付宝小程序中，组件定义较早，在props的default里使用了t()函数（如uni-goods-nav），此时app还未初始化
+                  // options: {
+                  // 	type: Array,
+                  // 	default () {
+                  // 		return [{
+                  // 			icon: 'shop',
+                  // 			text: t("uni-goods-nav.options.shop"),
+                  // 		}, {
+                  // 			icon: 'cart',
+                  // 			text: t("uni-goods-nav.options.cart")
+                  // 		}]
+                  // 	}
+                  // },
+                  if (appVm) {
+                      // 触发响应式
+                      appVm.$locale;
+                      if (!isWatchedAppLocale) {
+                          isWatchedAppLocale = true;
+                          watchAppLocale(appVm, i18n);
                       }
-                      return i18n.t(key, $i18n.locale, values);
-                  };
-              }
+                  }
+                  return i18n.t(key, values);
+              };
           }
           return t(key, values);
       };
       return {
+          i18n,
+          f(message, values, delimiters) {
+              return i18n.f(message, values, delimiters);
+          },
           t(key, values) {
               return t(key, values);
+          },
+          add(locale, message, override = true) {
+              return i18n.add(locale, message, override);
+          },
+          watch(fn) {
+              return i18n.watchLocale(fn);
           },
           getLocale() {
               return i18n.getLocale();
@@ -1409,23 +1648,14 @@ var serviceContext = (function () {
           setLocale(newLocale) {
               return i18n.setLocale(newLocale);
           },
-          mixin: {
-              beforeCreate() {
-                  const unwatch = i18n.watchLocale(() => {
-                      this.$forceUpdate();
-                  });
-                  this.$once('hook:beforeDestroy', function () {
-                      unwatch();
-                  });
-              },
-              methods: {
-                  $$t(key, values) {
-                      return t(key, values);
-                  },
-              },
-          },
       };
   }
+  function isI18nStr(value, delimiters) {
+      return value.indexOf(delimiters[0]) > -1;
+  }
+
+  const NAVBAR_HEIGHT = 44;
+  const ON_THEME_CHANGE = 'onThemeChange';
 
   var en = {
   	"uni.app.quit": "Press back button again to exit",
@@ -1441,6 +1671,7 @@ var serviceContext = (function () {
   	"uni.chooseVideo.cancel": "Cancel",
   	"uni.chooseVideo.sourceType.album": "Album",
   	"uni.chooseVideo.sourceType.camera": "Camera",
+  	"uni.chooseFile.notUserActivation": "File chooser dialog can only be shown with a user activation",
   	"uni.previewImage.cancel": "Cancel",
   	"uni.previewImage.button.save": "Save Image",
   	"uni.previewImage.save.success": "Saved successfully",
@@ -1457,7 +1688,9 @@ var serviceContext = (function () {
   	"uni.video.danmu": "Danmu",
   	"uni.video.volume": "Volume",
   	"uni.button.feedback.title": "feedback",
-  	"uni.button.feedback.send": "send"
+  	"uni.button.feedback.send": "send",
+  	"uni.chooseLocation.search": "Find Place",
+  	"uni.chooseLocation.cancel": "Cancel"
   };
 
   var es = {
@@ -1474,6 +1707,7 @@ var serviceContext = (function () {
   	"uni.chooseVideo.cancel": "Cancelar",
   	"uni.chooseVideo.sourceType.album": "Álbum",
   	"uni.chooseVideo.sourceType.camera": "Cámara",
+  	"uni.chooseFile.notUserActivation": "El cuadro de diálogo del selector de archivos solo se puede mostrar con la activación del usuario",
   	"uni.previewImage.cancel": "Cancelar",
   	"uni.previewImage.button.save": "Guardar imagen",
   	"uni.previewImage.save.success": "Guardado exitosamente",
@@ -1490,7 +1724,9 @@ var serviceContext = (function () {
   	"uni.video.danmu": "Danmu",
   	"uni.video.volume": "Volumen",
   	"uni.button.feedback.title": "realimentación",
-  	"uni.button.feedback.send": "enviar"
+  	"uni.button.feedback.send": "enviar",
+  	"uni.chooseLocation.search": "Encontrar",
+  	"uni.chooseLocation.cancel": "Cancelar"
   };
 
   var fr = {
@@ -1507,6 +1743,7 @@ var serviceContext = (function () {
   	"uni.chooseVideo.cancel": "Annuler",
   	"uni.chooseVideo.sourceType.album": "Album",
   	"uni.chooseVideo.sourceType.camera": "Caméra",
+  	"uni.chooseFile.notUserActivation": "La boîte de dialogue du sélecteur de fichier ne peut être affichée qu'avec une activation par l'utilisateur",
   	"uni.previewImage.cancel": "Annuler",
   	"uni.previewImage.button.save": "Guardar imagen",
   	"uni.previewImage.save.success": "Enregistré avec succès",
@@ -1523,7 +1760,9 @@ var serviceContext = (function () {
   	"uni.video.danmu": "Danmu",
   	"uni.video.volume": "Le Volume",
   	"uni.button.feedback.title": "retour d'information",
-  	"uni.button.feedback.send": "envoyer"
+  	"uni.button.feedback.send": "envoyer",
+  	"uni.chooseLocation.search": "Trouve",
+  	"uni.chooseLocation.cancel": "Annuler"
   };
 
   var zhHans = {
@@ -1540,6 +1779,7 @@ var serviceContext = (function () {
   	"uni.chooseVideo.cancel": "取消",
   	"uni.chooseVideo.sourceType.album": "从相册选择",
   	"uni.chooseVideo.sourceType.camera": "拍摄",
+  	"uni.chooseFile.notUserActivation": "文件选择器对话框只能在由用户激活时显示",
   	"uni.previewImage.cancel": "取消",
   	"uni.previewImage.button.save": "保存图像",
   	"uni.previewImage.save.success": "保存图像到相册成功",
@@ -1556,7 +1796,9 @@ var serviceContext = (function () {
   	"uni.video.danmu": "弹幕",
   	"uni.video.volume": "音量",
   	"uni.button.feedback.title": "问题反馈",
-  	"uni.button.feedback.send": "发送"
+  	"uni.button.feedback.send": "发送",
+  	"uni.chooseLocation.search": "搜索地点",
+  	"uni.chooseLocation.cancel": "取消"
   };
 
   var zhHant = {
@@ -1573,6 +1815,7 @@ var serviceContext = (function () {
   	"uni.chooseVideo.cancel": "取消",
   	"uni.chooseVideo.sourceType.album": "從相冊選擇",
   	"uni.chooseVideo.sourceType.camera": "拍攝",
+  	"uni.chooseFile.notUserActivation": "文件選擇器對話框只能在由用戶激活時顯示",
   	"uni.previewImage.cancel": "取消",
   	"uni.previewImage.button.save": "保存圖像",
   	"uni.previewImage.save.success": "保存圖像到相冊成功",
@@ -1589,29 +1832,201 @@ var serviceContext = (function () {
   	"uni.video.danmu": "彈幕",
   	"uni.video.volume": "音量",
   	"uni.button.feedback.title": "問題反饋",
-  	"uni.button.feedback.send": "發送"
+  	"uni.button.feedback.send": "發送",
+  	"uni.chooseLocation.search": "搜索地點",
+  	"uni.chooseLocation.cancel": "取消"
   };
 
-  const messages = {
-    en,
-    es,
-    fr,
-    'zh-Hans': zhHans,
-    'zh-Hant': zhHant
-  };
+  const LOCALE_ZH_HANS$1 = 'zh-Hans';
+  const LOCALE_ZH_HANT$1 = 'zh-Hant';
+  const LOCALE_EN$1 = 'en';
+  const LOCALE_FR$1 = 'fr';
+  const LOCALE_ES$1 = 'es';
 
-  const fallbackLocale = 'en';
+  const messages = {};
 
-  const i18n = initVueI18n( messages , fallbackLocale);
+  {
+    Object.assign(messages, {
+      [LOCALE_EN$1]: en,
+      [LOCALE_ES$1]: es,
+      [LOCALE_FR$1]: fr,
+      [LOCALE_ZH_HANS$1]: zhHans,
+      [LOCALE_ZH_HANT$1]: zhHant
+    });
+  }
+
+  let locale;
+
+  {
+    if (typeof weex === 'object') {
+      locale = weex.requireModule('plus').getLanguage();
+    } else {
+      locale = '';
+    }
+  }
+
+  function initI18nMessages () {
+    if (!isEnableLocale()) {
+      return
+    }
+    const localeKeys = Object.keys(__uniConfig.locales);
+    if (localeKeys.length) {
+      localeKeys.forEach((locale) => {
+        const curMessages = messages[locale];
+        const userMessages = __uniConfig.locales[locale];
+        if (curMessages) {
+          Object.assign(curMessages, userMessages);
+        } else {
+          messages[locale] = userMessages;
+        }
+      });
+    }
+  }
+
+  initI18nMessages();
+
+  const i18n = initVueI18n(
+    locale,
+     messages 
+  );
   const t = i18n.t;
+  const i18nMixin = (i18n.mixin = {
+    beforeCreate () {
+      const unwatch = i18n.i18n.watchLocale(() => {
+        this.$forceUpdate();
+      });
+      this.$once('hook:beforeDestroy', function () {
+        unwatch();
+      });
+    },
+    methods: {
+      $$t (key, values) {
+        return t(key, values)
+      }
+    }
+  });
   const getLocale = i18n.getLocale;
 
+  function initAppLocale (Vue, appVm, locale) {
+    const state = Vue.observable({
+      locale: locale || i18n.getLocale()
+    });
+    const localeWatchers = [];
+    appVm.$watchLocale = fn => {
+      localeWatchers.push(fn);
+    };
+    Object.defineProperty(appVm, '$locale', {
+      get () {
+        return state.locale
+      },
+      set (v) {
+        state.locale = v;
+        localeWatchers.forEach(watch => watch(v));
+      }
+    });
+  }
+
+  const I18N_JSON_DELIMITERS = ['%', '%'];
+
+  function getLocaleMessage () {
+    const locale = uni.getLocale();
+    const locales = __uniConfig.locales;
+    return (
+      locales[locale] || locales[__uniConfig.fallbackLocale] || locales[LOCALE_EN$1] || {}
+    )
+  }
+
+  function formatI18n (message) {
+    if (isI18nStr(message, I18N_JSON_DELIMITERS)) {
+      return i18n.f(message, getLocaleMessage(), I18N_JSON_DELIMITERS)
+    }
+    return message
+  }
+
+  function resolveJsonObj (jsonObj, names) {
+    if (names.length === 1) {
+      if (jsonObj) {
+        const _isI18nStr = (value) => isStr(value) && isI18nStr(value, I18N_JSON_DELIMITERS);
+        const _name = names[0];
+        let filterJsonObj = [];
+        if (Array.isArray(jsonObj) && (filterJsonObj = jsonObj.filter(item => _isI18nStr(item[_name]))).length) {
+          return filterJsonObj
+        }
+        const value = jsonObj[_name];
+        if (_isI18nStr(value)) {
+          return jsonObj
+        }
+      }
+      return
+    }
+    const name = names.shift();
+    return resolveJsonObj(jsonObj && jsonObj[name], names)
+  }
+
+  function defineI18nProperties (obj, names) {
+    return names.map(name => defineI18nProperty(obj, name))
+  }
+
+  function defineI18nProperty (obj, names) {
+    const jsonObj = resolveJsonObj(obj, names);
+    if (!jsonObj) {
+      return false
+    }
+    const prop = names[names.length - 1];
+    if (Array.isArray(jsonObj)) {
+      jsonObj
+        .forEach(item => defineI18nProperty(item, [prop]));
+    } else {
+      let value = jsonObj[prop];
+      Object.defineProperty(jsonObj, prop, {
+        get () {
+          return formatI18n(value)
+        },
+        set (v) {
+          value = v;
+        }
+      });
+    }
+    return true
+  }
+
+  function isEnableLocale () {
+    return typeof __uniConfig !== 'undefined' && __uniConfig.locales && !!Object.keys(__uniConfig.locales).length
+  }
+
+  function initNavigationBarI18n (navigationBar) {
+    if (isEnableLocale()) {
+      return defineI18nProperties(navigationBar, [
+        ['titleText'],
+        ['searchInput', 'placeholder'],
+        ['buttons', 'text']
+      ])
+    }
+  }
+  // export function initI18n() {
+  //   const localeKeys = Object.keys(__uniConfig.locales || {})
+  //   if (localeKeys.length) {
+  //     localeKeys.forEach((locale) =>
+  //       i18n.add(locale, __uniConfig.locales[locale])
+  //     )
+  //   }
+  // }
+
   const setClipboardData = {
-    beforeSuccess () {
+    data: {
+      type: String,
+      required: true
+    },
+    showToast: {
+      type: Boolean,
+      default: true
+    },
+    beforeSuccess (res, params) {
+      if (!params.showToast) return
       const title = t('uni.setClipboardData.success');
       if (title) {
         uni.showToast({
-          title: t('uni.setClipboardData.success'),
+          title,
           icon: 'success',
           mask: false,
           style: {
@@ -1622,7 +2037,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_9 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_10 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     setClipboardData: setClipboardData
   });
@@ -1685,7 +2100,7 @@ var serviceContext = (function () {
         return 'https:' + filePath
       }
       // 平台绝对路径 安卓、iOS
-      if (filePath.startsWith('/storage/') || filePath.includes('/Containers/Data/Application/')) {
+      if (filePath.startsWith('/storage/') || filePath.startsWith('/sdcard/') || filePath.includes('/Containers/Data/Application/')) {
         return 'file://' + filePath
       }
       return addBase(filePath.substr(1))
@@ -1757,7 +2172,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_10 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_11 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     saveFile: saveFile,
     getFileInfo: getFileInfo,
@@ -1775,7 +2190,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_11 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_12 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     openDocument: openDocument
   });
@@ -1786,23 +2201,20 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_12 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_13 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     chooseLocation: chooseLocation
   });
 
-  const type = {
-    WGS84: 'WGS84',
-    GCJ02: 'GCJ02'
-  };
+  const coordTypes = ['wgs84', 'gcj02'];
+
   const getLocation = {
     type: {
       type: String,
       validator (value, params) {
-        value = (value || '').toUpperCase();
-        params.type = Object.values(type).indexOf(value) < 0 ? type.WGS84 : value;
-      },
-      default: type.WGS84
+        value = (value || '').toLowerCase();
+        params.type = coordTypes.indexOf(value) < 0 ? coordTypes[0] : value;
+      }
     },
     altitude: {
       type: Boolean,
@@ -1810,7 +2222,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_13 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_14 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     getLocation: getLocation
   });
@@ -1840,7 +2252,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_14 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_15 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     openLocation: openLocation
   });
@@ -1886,7 +2298,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_15 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_16 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     chooseFile: chooseFile
   });
@@ -1933,7 +2345,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_16 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_17 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     chooseImage: chooseImage
   });
@@ -1971,7 +2383,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_17 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_18 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     chooseVideo: chooseVideo
   });
@@ -1986,7 +2398,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_18 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_19 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     compressImage: compressImage
   });
@@ -2013,7 +2425,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_19 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_20 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     compressVideo: compressVideo
   });
@@ -2028,7 +2440,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_20 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_21 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     getImageInfo: getImageInfo
   });
@@ -2043,7 +2455,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_21 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_22 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     getVideoInfo: getVideoInfo
   });
@@ -2079,7 +2491,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_22 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_23 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     previewImage: previewImage
   });
@@ -2094,7 +2506,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_23 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_24 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     saveImageToPhotosAlbum: saveImageToPhotosAlbum
   });
@@ -2112,7 +2524,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_24 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_25 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     downloadFile: downloadFile
   });
@@ -2125,7 +2537,8 @@ var serviceContext = (function () {
     PUT: 'PUT',
     DELETE: 'DELETE',
     TRACE: 'TRACE',
-    CONNECT: 'CONNECT'
+    CONNECT: 'CONNECT',
+    PATCH: 'PATCH'
   };
   const dataType = {
     JSON: 'json'
@@ -2223,9 +2636,22 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_25 = /*#__PURE__*/Object.freeze({
+  const configMTLS = {
+    certificates: {
+      type: Array,
+      required: true,
+      validator (value) {
+        if (value.some(item => toRawType(item.host) !== 'String')) {
+          return '参数配置错误，请确认后重试'
+        }
+      }
+    }
+  };
+
+  var require_context_module_0_26 = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    request: request
+    request: request,
+    configMTLS: configMTLS
   });
 
   const method$1 = {
@@ -2281,7 +2707,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_26 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_27 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     connectSocket: connectSocket,
     sendSocketMessage: sendSocketMessage,
@@ -2323,7 +2749,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_27 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_28 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     uploadFile: uploadFile
   });
@@ -2348,7 +2774,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_28 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_29 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     getProvider: getProvider
   });
@@ -2369,7 +2795,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_29 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_30 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     loadSubPackage: loadSubPackage
   });
@@ -2391,7 +2817,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_30 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_31 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     preLogin: preLogin
   });
@@ -2592,7 +3018,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_31 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_32 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     redirectTo: redirectTo,
     reLaunch: reLaunch,
@@ -2638,7 +3064,7 @@ var serviceContext = (function () {
   const removeStorage = getStorage;
   const removeStorageSync = getStorageSync;
 
-  var require_context_module_0_32 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_33 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     getStorage: getStorage,
     getStorageSync: getStorageSync,
@@ -2675,7 +3101,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_33 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_34 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     loadFontFace: loadFontFace
   });
@@ -2718,7 +3144,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_34 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_35 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     setNavigationBarColor: setNavigationBarColor,
     setNavigationBarTitle: setNavigationBarTitle
@@ -2726,8 +3152,7 @@ var serviceContext = (function () {
 
   const pageScrollTo = {
     scrollTop: {
-      type: Number,
-      required: true
+      type: Number
     },
     duration: {
       type: Number,
@@ -2738,7 +3163,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_35 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_36 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     pageScrollTo: pageScrollTo
   });
@@ -2764,7 +3189,7 @@ var serviceContext = (function () {
     },
     cancelColor: {
       type: String,
-      default: '#000000'
+      default: '#000'
     },
     confirmText: {
       type: String,
@@ -2852,7 +3277,7 @@ var serviceContext = (function () {
     },
     itemColor: {
       type: String,
-      default: '#000000'
+      default: '#000'
     },
     visible: {
       type: Boolean,
@@ -2863,7 +3288,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_36 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_37 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     showModal: showModal,
     showToast: showToast,
@@ -2962,7 +3387,7 @@ var serviceContext = (function () {
     }
   };
 
-  var require_context_module_0_37 = /*#__PURE__*/Object.freeze({
+  var require_context_module_0_38 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     setTabBarItem: setTabBarItem,
     setTabBarStyle: setTabBarStyle,
@@ -2985,37 +3410,38 @@ var serviceContext = (function () {
   './base/upx2px.js': require_context_module_0_4,
   './context/canvas.js': require_context_module_0_5,
   './context/context.js': require_context_module_0_6,
-  './device/make-phone-call.js': require_context_module_0_7,
-  './device/scan-code.js': require_context_module_0_8,
-  './device/set-clipboard-data.js': require_context_module_0_9,
-  './file/file.js': require_context_module_0_10,
-  './file/open-document.js': require_context_module_0_11,
-  './location/choose-location.js': require_context_module_0_12,
-  './location/get-location.js': require_context_module_0_13,
-  './location/open-location.js': require_context_module_0_14,
-  './media/choose-file.js': require_context_module_0_15,
-  './media/choose-image.js': require_context_module_0_16,
-  './media/choose-video.js': require_context_module_0_17,
-  './media/compress-image.js': require_context_module_0_18,
-  './media/compress-video.js': require_context_module_0_19,
-  './media/get-image-info.js': require_context_module_0_20,
-  './media/get-video-info.js': require_context_module_0_21,
-  './media/preview-image.js': require_context_module_0_22,
-  './media/save-image-to-photos-album.js': require_context_module_0_23,
-  './network/download-file.js': require_context_module_0_24,
-  './network/request.js': require_context_module_0_25,
-  './network/socket.js': require_context_module_0_26,
-  './network/upload-file.js': require_context_module_0_27,
-  './plugin/get-provider.js': require_context_module_0_28,
-  './plugin/load-sub-package.js': require_context_module_0_29,
-  './plugin/pre-login.js': require_context_module_0_30,
-  './route/route.js': require_context_module_0_31,
-  './storage/storage.js': require_context_module_0_32,
-  './ui/load-font-face.js': require_context_module_0_33,
-  './ui/navigation-bar.js': require_context_module_0_34,
-  './ui/page-scroll-to.js': require_context_module_0_35,
-  './ui/popup.js': require_context_module_0_36,
-  './ui/tab-bar.js': require_context_module_0_37,
+  './device/add-phone-contact.js': require_context_module_0_7,
+  './device/make-phone-call.js': require_context_module_0_8,
+  './device/scan-code.js': require_context_module_0_9,
+  './device/set-clipboard-data.js': require_context_module_0_10,
+  './file/file.js': require_context_module_0_11,
+  './file/open-document.js': require_context_module_0_12,
+  './location/choose-location.js': require_context_module_0_13,
+  './location/get-location.js': require_context_module_0_14,
+  './location/open-location.js': require_context_module_0_15,
+  './media/choose-file.js': require_context_module_0_16,
+  './media/choose-image.js': require_context_module_0_17,
+  './media/choose-video.js': require_context_module_0_18,
+  './media/compress-image.js': require_context_module_0_19,
+  './media/compress-video.js': require_context_module_0_20,
+  './media/get-image-info.js': require_context_module_0_21,
+  './media/get-video-info.js': require_context_module_0_22,
+  './media/preview-image.js': require_context_module_0_23,
+  './media/save-image-to-photos-album.js': require_context_module_0_24,
+  './network/download-file.js': require_context_module_0_25,
+  './network/request.js': require_context_module_0_26,
+  './network/socket.js': require_context_module_0_27,
+  './network/upload-file.js': require_context_module_0_28,
+  './plugin/get-provider.js': require_context_module_0_29,
+  './plugin/load-sub-package.js': require_context_module_0_30,
+  './plugin/pre-login.js': require_context_module_0_31,
+  './route/route.js': require_context_module_0_32,
+  './storage/storage.js': require_context_module_0_33,
+  './ui/load-font-face.js': require_context_module_0_34,
+  './ui/navigation-bar.js': require_context_module_0_35,
+  './ui/page-scroll-to.js': require_context_module_0_36,
+  './ui/popup.js': require_context_module_0_37,
+  './ui/tab-bar.js': require_context_module_0_38,
 
       };
       var req = function req(key) {
@@ -3297,21 +3723,12 @@ var serviceContext = (function () {
     }
     params = Object.assign({}, params);
 
-    const apiCallbacks = {};
-    for (const name in params) {
-      const param = params[name];
-      if (isFn(param)) {
-        apiCallbacks[name] = tryCatch(param);
-        delete params[name];
-      }
-    }
-
     const {
       success,
       fail,
       cancel,
       complete
-    } = apiCallbacks;
+    } = getApiCallbacks(params);
 
     const hasSuccess = isFn(success);
     const hasFail = isFn(fail);
@@ -3368,7 +3785,7 @@ var serviceContext = (function () {
       const errMsg = res.errMsg;
 
       if (errMsg.indexOf(apiName + ':ok') === 0) {
-        isFn(beforeSuccess) && beforeSuccess(res);
+        isFn(beforeSuccess) && beforeSuccess(res, params);
 
         hasSuccess && success(res);
 
@@ -3456,9 +3873,11 @@ var serviceContext = (function () {
       isFn(protocolOptions.beforeSuccess) && (extras.beforeSuccess = protocolOptions.beforeSuccess);
     }
   }
+  // 部分 API 直接实现
+  const unwrappers = ['getPushClientId', 'onPushMessage', 'offPushMessage'];
 
   function wrapper (name, invokeMethod, extras = {}) {
-    if (!isFn(invokeMethod)) {
+    if (unwrappers.indexOf(name) > -1 || !isFn(invokeMethod)) {
       return invokeMethod
     }
     wrapperExtras(name, extras);
@@ -3469,7 +3888,8 @@ var serviceContext = (function () {
         }
       } else if (isCallbackApi(name)) {
         if (validateParams(name, args, -1)) {
-          return invokeMethod((name.startsWith('off') ? getKeepAliveApiCallback : createKeepAliveApiCallback)(name, args[0]))
+          return invokeMethod((name.startsWith('off') ? getKeepAliveApiCallback : createKeepAliveApiCallback)(name,
+            args[0]))
         }
       } else {
         let argsObj = {};
@@ -3596,7 +4016,10 @@ var serviceContext = (function () {
     if (hasOwn(platformSchema, schema)) {
       return platformSchema[schema]
     }
-    return true
+    if (hasOwn(api$2, schema)) {
+      return true
+    }
+    return false
   }
 
   var require_context_module_1_1 = /*#__PURE__*/Object.freeze({
@@ -3922,7 +4345,7 @@ var serviceContext = (function () {
     // 绝对路径转换为本地文件系统路径
     if (filePath.indexOf('/') === 0) {
       // 平台绝对路径 安卓、iOS
-      if (filePath.startsWith('/storage/') || filePath.includes('/Containers/Data/Application/')) {
+      if (filePath.startsWith('/storage/') || filePath.startsWith('/sdcard/') || filePath.includes('/Containers/Data/Application/')) {
         return 'file://' + filePath
       }
       return wwwPath + filePath
@@ -4089,6 +4512,8 @@ var serviceContext = (function () {
     return array.length > 1 ? '.' + array[array.length - 1] : ''
   }
 
+  const AUDIO_DEFAULT_SESSION_CATEGORY = 'playback';
+
   const audios = {};
 
   const evts = ['play', 'canplay', 'ended', 'stop', 'waiting', 'seeking', 'seeked', 'pause'];
@@ -4135,6 +4560,7 @@ var serviceContext = (function () {
     audio.src = '';
     audio.volume = 1;
     audio.startTime = 0;
+    audio.setSessionCategory(AUDIO_DEFAULT_SESSION_CATEGORY);
     return {
       errMsg: 'createAudioInstance:ok',
       audioId
@@ -4161,7 +4587,9 @@ var serviceContext = (function () {
     autoplay = false,
     loop = false,
     obeyMuteSwitch,
-    volume
+    volume,
+    sessionCategory = AUDIO_DEFAULT_SESSION_CATEGORY,
+    playbackRate
   }) {
     const audio = audios[audioId];
     if (audio) {
@@ -4170,7 +4598,9 @@ var serviceContext = (function () {
         autoplay
       };
       if (src) {
-        audio.src = style.src = getRealPath$1(src);
+        // iOS 设置 src 会重新播放
+        const realSrc = getRealPath$1(src);
+        if (audio.src !== realSrc) audio.src = style.src = realSrc;
       }
       if (startTime) {
         audio.startTime = style.startTime = startTime;
@@ -4179,6 +4609,12 @@ var serviceContext = (function () {
         audio.volume = style.volume = volume;
       }
       audio.setStyles(style);
+      if (sessionCategory) {
+        audio.setSessionCategory(sessionCategory);
+      }
+      if (playbackRate && audio.playbackRate) {
+        audio.playbackRate(playbackRate);
+      }
       initStateChage(audioId);
     }
     return {
@@ -4299,6 +4735,7 @@ var serviceContext = (function () {
 
   function startTimeUpdateTimer () {
     stopTimeUpdateTimer();
+    publishBackgroundAudioStateChange('timeUpdate', {});
     timeUpdateTimer = setInterval(() => {
       publishBackgroundAudioStateChange('timeUpdate', {});
     }, TIME_UPDATE);
@@ -4310,9 +4747,16 @@ var serviceContext = (function () {
     }
   }
 
-  function setMusicState (args) {
+  function setMusicState (args, name) {
     initMusic();
     const props = ['src', 'startTime', 'coverImgUrl', 'webUrl', 'singer', 'epname', 'title'];
+
+    if (name && name === 'playbackRate') {
+      const val = args[name];
+      audio.playbackRate && audio.playbackRate(parseFloat(val));
+      return
+    }
+
     const style = {};
     Object.keys(args).forEach(key => {
       if (props.indexOf(key) >= 0) {
@@ -4374,8 +4818,8 @@ var serviceContext = (function () {
       errMsg: `${api}:ok`
     }
   }
-  function setBackgroundAudioState (args) {
-    setMusicState(args);
+  function setBackgroundAudioState (args, name) {
+    setMusicState(args, name);
     return {
       errMsg: 'setBackgroundAudioState:ok'
     }
@@ -4595,8 +5039,14 @@ var serviceContext = (function () {
     moveAlong (ctx, args) {
       return invokeVmMethod(ctx, 'moveAlong', args)
     },
+    setLocMarkerIcon (ctx, args) {
+      return invokeVmMethod(ctx, 'setLocMarkerIcon', args)
+    },
     openMapApp (ctx, args) {
       return invokeVmMethod(ctx, 'openMapApp', args)
+    },
+    on (ctx, args) {
+      return ctx.on(args.name, args.callback)
     }
   };
 
@@ -4736,8 +5186,65 @@ var serviceContext = (function () {
     return new LivePusherContext(id, elm)
   }
 
-  function createLivePusherContext$1 (id, vm) {
-    return createLivePusherContext(id, vm)
+  function operateLivePusher (livePusherId, pageVm, type, data) {
+    const pageId = pageVm.$page.id;
+    UniServiceJSBridge.publishHandler(pageId + '-livepusher-' + livePusherId, {
+      livePusherId,
+      type,
+      data
+    }, pageId);
+  }
+
+  UniServiceJSBridge.subscribe('onLivePusherMethodCallback', ({
+    callbackId,
+    data
+  }) => {
+    callback.invoke(callbackId, data);
+  });
+
+  const methods = [
+    'start',
+    'stop',
+    'pause',
+    'resume',
+    'switchCamera',
+    'startPreview',
+    'stopPreview',
+    'snapshot'
+  ];
+
+  const methodMapping = {
+    startPreview: 'preview',
+    stopPreview: 'stop'
+  };
+
+  class LivePusherContext$1 {
+    constructor (id, pageVm) {
+      this.id = id;
+      this.pageVm = pageVm;
+    }
+
+    on (name, callback) {
+      operateLivePusher(this.id, this.pageVm, 'on', {
+        name,
+        callback
+      });
+    }
+  }
+
+  methods.forEach(function (method) {
+    LivePusherContext$1.prototype[method] = callback.warp(function (options, callbackId) {
+      options.callbackId = callbackId;
+      const methodName = methodMapping[method] ? methodMapping[method] : method;
+      operateLivePusher(this.id, this.pageVm, methodName, options);
+    });
+  });
+
+  function createLivePusherContext$1 (id, context) {
+    if (context.$page.meta.isNVue) {
+      return createLivePusherContext(id, context)
+    }
+    return new LivePusherContext$1(id, context)
   }
 
   const DEVICE_FREQUENCY = 200;
@@ -4804,206 +5311,136 @@ var serviceContext = (function () {
     }
   }
 
-  function addPhoneContact ({
-    photoFilePath = '',
-    nickName,
-    lastName,
-    middleName,
-    firstName,
-    remark,
-    mobilePhoneNumber,
-    weChatNumber,
-    addressCountry,
-    addressState,
-    addressCity,
-    addressStreet,
-    addressPostalCode,
-    organization,
-    title,
-    workFaxNumber,
-    workPhoneNumber,
-    hostNumber,
-    email,
-    url,
-    workAddressCountry,
-    workAddressState,
-    workAddressCity,
-    workAddressStreet,
-    workAddressPostalCode,
-    homeFaxNumber,
-    homePhoneNumber,
-    homeAddressCountry,
-    homeAddressState,
-    homeAddressCity,
-    homeAddressStreet,
-    homeAddressPostalCode
-  } = {}, callbackId) {
-    plus.contacts.getAddressBook(plus.contacts.ADDRESSBOOK_PHONE, (addressbook) => {
-      const contact = addressbook.create();
-      const name = {};
-      if (lastName) {
-        name.familyName = lastName;
+  const schema = {
+    name: {
+      givenName: 'firstName',
+      middleName: 'middleName',
+      familyName: 'lastName'
+    },
+    nickname: 'nickName',
+    photos: {
+      type: 'url',
+      value: 'photoFilePath'
+    },
+    note: 'remark',
+    phoneNumbers: [
+      {
+        type: 'mobile',
+        value: 'mobilePhoneNumber'
+      },
+      {
+        type: 'work',
+        value: 'workPhoneNumber'
+      },
+      {
+        type: 'company',
+        value: 'hostNumber'
+      },
+      {
+        type: 'home fax',
+        value: 'homeFaxNumber'
+      },
+      {
+        type: 'work fax',
+        value: 'workFaxNumber'
       }
-      if (firstName) {
-        name.givenName = firstName;
-      }
-      if (middleName) {
-        name.middleName = middleName;
-      }
-      contact.name = name;
-
-      if (nickName) {
-        contact.nickname = nickName;
-      }
-
-      if (photoFilePath) {
-        contact.photos = [{
-          type: 'url',
-          value: photoFilePath
-        }];
-      }
-
-      if (remark) {
-        contact.note = remark;
-      }
-
-      const mobilePhone = {
-        type: 'mobile'
-      };
-
-      const workPhone = {
-        type: 'work'
-      };
-
-      const companyPhone = {
-        type: 'company'
-      };
-
-      const homeFax = {
-        type: 'home fax'
-      };
-
-      const workFax = {
-        type: 'work fax'
-      };
-
-      if (mobilePhoneNumber) {
-        mobilePhone.value = mobilePhoneNumber;
-      }
-
-      if (workPhoneNumber) {
-        workPhone.value = workPhoneNumber;
-      }
-
-      if (hostNumber) {
-        companyPhone.value = hostNumber;
-      }
-
-      if (homeFaxNumber) {
-        homeFax.value = homeFaxNumber;
-      }
-
-      if (workFaxNumber) {
-        workFax.value = workFaxNumber;
-      }
-
-      contact.phoneNumbers = [mobilePhone, workPhone, companyPhone, homeFax, workFax];
-
-      if (email) {
-        contact.emails = [{
-          type: 'home',
-          value: email
-        }];
-      }
-
-      if (url) {
-        contact.urls = [{
-          type: 'other',
-          value: url
-        }];
-      }
-
-      if (weChatNumber) {
-        contact.ims = [{
-          type: 'other',
-          value: weChatNumber
-        }];
-      }
-
-      const defaultAddress = {
+    ],
+    emails: [{
+      type: 'home',
+      value: 'email'
+    }],
+    urls: [{
+      type: 'other',
+      value: 'url'
+    }],
+    organizations: [{
+      type: 'company',
+      name: 'organization',
+      title: 'title'
+    }],
+    ims: [{
+      type: 'other',
+      value: 'weChatNumber'
+    }],
+    addresses: [
+      {
         type: 'other',
-        preferred: true
-      };
-
-      const homeAddress = {
-        type: 'home'
-      };
-      const companyAddress = {
-        type: 'company'
-      };
-
-      if (addressCountry) {
-        defaultAddress.country = addressCountry;
+        preferred: true,
+        country: 'addressCountry',
+        region: 'addressState',
+        locality: 'addressCity',
+        streetAddress: 'addressStreet',
+        postalCode: 'addressPostalCode'
+      },
+      {
+        type: 'home',
+        country: 'homeAddressCountry',
+        region: 'homeAddressState',
+        locality: 'homeAddressCity',
+        streetAddress: 'homeAddressStreet',
+        postalCode: 'homeAddressPostalCode'
+      },
+      {
+        type: 'company',
+        country: 'workAddressCountry',
+        region: 'workAddressState',
+        locality: 'workAddressCity',
+        streetAddress: 'workAddressStreet',
+        postalCode: 'workAddressPostalCode'
       }
+    ]
+  };
 
-      if (addressState) {
-        defaultAddress.region = addressState;
+  const keepFields = ['type', 'preferred'];
+
+  function buildContact (contact, data, schema) {
+    let hasValue = 0;
+    Object.keys(schema).forEach(contactKey => {
+      const dataKey = schema[contactKey];
+      const typed = typeof dataKey;
+      if (typed !== 'object') {
+        if (keepFields.indexOf(contactKey) !== -1) {
+          contact[contactKey] = schema[contactKey];
+        } else {
+          if (typeof data[dataKey] !== 'undefined') {
+            hasValue++;
+            contact[contactKey] = data[dataKey];
+          } else {
+            delete contact[contactKey];
+          }
+        }
+      } else {
+        if (dataKey instanceof Array) {
+          contact[contactKey] = [];
+          dataKey.forEach(item => {
+            const obj = {};
+            if (buildContact(obj, data, item)) {
+              contact[contactKey].push(obj);
+            }
+          });
+          if (!contact[contactKey].length) {
+            delete contact[contactKey];
+          } else {
+            hasValue++;
+          }
+        } else {
+          contact[contactKey] = {};
+          if (buildContact(contact[contactKey], data, dataKey)) {
+            hasValue++;
+          } else {
+            delete contact[contactKey];
+          }
+        }
       }
+    });
+    return hasValue
+  }
 
-      if (addressCity) {
-        defaultAddress.locality = addressCity;
-      }
-
-      if (addressStreet) {
-        defaultAddress.streetAddress = addressStreet;
-      }
-
-      if (addressPostalCode) {
-        defaultAddress.postalCode = addressPostalCode;
-      }
-
-      if (homeAddressCountry) {
-        homeAddress.country = homeAddressCountry;
-      }
-
-      if (homeAddressState) {
-        homeAddress.region = homeAddressState;
-      }
-
-      if (homeAddressCity) {
-        homeAddress.locality = homeAddressCity;
-      }
-
-      if (homeAddressStreet) {
-        homeAddress.streetAddress = homeAddressStreet;
-      }
-
-      if (homeAddressPostalCode) {
-        homeAddress.postalCode = homeAddressPostalCode;
-      }
-
-      if (workAddressCountry) {
-        companyAddress.country = workAddressCountry;
-      }
-
-      if (workAddressState) {
-        companyAddress.region = workAddressState;
-      }
-
-      if (workAddressCity) {
-        companyAddress.locality = workAddressCity;
-      }
-
-      if (workAddressStreet) {
-        companyAddress.streetAddress = workAddressStreet;
-      }
-
-      if (workAddressPostalCode) {
-        companyAddress.postalCode = workAddressPostalCode;
-      }
-
-      contact.addresses = [defaultAddress, homeAddress, companyAddress];
-
+  function addPhoneContact$1 (data, callbackId) {
+    plus.contacts.getAddressBook(plus.contacts.ADDRESSBOOK_PHONE, (addressbook) => {
+      !data.photoFilePath && (data.photoFilePath = '');
+      const contact = addressbook.create();
+      buildContact(contact, data, schema);
       contact.save(() => {
         invoke$1(callbackId, {
           errMsg: 'addPhoneContact:ok'
@@ -5467,11 +5904,11 @@ var serviceContext = (function () {
     }
 
     sendMessage (data) {
-      const message = {
+      const message = JSON.parse(JSON.stringify(({
         __message: {
           data
         }
-      };
+      })));
       const id = this.webview.id;
       if (BroadcastChannel_) {
         const channel = new BroadcastChannel_(id);
@@ -5518,8 +5955,9 @@ var serviceContext = (function () {
       animationType: 'pop-in',
       animationDuration: 200,
       uniNView: {
-        path: `${(typeof process === 'object' && process.env && process.env.VUE_APP_TEMPLATE_PATH) || ''}/${url}.js`,
-        defaultFontSize: plus_.screen.resolutionWidth / 20,
+        // eslint-disable-next-line
+        path: `${typeof VUE_APP_TEMPLATE_PATH === 'string' ? VUE_APP_TEMPLATE_PATH : ''}/${url}.js`,
+        defaultFontSize: 16,
         viewport: plus_.screen.resolutionWidth
       }
     };
@@ -5528,7 +5966,7 @@ var serviceContext = (function () {
       extras: {
         from: getPageId(),
         runtime: getRuntime(),
-        data,
+        data: Object.assign({}, data, { darkmode: __uniConfig.darkmode }),
         useGlobalEvent: !BroadcastChannel_
       }
     });
@@ -5728,7 +6166,7 @@ var serviceContext = (function () {
       return {
         authMode: supportMode[0] || 'fingerPrint',
         errCode: 90001,
-        errMsg: 'startSoterAuthentication:fail'
+        errMsg: 'startSoterAuthentication:fail not support'
       }
     }
     const supportRequestAuthMode = [];
@@ -5762,8 +6200,14 @@ var serviceContext = (function () {
     }
     const realAuthMode = enrolledRequestAuthMode[0];
     if (realAuthMode === 'fingerPrint') {
+      let waiting = null;
+      let waitingTimer;
+      const waitingTitle =
+        authContent || t('uni.startSoterAuthentication.authContent');
       if (plus.os.name.toLowerCase() === 'android') {
-        plus.nativeUI.showWaiting(authContent || t('uni.startSoterAuthentication.authContent')).onclose = function () {
+        waiting = plus.nativeUI.showWaiting(waitingTitle);
+
+        waiting.onclose = function () {
           plus.fingerprint.cancel();
         };
       }
@@ -5777,6 +6221,13 @@ var serviceContext = (function () {
       }, (e) => {
         switch (e.code) {
           case e.AUTHENTICATE_MISMATCH:
+            if (waiting) {
+              clearTimeout(waitingTimer);
+              waiting.setTitle('无法识别');
+              waitingTimer = setTimeout(() => {
+                waiting && waiting.setTitle(waitingTitle);
+              }, 1000);
+            }
             // 微信小程序没有这个回调，如果要实现此处回调需要多次触发需要用事件publish实现
             // invoke(callbackId, {
             //   authMode: realAuthMode,
@@ -5860,10 +6311,1384 @@ var serviceContext = (function () {
     }
   }
 
-  const NAVBAR_HEIGHT = 44;
+  function createButtonOnClick (index) {
+    return function onClick (btn) {
+      const pages = getCurrentPages();
+      if (!pages.length) {
+        return
+      }
+      btn.index = index;
+      const page = pages[pages.length - 1];
+      page.$vm &&
+        page.$vm.__call_hook &&
+        page.$vm.__call_hook('onNavigationBarButtonTap', btn);
+    }
+  }
+
+  function parseTitleNViewButtons (titleNView) {
+    const buttons = titleNView.buttons;
+    if (!Array.isArray(buttons)) {
+      return titleNView
+    }
+    buttons.forEach((btn, index) => {
+      btn.onclick = createButtonOnClick(index);
+    });
+    return titleNView
+  }
+
+  function parseTitleNView (id, routeOptions) {
+    const windowOptions = routeOptions.window;
+    const titleNView = windowOptions.titleNView;
+    routeOptions.meta.statusBarStyle =
+      windowOptions.navigationBarTextStyle === 'black' ? 'dark' : 'light';
+    if (
+      // 无头
+      titleNView === false ||
+      titleNView === 'false' ||
+      (windowOptions.navigationStyle === 'custom' &&
+        !isPlainObject(titleNView)) ||
+      (windowOptions.transparentTitle === 'always' && !isPlainObject(titleNView))
+    ) {
+      return false
+    }
+
+    const titleImage = windowOptions.titleImage || '';
+    const transparentTitle = windowOptions.transparentTitle || 'none';
+    const titleNViewTypeList = {
+      none: 'default',
+      auto: 'transparent',
+      always: 'float'
+    };
+
+    const navigationBarBackgroundColor =
+      windowOptions.navigationBarBackgroundColor;
+    const ret = {
+      autoBackButton: !routeOptions.meta.isQuit,
+      titleText:
+        titleImage === '' ? windowOptions.navigationBarTitleText || '' : '',
+      titleColor:
+        windowOptions.navigationBarTextStyle === 'black' ? '#000000' : '#ffffff',
+      type: titleNViewTypeList[transparentTitle],
+      backgroundColor:
+        /^#[a-z0-9]{6}$/i.test(navigationBarBackgroundColor) ||
+        navigationBarBackgroundColor === 'transparent'
+          ? navigationBarBackgroundColor
+          : '#f7f7f7',
+      tags:
+        titleImage === ''
+          ? []
+          : [
+            {
+              tag: 'img',
+              src: titleImage,
+              position: {
+                left: 'auto',
+                top: 'auto',
+                width: 'auto',
+                height: '26px'
+              }
+            }
+          ]
+    };
+
+    if (isPlainObject(titleNView)) {
+      return initTitleNViewI18n(
+        id,
+        Object.assign(ret, parseTitleNViewButtons(titleNView))
+      )
+    }
+    return initTitleNViewI18n(id, ret)
+  }
+
+  function initTitleNViewI18n (id, titleNView) {
+    const i18nResult = initNavigationBarI18n(titleNView);
+    if (!i18nResult) {
+      return titleNView
+    }
+    const [titleTextI18n, searchInputPlaceholderI18n] = i18nResult;
+    if (titleTextI18n || searchInputPlaceholderI18n) {
+      uni.onLocaleChange(() => {
+        const webview = plus.webview.getWebviewById(id + '');
+        if (!webview) {
+          return
+        }
+        const newTitleNView = {};
+        if (titleTextI18n) {
+          newTitleNView.titleText = titleNView.titleText;
+        }
+        if (searchInputPlaceholderI18n) {
+          newTitleNView.searchInput = {
+            placeholder: titleNView.searchInput.placeholder
+          };
+        }
+        if (process.env.NODE_ENV !== 'production') {
+          console.log('[uni-app] updateWebview', webview.id, newTitleNView);
+        }
+        webview.setStyle({
+          titleNView: newTitleNView
+        });
+      });
+    }
+    return titleNView
+  }
+
+  function parsePullToRefresh (routeOptions) {
+    const windowOptions = routeOptions.window;
+
+    if (windowOptions.enablePullDownRefresh || (windowOptions.pullToRefresh && windowOptions.pullToRefresh.support)) {
+      const pullToRefreshStyles = Object.create(null);
+      // 初始化默认值
+      if (plus.os.name === 'Android') {
+        Object.assign(pullToRefreshStyles, {
+          support: true,
+          style: 'circle'
+        });
+      } else {
+        Object.assign(pullToRefreshStyles, {
+          support: true,
+          style: 'default',
+          height: '50px',
+          range: '200px',
+          contentdown: {
+            caption: ''
+          },
+          contentover: {
+            caption: ''
+          },
+          contentrefresh: {
+            caption: ''
+          }
+        });
+      }
+
+      if (windowOptions.backgroundTextStyle) {
+        pullToRefreshStyles.color = windowOptions.backgroundTextStyle;
+        pullToRefreshStyles.snowColor = windowOptions.backgroundTextStyle;
+      }
+
+      Object.assign(pullToRefreshStyles, windowOptions.pullToRefresh || {});
+
+      return pullToRefreshStyles
+    }
+  }
+
+  const REGEX_UPX = /(\d+(\.\d+)?)[r|u]px/g;
+
+  function transformCSS (css) {
+    return css.replace(REGEX_UPX, (a, b) => {
+      return uni.upx2px(parseInt(b) || 0) + 'px'
+    })
+  }
+
+  function parseStyleUnit (styles) {
+    let newStyles = {};
+    const stylesStr = JSON.stringify(styles);
+    if (~stylesStr.indexOf('upx') || ~stylesStr.indexOf('rpx')) {
+      try {
+        newStyles = JSON.parse(transformCSS(stylesStr));
+      } catch (e) {
+        newStyles = styles;
+        console.error(e);
+      }
+    } else {
+      newStyles = JSON.parse(stylesStr);
+    }
+
+    return newStyles
+  }
+
+  const WEBVIEW_STYLE_BLACKLIST = [
+    'navigationBarBackgroundColor',
+    'navigationBarTextStyle',
+    'navigationBarTitleText',
+    'navigationBarShadow',
+    'navigationStyle',
+    'disableScroll',
+    'backgroundColor',
+    'backgroundTextStyle',
+    'enablePullDownRefresh',
+    'onReachBottomDistance',
+    'usingComponents',
+    // 需要解析的
+    'titleNView',
+    'pullToRefresh'
+  ];
+
+  function parseWebviewStyle (id, path, _routeOptions = {}) {
+    const webviewStyle = {
+      bounce: 'vertical'
+    };
+
+    // 合并
+    _routeOptions.window = parseStyleUnit(
+      Object.assign(
+        JSON.parse(JSON.stringify(__uniConfig.window || {})),
+        _routeOptions.window || {}
+      )
+    );
+
+    const routeOptions = parseTheme(_routeOptions);
+
+    Object.keys(routeOptions.window).forEach(name => {
+      if (WEBVIEW_STYLE_BLACKLIST.indexOf(name) === -1) {
+        webviewStyle[name] = routeOptions.window[name];
+      }
+    });
+
+    const backgroundColor = routeOptions.window.backgroundColor;
+    if (
+      /^#[a-z0-9]{6}$/i.test(backgroundColor) ||
+      backgroundColor === 'transparent'
+    ) {
+      if (!webviewStyle.background) {
+        webviewStyle.background = backgroundColor;
+      }
+      if (!webviewStyle.backgroundColorTop) {
+        webviewStyle.backgroundColorTop = backgroundColor;
+      }
+      if (!webviewStyle.backgroundColorBottom) {
+        webviewStyle.backgroundColorBottom = backgroundColor;
+      }
+      if (!webviewStyle.animationAlphaBGColor) {
+        webviewStyle.animationAlphaBGColor = backgroundColor;
+      }
+      if (typeof webviewStyle.webviewBGTransparent === 'undefined') {
+        webviewStyle.webviewBGTransparent = true;
+      }
+    }
+
+    const titleNView = parseTitleNView(id, routeOptions);
+    if (titleNView) {
+      if (
+        id === 1 &&
+        __uniConfig.realEntryPagePath &&
+        !routeOptions.meta.isQuit // 可能是tabBar
+      ) {
+        titleNView.autoBackButton = true;
+      }
+      webviewStyle.titleNView = titleNView;
+    }
+
+    const pullToRefresh = parsePullToRefresh(routeOptions);
+    if (pullToRefresh) {
+      if (pullToRefresh.style === 'circle') {
+        webviewStyle.bounce = 'none';
+      }
+      webviewStyle.pullToRefresh = pullToRefresh;
+    }
+
+    // 不支持 hide
+    if (webviewStyle.popGesture === 'hide') {
+      delete webviewStyle.popGesture;
+    }
+
+    if (routeOptions.meta.isQuit) {
+      // 退出
+      webviewStyle.popGesture = plus.os.name === 'iOS' ? 'appback' : 'none';
+    }
+
+    // TODO 下拉刷新
+
+    if (path && routeOptions.meta.isNVue) {
+      webviewStyle.uniNView = {
+        path,
+        defaultFontSize: __uniConfig.defaultFontSize,
+        viewport: __uniConfig.viewport
+      };
+    }
+
+    _routeOptions.meta = routeOptions.meta;
+    return webviewStyle
+  }
+
+  function backbuttonListener () {
+    uni.navigateBack({
+      from: 'backbutton'
+    });
+  }
+
+  function getStatusbarHeight () {
+    // 横屏时 iOS 获取的状态栏高度错误，进行纠正
+    return plus.navigator.isImmersedStatusbar() ? Math.round(plus.os.name === 'iOS' ? plus.navigator.getSafeAreaInsets().top : plus.navigator.getStatusbarHeight()) : 0
+  }
+
+  function initPopupSubNVue (subNVueWebview, style, maskWebview) {
+    if (!maskWebview.popupSubNVueWebviews) {
+      maskWebview.popupSubNVueWebviews = {};
+    }
+
+    maskWebview.popupSubNVueWebviews[subNVueWebview.id] = subNVueWebview;
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(
+        `UNIAPP[webview][${maskWebview.id}]:add.popupSubNVueWebview[${subNVueWebview.id}]`
+      );
+    }
+
+    const hideSubNVue = function () {
+      maskWebview.setStyle({
+        mask: 'none'
+      });
+      subNVueWebview.hide('auto');
+    };
+    maskWebview.addEventListener('maskClick', hideSubNVue);
+    let isRemoved = false; // 增加个 remove 标记，防止出错
+    subNVueWebview.addEventListener('show', () => {
+      if (!isRemoved) {
+        plus.key.removeEventListener('backbutton', backbuttonListener);
+        plus.key.addEventListener('backbutton', hideSubNVue);
+        isRemoved = true;
+      }
+    });
+    subNVueWebview.addEventListener('hide', () => {
+      if (isRemoved) {
+        plus.key.removeEventListener('backbutton', hideSubNVue);
+        plus.key.addEventListener('backbutton', backbuttonListener);
+        isRemoved = false;
+      }
+    });
+    subNVueWebview.addEventListener('close', () => {
+      delete maskWebview.popupSubNVueWebviews[subNVueWebview.id];
+      if (isRemoved) {
+        plus.key.removeEventListener('backbutton', hideSubNVue);
+        plus.key.addEventListener('backbutton', backbuttonListener);
+        isRemoved = false;
+      }
+    });
+  }
+
+  function initNormalSubNVue (subNVueWebview, style, webview) {
+    webview.append(subNVueWebview);
+  }
+
+  function initSubNVue (subNVue, routeOptions, webview) {
+    if (!subNVue.path) {
+      return
+    }
+    const style = subNVue.style || {};
+    const isNavigationBar = subNVue.type === 'navigationBar';
+    const isPopup = subNVue.type === 'popup';
+
+    delete style.type;
+
+    if (isPopup && !subNVue.id) {
+      console.warn('subNVue[' + subNVue.path + '] is missing id');
+    }
+    // TODO lazyload
+
+    style.uniNView = {
+      path: subNVue.path.replace('.nvue', '.js'),
+      defaultFontSize: __uniConfig.defaultFontSize,
+      viewport: __uniConfig.viewport
+    };
+
+    const extras = {
+      __uniapp_host: routeOptions.path,
+      __uniapp_origin: style.uniNView.path.split('?')[0].replace('.js', ''),
+      __uniapp_origin_id: webview.id,
+      __uniapp_origin_type: webview.__uniapp_type
+    };
+
+    let maskWebview;
+
+    if (isNavigationBar) {
+      style.position = 'dock';
+      style.dock = 'top';
+      style.top = 0;
+      style.width = '100%';
+      style.height = NAVBAR_HEIGHT + getStatusbarHeight();
+      delete style.left;
+      delete style.right;
+      delete style.bottom;
+      delete style.margin;
+    } else if (isPopup) {
+      style.position = 'absolute';
+      if (isTabBarPage(routeOptions.path)) {
+        maskWebview = tabBar$1;
+      } else {
+        maskWebview = webview;
+      }
+      extras.__uniapp_mask = style.mask || 'rgba(0,0,0,0.5)';
+      extras.__uniapp_mask_id = maskWebview.id;
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(
+        `UNIAPP[webview][${webview.id}]:create[${subNVue.id}]:${JSON.stringify(style)}`
+      );
+    }
+    delete style.mask;
+    const subNVueWebview = plus.webview.create('', subNVue.id, style, extras);
+
+    if (isPopup) {
+      initPopupSubNVue(subNVueWebview, style, maskWebview);
+    } else {
+      initNormalSubNVue(subNVueWebview, style, webview);
+    }
+  }
+
+  function initSubNVues (routeOptions, webview) {
+    const subNVues = routeOptions.window.subNVues;
+    if (!subNVues || !subNVues.length) {
+      return
+    }
+    subNVues.forEach(subNVue => {
+      initSubNVue(subNVue, routeOptions, webview);
+    });
+  }
+
+  function onWebviewClose (webview) {
+    webview.popupSubNVueWebviews && webview.addEventListener('close', () => {
+      Object.keys(webview.popupSubNVueWebviews).forEach(id => {
+        if (process.env.NODE_ENV !== 'production') {
+          console.log(
+            `UNIAPP[webview][${webview.id}]:popupSubNVueWebview[${id}].close`
+          );
+        }
+        webview.popupSubNVueWebviews[id].close('none');
+      });
+    });
+  }
+
+  function onWebviewResize (webview) {
+    const onResize = function ({
+      width,
+      height
+    }) {
+      const landscape = Math.abs(plus.navigator.getOrientation()) === 90;
+      const res = {
+        deviceOrientation: landscape ? 'landscape' : 'portrait',
+        size: {
+          windowWidth: Math.ceil(width),
+          windowHeight: Math.ceil(height)
+        }
+      };
+      publish('onViewDidResize', res); // API
+      UniServiceJSBridge.emit('onResize', res, parseInt(webview.id)); // Page lifecycle
+    };
+    webview.addEventListener('resize', debounce(onResize, 50));
+  }
+
+  const VD_SYNC_VERSION = 2;
+
+  const PAGE_CREATE = 2;
+  const MOUNTED_DATA = 4;
+  const UPDATED_DATA = 6;
+  const PAGE_CREATED = 10;
+
+  const UI_EVENT = 20;
+
+  const VD_SYNC = 'vdSync';
+
+  const WEBVIEW_READY = 'webviewReady';
+  const VD_SYNC_CALLBACK = 'vdSyncCallback';
+  const INVOKE_API = 'invokeApi';
+  const WEB_INVOKE_APPSERVICE$1 = 'WEB_INVOKE_APPSERVICE';
+  const WEBVIEW_INSERTED = 'webviewInserted';
+  const WEBVIEW_REMOVED = 'webviewRemoved';
+  const WEBVIEW_ID_PREFIX = 'webviewId';
+
+  function onWebviewRecovery (webview, routeOptions) {
+    const {
+      subscribe,
+      unsubscribe
+    } = UniServiceJSBridge;
+
+    const id = webview.id;
+    const onWebviewRecoveryReady = function (data, pageId) {
+      if (id !== pageId) {
+        return
+      }
+      unsubscribe(WEBVIEW_READY, onWebviewRecoveryReady);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`UNIAPP[webview][${id}]:onWebviewRecoveryReady ready`);
+      }
+      // 恢复目标页面
+      pageId = parseInt(pageId);
+      const page = getCurrentPages(true).find(page => page.$page.id === pageId);
+      if (!page) {
+        return console.error(`Page[${pageId}] not found`)
+      }
+      page.$vm._$vd.restore();
+    };
+
+    webview.addEventListener('recovery', e => {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`UNIAPP[webview][${this.id}].recovery.reload:` + JSON.stringify({
+          path: routeOptions.path,
+          webviewId: id
+        }));
+      }
+      subscribe(WEBVIEW_READY, onWebviewRecoveryReady);
+    });
+  }
+
+  function onWebviewPopGesture (webview) {
+    let popStartStatusBarStyle;
+    webview.addEventListener('popGesture', e => {
+      if (e.type === 'start') {
+        // 设置下一个页面的 statusBarStyle
+        const pages = getCurrentPages();
+        const page = pages[pages.length - 2];
+        popStartStatusBarStyle = lastStatusBarStyle;
+        const statusBarStyle = page && page.$page.meta.statusBarStyle;
+        statusBarStyle && setStatusBarStyle(statusBarStyle);
+      } else if (e.type === 'end' && !e.result) {
+        // 拖拽未完成,设置为当前状态栏前景色
+        setStatusBarStyle(popStartStatusBarStyle);
+      } else if (e.type === 'end' && e.result) {
+        const pages = getCurrentPages();
+        const len = pages.length;
+        const page = pages[pages.length - 1];
+        page && page.$remove();
+        setStatusBarStyle();
+        // 仅当存在一个页面，且是直达页面时，才 reLaunch 首页
+        if (page && len === 1 && isDirectPage(page)) {
+          reLaunchEntryPage();
+        } else {
+          UniServiceJSBridge.emit('onAppRoute', {
+            type: 'navigateBack'
+          });
+        }
+      }
+    });
+  }
+
+  /**
+   * 是否处于直达页面
+   * @param page
+   * @returns
+   */
+  function isDirectPage (page) {
+    return (
+      __uniConfig.realEntryPagePath &&
+      page.$page.route === __uniConfig.entryPagePath
+    )
+  }
+  /**
+   * 重新启动到首页
+   */
+  function reLaunchEntryPage () {
+    __uniConfig.entryPagePath = __uniConfig.realEntryPagePath;
+    delete __uniConfig.realEntryPagePath;
+    uni.reLaunch({
+      url: addLeadingSlash(__uniConfig.entryPagePath)
+    });
+  }
+
+  function hasLeadingSlash (str) {
+    return str.indexOf('/') === 0
+  }
+
+  function addLeadingSlash (str) {
+    return hasLeadingSlash(str) ? str : '/' + str
+  }
+
+  let preloadWebview;
+
+  let id$1 = 2;
+
+  const WEBVIEW_LISTENERS = {
+    pullToRefresh: 'onPullDownRefresh',
+    titleNViewSearchInputChanged: 'onNavigationBarSearchInputChanged',
+    titleNViewSearchInputConfirmed: 'onNavigationBarSearchInputConfirmed',
+    titleNViewSearchInputClicked: 'onNavigationBarSearchInputClicked',
+    titleNViewSearchInputFocusChanged: 'onNavigationBarSearchInputFocusChanged'
+  };
+
+  function setPreloadWebview (webview) {
+    preloadWebview = webview;
+  }
+
+  function noop$1 (str) {
+    return str
+  }
+
+  function getUniPageUrl (path, query) {
+    const queryString = query ? stringifyQuery(query, noop$1) : '';
+    return {
+      path: path.substr(1),
+      query: queryString ? queryString.substr(1) : queryString
+    }
+  }
+
+  function getDebugRefresh (path, query, routeOptions) {
+    const queryString = query ? stringifyQuery(query, noop$1) : '';
+    return {
+      isTab: routeOptions.meta.isTabBar,
+      arguments: JSON.stringify({
+        path: path.substr(1),
+        query: queryString ? queryString.substr(1) : queryString
+      })
+    }
+  }
+
+  function createWebview (path, routeOptions, query, extras = {}) {
+    if (routeOptions.meta.isNVue) {
+      const getWebviewStyle = () => parseWebviewStyle(
+        webviewId,
+        path,
+        routeOptions
+      );
+      const webviewId = id$1++;
+      const webviewStyle = getWebviewStyle();
+      webviewStyle.uniPageUrl = getUniPageUrl(path, query);
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[uni-app] createWebview', webviewId, path, webviewStyle);
+      }
+      // android 需要使用
+      webviewStyle.isTab = !!routeOptions.meta.isTabBar;
+      const webview = plus.webview.create('', String(webviewId), webviewStyle, Object.assign({
+        nvue: true
+      }, extras));
+
+      useWebviewThemeChange(webview, getWebviewStyle);
+
+      return webview
+    }
+    if (id$1 === 2) { // 如果首页非 nvue，则直接返回 Launch Webview
+      return plus.webview.getLaunchWebview()
+    }
+    const webview = preloadWebview;
+    return webview
+  }
+
+  function initWebview (webview, routeOptions, path, query) {
+    // 首页或非 nvue 页面
+    if (webview.id === '1' || !routeOptions.meta.isNVue) {
+      const getWebviewStyle = () => parseWebviewStyle(
+        parseInt(webview.id),
+        '',
+        routeOptions
+      );
+      const webviewStyle = getWebviewStyle();
+
+      webviewStyle.uniPageUrl = getUniPageUrl(path, query);
+
+      if (!routeOptions.meta.isNVue) {
+        webviewStyle.debugRefresh = getDebugRefresh(path, query, routeOptions);
+      } else {
+        // android 需要使用
+        webviewStyle.isTab = !!routeOptions.meta.isTabBar;
+      }
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('[uni-app] updateWebview', webviewStyle);
+      }
+
+      useWebviewThemeChange(webview, getWebviewStyle);
+
+      webview.setStyle(webviewStyle);
+    }
+
+    const {
+      on,
+      emit
+    } = UniServiceJSBridge;
+
+    initSubNVues(routeOptions, webview);
+
+    Object.keys(WEBVIEW_LISTENERS).forEach(name => {
+      webview.addEventListener(name, (e) => {
+        emit(WEBVIEW_LISTENERS[name], e, parseInt(webview.id));
+      });
+    });
+
+    onWebviewClose(webview);
+    onWebviewResize(webview);
+
+    if (plus.os.name === 'iOS') {
+      !webview.nvue && onWebviewRecovery(webview, routeOptions);
+      onWebviewPopGesture(webview);
+    }
+
+    on(webview.id + '.startPullDownRefresh', () => {
+      webview.beginPullToRefresh();
+    });
+
+    on(webview.id + '.stopPullDownRefresh', () => {
+      webview.endPullToRefresh();
+    });
+
+    return webview
+  }
+
+  function createPreloadWebview () {
+    if (!preloadWebview || preloadWebview.__uniapp_route) { // 不存在，或已被使用
+      preloadWebview = plus.webview.create(VIEW_WEBVIEW_PATH, String(id$1++), { contentAdjust: false });
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`[uni-app] preloadWebview[${preloadWebview.id}]`);
+      }
+    }
+    return preloadWebview
+  }
+
+  const webviewReadyCallbacks = {};
+
+  function registerWebviewReady (pageId, callback) {
+    (webviewReadyCallbacks[pageId] || (webviewReadyCallbacks[pageId] = [])).push(callback);
+  }
+
+  function consumeWebviewReady (pageId) {
+    const callbacks = webviewReadyCallbacks[pageId];
+    Array.isArray(callbacks) && callbacks.forEach(callback => callback());
+    delete webviewReadyCallbacks[pageId];
+  }
+
+  let todoNavigator = false;
+
+  function setTodoNavigator (path, callback, msg) {
+    todoNavigator = {
+      path: path,
+      nvue: __uniRoutes.find(route => route.path === path).meta.isNVue,
+      navigate: callback
+    };
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`todoNavigator:${todoNavigator.path} ${msg}`);
+    }
+  }
+
+  function navigate (path, callback, isAppLaunch) {
+    {
+      if (isAppLaunch && __uniConfig.splashscreen && __uniConfig.splashscreen.autoclose && (!__uniConfig.splashscreen.alwaysShowBeforeRender)) {
+        plus.navigator.closeSplashscreen();
+      }
+      if (!isAppLaunch && todoNavigator) {
+        return console.error(`Waiting to navigate to: ${todoNavigator.path}, do not operate continuously: ${path}.`)
+      }
+      if (__uniConfig.renderer === 'native') { // 纯原生无需wait逻辑
+        // 如果是首页还未初始化，需要等一等，其他无需等待
+        if (getCurrentPages().length === 0) {
+          return setTodoNavigator(path, callback, 'waitForReady')
+        }
+        return callback()
+      }
+      // 未创建 preloadWebview 或 preloadWebview 已被使用
+      const waitPreloadWebview = !preloadWebview || (preloadWebview && preloadWebview.__uniapp_route);
+      // 已创建未 loaded
+      const waitPreloadWebviewReady = preloadWebview && !preloadWebview.loaded;
+
+      if (waitPreloadWebview || waitPreloadWebviewReady) {
+        setTodoNavigator(path, callback, waitPreloadWebview ? 'waitForCreate' : 'waitForReady');
+      } else {
+        callback();
+      }
+      if (waitPreloadWebviewReady) {
+        registerWebviewReady(preloadWebview.id, todoNavigate);
+      }
+    }
+  }
+
+  function todoNavigate () {
+    if (!todoNavigator) {
+      return
+    }
+    const {
+      navigate
+    } = todoNavigator;
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`todoNavigate:${todoNavigator.path}`);
+    }
+    todoNavigator = false;
+    return navigate()
+  }
+
+  function navigateFinish () {
+    {
+      if (__uniConfig.renderer === 'native') {
+        if (!todoNavigator) {
+          return
+        }
+        if (todoNavigator.nvue) {
+          return todoNavigate()
+        }
+        return
+      }
+      // 创建预加载
+      const preloadWebview = createPreloadWebview();
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`navigateFinish.preloadWebview:${preloadWebview.id}`);
+      }
+      if (!todoNavigator) {
+        return
+      }
+      if (todoNavigator.nvue) {
+        return todoNavigate()
+      }
+      preloadWebview.loaded
+        ? todoNavigator.navigate()
+        : registerWebviewReady(preloadWebview.id, todoNavigate);
+    }
+  }
+
+  const pageFactory = Object.create(null);
+
+  function definePage (name, createPageVueComponent) {
+    pageFactory[name] = createPageVueComponent;
+  }
+
+  const getPageVueComponent = cached(function (pagePath) {
+    return pageFactory[pagePath]()
+  });
+
+  function createPage (pagePath, pageId, pageQuery, pageInstance) {
+    if (!pageFactory[pagePath]) {
+      console.error(`${pagePath} not found`);
+    }
+    const startTime = Date.now();
+    const pageVm = new (getPageVueComponent(pagePath))({
+      mpType: 'page',
+      pageId,
+      pagePath,
+      pageQuery,
+      pageInstance
+    });
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`new ${pagePath}[${pageId}]:time(${Date.now() - startTime})`);
+    }
+    return pageVm
+  }
+
+  const loadedSubPackages = [];
+
+  /**
+   * 指定路由 ready 后，检查是否触发分包预加载
+   * @param {Object} route
+   */
+  function preloadSubPackages (route) {
+    if (!__uniConfig.preloadRule) {
+      return
+    }
+    const options = __uniConfig.preloadRule[route];
+    if (!options || !Array.isArray(options.packages)) {
+      return
+    }
+    const packages = options.packages.filter(root => loadedSubPackages.indexOf(root) === -1);
+    if (!packages.length) {
+      return
+    }
+    loadSubPackages(options.packages);
+    // 暂不需要网络下载
+    // const network = options.network || 'wifi'
+    // if (network === 'wifi') {
+    //   uni.getNetworkType({
+    //     success (res) {
+    //       if (process.env.NODE_ENV !== 'production') {
+    //         console.log('UNIAPP[preloadRule]:' + res.networkType + ':' + JSON.stringify(options))
+    //       }
+    //       if (res.networkType === 'wifi') {
+    //         loadSubPackages(options.packages)
+    //       }
+    //     }
+    //   })
+    // } else {
+    //   if (process.env.NODE_ENV !== 'production') {
+    //     console.log('UNIAPP[preloadRule]:' + JSON.stringify(options))
+    //   }
+    //   loadSubPackages(options.packages)
+    // }
+  }
+
+  function loadPage (route, callback) {
+    let isInSubPackage = false;
+    const subPackages = __uniConfig.subPackages;
+    if (Array.isArray(subPackages)) {
+      const subPackage = subPackages.find(subPackage => route.indexOf(subPackage.root) === 0);
+      if (subPackage) {
+        isInSubPackage = true;
+        loadSubPackage$1(subPackage.root, callback);
+      }
+    }
+    if (!isInSubPackage) {
+      callback();
+    }
+  }
+
+  function loadSubPackage$1 (root, callback) {
+    if (loadedSubPackages.indexOf(root) !== -1) {
+      return callback()
+    }
+    loadSubPackages([root], () => {
+      callback();
+    });
+  }
+
+  const SUB_FILENAME = 'app-sub-service.js';
+
+  function evaluateScriptFiles (files, callback) {
+    __uniConfig.onServiceReady(() => {
+      weex.requireModule('plus').evalJSFiles(files, callback);
+    });
+  }
+
+  function loadSubPackages (packages, callback) {
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('UNIAPP[loadSubPackages]:' + JSON.stringify(packages));
+    }
+    const startTime = Date.now();
+    evaluateScriptFiles(packages.map(root => {
+      loadedSubPackages.push(root);
+      return root + '/' + SUB_FILENAME
+    }), res => {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log('UNIAPP[loadSubPackages]:耗时(' + (Date.now() - startTime) + ')');
+      }
+      callback && callback(true);
+    });
+  }
+
+  const extend$1 = Object.assign;
+
+  function createLaunchOptions () {
+    return {
+      path: '',
+      query: {},
+      scene: 1001,
+      referrerInfo: {
+        appId: '',
+        extraData: {}
+      }
+    }
+  }
+
+  const enterOptions = createLaunchOptions();
+  const launchOptions = createLaunchOptions();
+
+  function getLaunchOptions () {
+    return launchOptions
+  }
+
+  function getEnterOptions () {
+    return enterOptions
+  }
+
+  function initEnterOptions ({
+    path,
+    query,
+    referrerInfo
+  }) {
+    extend$1(enterOptions, {
+      path,
+      query: query ? parseQuery(query) : {},
+      referrerInfo: referrerInfo || {}
+    });
+  }
+
+  function initLaunchOptions ({
+    path,
+    query,
+    referrerInfo
+  }) {
+    extend$1(launchOptions, {
+      path,
+      query: query ? parseQuery(query) : {},
+      referrerInfo: referrerInfo || {},
+      channel: plus.runtime.channel,
+      launcher: plus.runtime.launcher
+    });
+    extend$1(enterOptions, launchOptions);
+    return launchOptions
+  }
+
+  function parseRedirectInfo () {
+    const weexPlus = weex.requireModule('plus');
+    if (weexPlus.getRedirectInfo) {
+      const {
+        path,
+        query,
+        extraData,
+        userAction,
+        fromAppid
+      } =
+        weexPlus.getRedirectInfo() || {};
+      const referrerInfo = {
+        appId: fromAppid,
+        extraData: {}
+      };
+      if (extraData) {
+        referrerInfo.extraData = extraData;
+      }
+      return {
+        path: path || '',
+        query: query ? '?' + query : '',
+        referrerInfo,
+        userAction
+      }
+    }
+  }
+
+  let isInitEntryPage = false;
+
+  function initEntryPage () {
+    if (isInitEntryPage) {
+      return
+    }
+    isInitEntryPage = true;
+
+    let entryPagePath;
+    let entryPageQuery;
+
+    const weexPlus = weex.requireModule('plus');
+
+    if (weexPlus.getRedirectInfo) {
+      const {
+        path,
+        query,
+        referrerInfo
+      } = parseRedirectInfo();
+      if (path) {
+        entryPagePath = path;
+        entryPageQuery = query;
+      }
+      __uniConfig.referrerInfo = referrerInfo;
+    } else {
+      const argsJsonStr = plus.runtime.arguments;
+      if (!argsJsonStr) {
+        return
+      }
+      try {
+        const args = JSON.parse(argsJsonStr);
+        entryPagePath = args.path || args.pathName;
+        entryPageQuery = args.query ? ('?' + args.query) : '';
+      } catch (e) {}
+    }
+
+    if (!entryPagePath || entryPagePath === __uniConfig.entryPagePath) {
+      if (entryPageQuery) {
+        __uniConfig.entryPageQuery = entryPageQuery;
+      }
+      return
+    }
+
+    const entryRoute = '/' + entryPagePath;
+    const routeOptions = __uniRoutes.find(route => route.path === entryRoute);
+    if (!routeOptions) {
+      console.error(`[uni-app] ${entryPagePath} not found...`);
+      return
+    }
+
+    if (!routeOptions.meta.isTabBar) {
+      __uniConfig.realEntryPagePath = __uniConfig.realEntryPagePath || __uniConfig.entryPagePath;
+    }
+
+    __uniConfig.entryPagePath = entryPagePath;
+    __uniConfig.entryPageQuery = entryPageQuery;
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[uni-app] entryPagePath(${entryPagePath + entryPageQuery})`);
+    }
+  }
+
+  const pages = [];
+
+  function getCurrentPages$1 (returnAll) {
+    return returnAll ? pages.slice(0) : pages.filter(page => {
+      return !page.$page.meta.isTabBar || page.$page.meta.visible
+    })
+  }
+
+  function getCurrentPageId () {
+    const pages = getCurrentPages$1();
+    return pages[pages.length - 1].$page.id
+  }
+
+  const preloadWebviews = {};
+
+  function removePreloadWebview (webview) {
+    const url = Object.keys(preloadWebviews).find(url => preloadWebviews[url].id === webview.id);
+    if (url) {
+      if (process.env.NODE_ENV !== 'production') {
+        console.log(`[uni-app] removePreloadWebview(${webview.id})`);
+      }
+      delete preloadWebviews[url];
+    }
+  }
+
+  function closePreloadWebview ({
+    url
+  }) {
+    const webview = preloadWebviews[url];
+    if (webview) {
+      if (webview.__page__) {
+        if (!getCurrentPages$1(true).find(page => page === webview.__page__)) {
+          // 未使用
+          webview.close('none');
+        } else { // 被使用
+          webview.__preload__ = false;
+        }
+      } else { // 未使用
+        webview.close('none');
+      }
+      delete preloadWebviews[url];
+    }
+    return webview
+  }
+
+  function preloadWebview$1 ({
+    url,
+    path,
+    query
+  }) {
+    if (!preloadWebviews[url]) {
+      const routeOptions = JSON.parse(JSON.stringify(__uniRoutes.find(route => route.path === path)));
+      preloadWebviews[url] = createWebview(path, routeOptions, query, {
+        __preload__: true,
+        __query__: JSON.stringify(query)
+      });
+    }
+    return preloadWebviews[url]
+  }
+
+  /**
+   * 首页需要主动registerPage，二级页面路由跳转时registerPage
+   */
+  function registerPage ({
+    url,
+    path,
+    query,
+    openType,
+    webview,
+    eventChannel
+  }) {
+    // fast 模式，nvue 首页时，初始化下 entry page
+    webview && initEntryPage();
+
+    if (preloadWebviews[url]) {
+      webview = preloadWebviews[url];
+      if (webview.__page__) {
+        // 该预载页面已处于显示状态,不再使用该预加载页面,直接新开
+        if (getCurrentPages$1(true).find(page => page === webview.__page__)) {
+          if (process.env.NODE_ENV !== 'production') {
+            console.log(`[uni-app] preloadWebview(${path},${webview.id}) already in use`);
+          }
+          webview = null;
+        } else {
+          if (eventChannel) {
+            webview.__page__.eventChannel = eventChannel;
+          }
+          pages.push(webview.__page__);
+          if (process.env.NODE_ENV !== 'production') {
+            console.log(`[uni-app] reuse preloadWebview(${path},${webview.id})`);
+          }
+          return webview
+        }
+      }
+    }
+    const routeOptions = JSON.parse(JSON.stringify(__uniRoutes.find(route => route.path === path)));
+
+    if (
+      openType === 'reLaunch' ||
+      (
+        !__uniConfig.realEntryPagePath &&
+        getCurrentPages$1().length === 0 // redirectTo
+      )
+    ) {
+      routeOptions.meta.isQuit = true;
+    } else if (!routeOptions.meta.isTabBar) {
+      routeOptions.meta.isQuit = false;
+    }
+
+    if (!webview) {
+      webview = createWebview(path, routeOptions, query);
+    } else {
+      webview = plus.webview.getWebviewById(webview.id);
+      webview.nvue = routeOptions.meta.isNVue;
+    }
+
+    if (routeOptions.meta.isTabBar) {
+      routeOptions.meta.visible = true;
+    }
+
+    if (routeOptions.meta.isTabBar) {
+      tabBar$1.append(webview);
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`[uni-app] registerPage(${path},${webview.id})`);
+    }
+
+    const isLaunchNVuePage = webview.id === '1' && webview.nvue;
+
+    initWebview(webview, routeOptions, path, query);
+
+    const route = path.slice(1);
+
+    webview.__uniapp_route = route;
+
+    const pageInstance = {
+      route,
+      options: Object.assign({}, query || {}),
+      $getAppWebview () {
+        // 重要，不能直接返回 webview 对象，因为 plus 可能会被二次替换，返回的 webview 对象内部的 plus 不正确
+        // 导致 webview.getStyle 等逻辑出错(旧的 webview 内部 plus 被释放)
+        return plus.webview.getWebviewById(webview.id)
+      },
+      eventChannel,
+      $page: {
+        id: parseInt(webview.id),
+        meta: routeOptions.meta,
+        path,
+        route,
+        fullPath: url,
+        openType
+      },
+      $remove () {
+        const index = pages.findIndex(page => page === this);
+        if (index !== -1) {
+          if (!webview.nvue) {
+            this.$vm.$destroy();
+          }
+          pages.splice(index, 1);
+          if (process.env.NODE_ENV !== 'production') {
+            console.log('[uni-app] removePage(' + path + ')[' + webview.id + ']');
+          }
+        }
+      },
+      // 兼容小程序框架
+      selectComponent (selector) {
+        return this.$vm.selectComponent(selector)
+      },
+      selectAllComponents (selector) {
+        return this.$vm.selectAllComponents(selector)
+      }
+    };
+
+    pages.push(pageInstance);
+
+    if (webview.__preload__) {
+      webview.__page__ = pageInstance;
+    }
+
+    // 首页是 nvue 时，在 registerPage 时，执行路由堆栈
+    if (isLaunchNVuePage) {
+      if (
+        __uniConfig.splashscreen &&
+        __uniConfig.splashscreen.autoclose &&
+        !__uniConfig.splashscreen.alwaysShowBeforeRender
+      ) {
+        plus.navigator.closeSplashscreen();
+      }
+      __uniConfig.onReady(function () {
+        navigateFinish();
+      });
+    }
+
+    {
+      if (!webview.nvue) {
+        const pageId = webview.id;
+        try {
+          loadPage(route, () => {
+            createPage(route, pageId, query, pageInstance).$mount();
+          });
+        } catch (e) {
+          console.error(e);
+        }
+      }
+    }
+
+    return webview
+  }
+
+  const ON_THEME_CHANGE$1 = 'api.onThemeChange';
+
+  function onThemeChange (callback = () => { }) {
+    UniServiceJSBridge.on(ON_THEME_CHANGE$1, callback);
+  }
+
+  function offThemeChange (callback = () => { }) {
+    UniServiceJSBridge.off(ON_THEME_CHANGE$1, callback);
+  }
+
+  function getNavigatorStyle () {
+    return plus.navigator.getUIStyle() === 'dark' ? 'light' : 'dark'
+  }
+
+  function changePagesNavigatorStyle () {
+    if (__uniConfig.darkmode) {
+      const theme = getNavigatorStyle();
+
+      setStatusBarStyle(theme);
+
+      const pages = getCurrentPages$1(true);
+      pages.forEach((page) => {
+        page.$page.meta.statusBarStyle = theme;
+      });
+    }
+  }
+
+  function parseTheme (pageStyle) {
+    if (__uniConfig.darkmode) {
+      let parsedStyle = {};
+      let theme = plus.navigator.getUIStyle();
+
+      const systemInfo = weexGetSystemInfoSync();
+      // 小程序 SDK
+      if (systemInfo && systemInfo.hostTheme) {
+        theme = systemInfo.hostTheme;
+      }
+
+      parsedStyle = normallizeStyles(pageStyle, __uniConfig.themeConfig, theme);
+      return parsedStyle
+    }
+    return pageStyle
+  }
+
+  function useTabBarThemeChange (tabBar, options) {
+    if (__uniConfig.darkmode) {
+      const fn = () => {
+        const {
+          list = [], color, selectedColor,
+          backgroundColor, borderStyle
+        } = parseTheme(options);
+        const tabbarStyle = {
+          color,
+          selectedColor,
+          backgroundColor,
+          borderStyle
+        };
+
+        tabBar && tabBar.setTabBarStyle(tabbarStyle);
+        tabBar && tabBar.setTabBarItems({
+          list: list.map((item) => ({
+            iconPath: item.iconPath,
+            selectedIconPath: item.selectedIconPath,
+            visible: item.visible
+          }))
+        });
+        // TODO 暂未实现
+        // tabBar && tabBar.setAnimationAlphaBGColor(parseTheme((__uniConfig.window || {}).backgroundColor, false))
+      };
+
+      fn();
+
+      onThemeChange(fn);
+    }
+  }
+
+  function useWebviewThemeChange (webview, getWebviewStyle) {
+    if (__uniConfig.darkmode) {
+      const fn = () => {
+        const webviewStyle = getWebviewStyle();
+        const style = {
+          animationAlphaBGColor: webviewStyle.animationAlphaBGColor,
+          background: webviewStyle.background,
+          backgroundColorBottom: webviewStyle.backgroundColorBottom,
+          backgroundColorTop: webviewStyle.backgroundColorTop
+        };
+        var titleNView = webviewStyle.titleNView;
+        if (typeof titleNView !== 'undefined') {
+          style.titleNView = typeof titleNView === 'object' ? {
+            backgroundColor: titleNView.backgroundColor,
+            titleColor: titleNView.titleColor
+          } : titleNView;
+        }
+        webview && webview.setStyle(webviewStyle);
+      };
+      onThemeChange(fn);
+      webview.addEventListener('close', () => offThemeChange(fn));
+    }
+  }
 
   const TABBAR_HEIGHT = 50;
-  const isIOS$1 = plus.os.name === 'iOS';
   let config;
 
   /**
@@ -5872,6 +7697,10 @@ var serviceContext = (function () {
   let visible = true;
 
   let tabBar;
+
+  function setTabBarItems (style) {
+    tabBar && tabBar.setTabBarItems(style);
+  }
 
   /**
    * 设置角标
@@ -5904,7 +7733,7 @@ var serviceContext = (function () {
   /**
    * 动态设置 tabBar 某一项的内容
    */
-  function setTabBarItem$1 (index, text, iconPath, selectedIconPath) {
+  function setTabBarItem$1 (index, text, iconPath, selectedIconPath, visible, iconfont) {
     const item = {
       index
     };
@@ -5917,7 +7746,20 @@ var serviceContext = (function () {
     if (selectedIconPath) {
       item.selectedIconPath = getRealPath$1(selectedIconPath);
     }
-    tabBar && tabBar.setTabBarItem(item);
+    if (iconfont !== undefined) {
+      item.iconfont = iconfont;
+    }
+    if (visible !== undefined) {
+      item.visible = config.list[index].visible = visible;
+      delete item.index;
+
+      const tabbarItems = config.list.map(item => ({ visible: item.visible }));
+      tabbarItems[index] = item;
+
+      setTabBarItems({ list: tabbarItems });
+    } else {
+      tabBar && tabBar.setTabBarItem(item);
+    }
   }
   /**
    * 动态设置 tabBar 的整体样式
@@ -5971,8 +7813,11 @@ var serviceContext = (function () {
       tabBar && tabBar.onMidButtonClick(() => {
         publish('onTabBarMidButtonTap', {});
       });
+
+      useTabBarThemeChange(tabBar, options);
     },
     indexOf (page) {
+      const config = this.config;
       const itemLength = config && config.list && config.list.length;
       if (itemLength) {
         for (let i = 0; i < itemLength; i++) {
@@ -6013,16 +7858,21 @@ var serviceContext = (function () {
         }
       });
     },
+    get config () {
+      return config || __uniConfig.tabBar
+    },
     get visible () {
       return visible
     },
     get height () {
+      const config = this.config;
       return (config && config.height ? parseFloat(config.height) : TABBAR_HEIGHT) + plus.navigator.getSafeAreaInsets().deviceBottom
     },
     // tabBar是否遮挡内容区域
     get cover () {
+      const config = this.config;
       const array = ['extralight', 'light', 'dark'];
-      return isIOS$1 && array.indexOf(config.blurEffect) >= 0
+      return config && array.indexOf(config.blurEffect) >= 0
     },
     setStyle ({ mask }) {
       tabBar.setMask({
@@ -6038,26 +7888,9 @@ var serviceContext = (function () {
     }
   };
 
-  function getStatusbarHeight () {
-    // 横屏时 iOS 获取的状态栏高度错误，进行纠正
-    return plus.navigator.isImmersedStatusbar() ? Math.round(plus.os.name === 'iOS' ? plus.navigator.getSafeAreaInsets().top : plus.navigator.getStatusbarHeight()) : 0
-  }
+  function getWindowInfo () {
+    const ios = plus.os.name.toLowerCase() === 'ios';
 
-  let deviceId;
-
-  function deviceId$1 () {
-    deviceId = deviceId || plus.runtime.getDCloudId();
-    return deviceId
-  }
-
-  function getSystemInfoSync () {
-    return callApiSync(getSystemInfo, Object.create(null), 'getSystemInfo', 'getSystemInfoSync')
-  }
-
-  function getSystemInfo () {
-    const platform = plus.os.name.toLowerCase();
-    const ios = platform === 'ios';
-    const isAndroid = platform === 'android';
     const {
       screenWidth,
       screenHeight
@@ -6114,23 +7947,12 @@ var serviceContext = (function () {
     };
 
     return {
-      errMsg: 'getSystemInfo:ok',
-      brand: plus.device.vendor,
-      model: plus.device.model,
       pixelRatio: plus.screen.scale,
       screenWidth,
       screenHeight,
       windowWidth,
       windowHeight,
       statusBarHeight,
-      language: plus.os.language,
-      system: `${ios ? 'iOS' : isAndroid ? 'Android' : ''} ${plus.os.version}`,
-      version: plus.runtime.innerVersion,
-      fontSizeSetting: '',
-      platform,
-      SDKVersion: '',
-      windowTop,
-      windowBottom,
       safeArea,
       safeAreaInsets: {
         top: safeAreaInsets.top,
@@ -6138,8 +7960,128 @@ var serviceContext = (function () {
         bottom: safeAreaInsets.bottom,
         left: safeAreaInsets.left
       },
-      deviceId: deviceId$1()
+      windowTop,
+      windowBottom,
+      screenTop: screenHeight - windowHeight
     }
+  }
+
+  let systemInfo = {};
+  let _initSystemInfo = true;
+
+  function weexGetSystemInfoSync () {
+    if (!_initSystemInfo) return
+    const { getSystemInfoSync } = weex.requireModule('plus');
+    systemInfo = getSystemInfoSync();
+    if (typeof systemInfo === 'string') {
+      try {
+        systemInfo = JSON.parse(systemInfo);
+      } catch (error) { }
+    }
+    return systemInfo
+  }
+
+  function getDeviceInfo () {
+    weexGetSystemInfoSync();
+    const {
+      deviceBrand = '', deviceModel, osName,
+      osVersion, deviceOrientation, deviceType,
+      deviceId
+    } = systemInfo;
+
+    const brand = deviceBrand.toLowerCase();
+    const _osName = osName.toLowerCase();
+
+    return {
+      brand,
+      deviceBrand: brand,
+      deviceModel,
+      devicePixelRatio: plus.screen.scale,
+      deviceId,
+      deviceOrientation,
+      deviceType,
+      model: deviceModel,
+      platform: _osName,
+      system: `${_osName === 'ios' ? 'iOS' : 'Android'} ${osVersion}`
+    }
+  }
+
+  function getAppBaseInfo () {
+    weexGetSystemInfoSync();
+    const {
+      hostPackageName, hostName, osLanguage,
+      hostVersion, hostLanguage, hostTheme,
+      appId, appName, appVersion, appVersionCode,
+      appWgtVersion
+    } = systemInfo;
+
+    const appLanguage = uni
+      ? uni.getLocale
+        ? uni.getLocale()
+        : hostLanguage
+      : hostLanguage;
+
+    return {
+      appId,
+      appName,
+      appVersion,
+      appVersionCode,
+      appWgtVersion,
+      appLanguage,
+      enableDebug: false,
+      hostSDKVersion: undefined,
+      hostPackageName,
+      hostName,
+      hostVersion,
+      hostLanguage,
+      hostTheme,
+      hostFontSizeSetting: undefined,
+      language: osLanguage,
+      SDKVersion: '',
+      theme: plus.navigator.getUIStyle(),
+      version: plus.runtime.innerVersion
+    }
+  }
+
+  function getSystemInfoSync () {
+    return callApiSync(getSystemInfo, Object.create(null), 'getSystemInfo', 'getSystemInfoSync')
+  }
+
+  function getSystemInfo () {
+    _initSystemInfo = true;
+    weexGetSystemInfoSync();
+    _initSystemInfo = false;
+    const windowInfo = getWindowInfo();
+    const deviceInfo = getDeviceInfo();
+    const appBaseInfo = getAppBaseInfo();
+    _initSystemInfo = true;
+
+    const extraData = {
+      errMsg: 'getSystemInfo:ok',
+      fontSizeSetting: appBaseInfo.hostFontSizeSetting,
+      osName: systemInfo.osName.toLowerCase()
+    };
+
+    if (systemInfo.hostName) {
+      extraData.hostSDKVersion = systemInfo.uniRuntimeVersion;
+    }
+
+    const _systemInfo = Object.assign(
+      {},
+      systemInfo,
+      windowInfo,
+      deviceInfo,
+      appBaseInfo,
+      extraData
+    );
+
+    delete _systemInfo.screenTop;
+    delete _systemInfo.enableDebug;
+    if (!__uniConfig.darkmode) {
+      delete _systemInfo.theme;
+    }
+
+    return sortObject(_systemInfo)
   }
 
   function vibrateLong () {
@@ -6153,6 +8095,48 @@ var serviceContext = (function () {
     return {
       errMsg: 'vibrateShort:ok'
     }
+  }
+
+  function getSystemSetting () {
+    const { getSystemSetting } = weex.requireModule('plus');
+    let systemSetting = getSystemSetting();
+    try {
+      if (typeof systemSetting === 'string') { systemSetting = JSON.parse(systemSetting); }
+    } catch (error) { }
+
+    return systemSetting
+  }
+
+  function getAppAuthorizeSetting () {
+    const { getAppAuthorizeSetting } = weex.requireModule('plus');
+    let appAuthorizeSetting = getAppAuthorizeSetting();
+    try {
+      if (typeof appAuthorizeSetting === 'string') { appAuthorizeSetting = JSON.parse(appAuthorizeSetting); }
+    } catch (error) { }
+
+    for (const key in appAuthorizeSetting) {
+      if (Object.hasOwnProperty.call(appAuthorizeSetting, key)) {
+        const value = appAuthorizeSetting[key];
+        if (value === 'undefined') appAuthorizeSetting[key] = undefined;
+      }
+    }
+
+    return appAuthorizeSetting
+  }
+
+  function openAppAuthorizeSetting (options, callbackId) {
+    const { openAppAuthorizeSetting } = weex.requireModule('plus');
+    openAppAuthorizeSetting(ret => {
+      if (ret.type === 'success') {
+        invoke$1(callbackId, {
+          errMsg: 'getClipboardData:ok'
+        });
+      } else {
+        invoke$1(callbackId, {
+          errMsg: 'getClipboardData:fail'
+        });
+      }
+    });
   }
 
   const SAVED_DIR = 'uniapp_save';
@@ -6257,16 +8241,10 @@ var serviceContext = (function () {
     filePath,
     fileType
   } = {}, callbackId) {
-    plus.io.resolveLocalFileSystemURL(getRealPath$1(filePath), entry => {
-      plus.runtime.openFile(getRealPath$1(filePath));
-      invoke$1(callbackId, {
-        errMsg: 'openDocument:ok'
-      });
-    }, err => {
-      invoke$1(callbackId, {
-        errMsg: 'openDocument:fail ' + err.message
-      });
-    });
+    const successCallback = warpPlusSuccessCallback(callbackId, 'saveFile');
+    const errorCallback = warpPlusErrorCallback(callbackId, 'saveFile');
+
+    plus.runtime.openDocument(getRealPath$1(filePath), undefined, successCallback, errorCallback);
   }
 
   const CHOOSE_LOCATION_PATH = '_www/__uniappchooselocation.html';
@@ -6373,7 +8351,9 @@ var serviceContext = (function () {
     let result;
     const page = showPage({
       url: '__uniappchooselocation',
-      data: options,
+      data: Object.assign({}, options, {
+        locale: getLocale()
+      }),
       style: {
         animationType: options.animationType || 'slide-in-bottom',
         titleNView: false,
@@ -6469,7 +8449,9 @@ var serviceContext = (function () {
   function getLocation$1 ({
     type = 'wgs84',
     geocode = false,
-    altitude = false
+    altitude = false,
+    isHighAccuracy = false,
+    highAccuracyExpireTime
   } = {}, callbackId) {
     const errorCallback = warpPlusErrorCallback(callbackId, 'getLocation');
     plus.geolocation.getCurrentPosition(
@@ -6485,7 +8467,9 @@ var serviceContext = (function () {
         errorCallback(e);
       }, {
         geocode: geocode,
-        enableHighAccuracy: altitude
+        enableHighAccuracy: isHighAccuracy || altitude,
+        timeout: highAccuracyExpireTime,
+        coordsType: type
       }
     );
   }
@@ -6542,7 +8526,9 @@ var serviceContext = (function () {
   function openLocation$2 (data, callbackId) {
     showPage({
       url: '__uniappopenlocation',
-      data,
+      data: Object.assign({}, data, {
+        locale: getLocale()
+      }),
       style: {
         titleNView: {
           type: 'transparent'
@@ -6569,6 +8555,80 @@ var serviceContext = (function () {
   function openLocation$3 (...array) {
     const api = __uniConfig.nvueCompiler !== 'weex' ? weex$3 : webview$2;
     return api.openLocation(...array)
+  }
+
+  let successCallbackIds = [];
+  let errorCallbackIds = [];
+  let started = false;
+  let watchId = 0;
+
+  function startLocationUpdate ({ type = 'gcj02' }, callbackId) {
+    watchId = watchId || plus.geolocation.watchPosition(
+      res => {
+        started = true;
+        successCallbackIds.forEach(callbackId => {
+          invoke$1(callbackId, res.coords);
+        });
+      },
+      error => {
+        if (!started) {
+          invoke$1(callbackId, { errMsg: `startLocationUpdate:fail ${error.message}` });
+          started = true;
+        }
+        errorCallbackIds.forEach(callbackId => {
+          invoke$1(callbackId, {
+            errMsg: `onLocationChange:fail ${error.message}`
+          });
+        });
+      },
+      {
+        coordsType: type
+      }
+    );
+    setTimeout(() => {
+      invoke$1(callbackId, {
+        errMsg: 'startLocationUpdate:ok'
+      });
+    }, 100);
+  }
+
+  function stopLocationUpdate () {
+    if (watchId !== 0) {
+      plus.geolocation.clearWatch(watchId);
+      started = false;
+      watchId = 0;
+    }
+    return {}
+  }
+
+  function onLocationChange (callbackId) {
+    successCallbackIds.push(callbackId);
+  }
+
+  function offLocationChange (callbackId) {
+    if (callbackId) {
+      const index = successCallbackIds.indexOf(callbackId);
+      if (index >= 0) {
+        successCallbackIds.splice(index, 1);
+      }
+    } else {
+      successCallbackIds = [];
+    }
+  }
+
+  function onLocationChangeError (callbackId) {
+    errorCallbackIds.push(callbackId);
+  }
+
+  function offLocationChangeError (callbackId) {
+    if (callbackId) {
+      const index = errorCallbackIds.indexOf(callbackId);
+      if (index >= 0) {
+        errorCallbackIds.splice(index, 1);
+      }
+    } else {
+      errorCallbackIds = [];
+    }
   }
 
   const RECORD_TIME = 60 * 60 * 1000;
@@ -6684,24 +8744,6 @@ var serviceContext = (function () {
     })
   }
 
-  function compressImage$1 (tempFilePath) {
-    const dstPath = `${TEMP_PATH}/compressed/${Date.now()}_${getFileName(tempFilePath)}`;
-    return new Promise((resolve) => {
-      plus.nativeUI.showWaiting();
-      plus.zip.compressImage({
-        src: tempFilePath,
-        dst: dstPath,
-        overwrite: true
-      }, () => {
-        plus.nativeUI.closeWaiting();
-        resolve(dstPath);
-      }, () => {
-        plus.nativeUI.closeWaiting();
-        resolve(tempFilePath);
-      });
-    })
-  }
-
   function chooseImage$1 ({
     count,
     sizeType,
@@ -6713,36 +8755,21 @@ var serviceContext = (function () {
     function successCallback (paths) {
       const tempFiles = [];
       const tempFilePaths = [];
-      // plus.zip.compressImage 压缩文件并发调用在iOS端容易出现问题（图像错误、闪退），改为队列执行
-      paths.reduce((promise, path) => {
-        return promise.then(() => {
-          return getFileInfo$2(path)
-        }).then(fileInfo => {
-          const size = fileInfo.size;
-          // 压缩阈值 0.5 兆
-          const THRESHOLD = 1024 * 1024 * 0.5;
-          // 判断是否需要压缩
-          if (!crop && sizeType.includes('compressed') && size > THRESHOLD) {
-            return compressImage$1(path).then(dstPath => {
-              path = dstPath;
-              return getFileInfo$2(path)
-            })
-          }
-          return fileInfo
-        }).then(({ size }) => {
-          tempFilePaths.push(path);
-          tempFiles.push({
-            path,
-            size
+      Promise.all(paths.map((path) => getFileInfo$2(path)))
+        .then((filesInfo) => {
+          filesInfo.forEach((file, index) => {
+            const path = paths[index];
+            tempFilePaths.push(path);
+            tempFiles.push({ path, size: file.size });
+          });
+
+          invoke$1(callbackId, {
+            errMsg: 'chooseImage:ok',
+            tempFilePaths,
+            tempFiles
           });
         })
-      }, Promise.resolve()).then(() => {
-        invoke$1(callbackId, {
-          errMsg: 'chooseImage:ok',
-          tempFilePaths,
-          tempFiles
-        });
-      }).catch(errorCallback);
+        .catch(errorCallback);
     }
 
     function openCamera () {
@@ -6751,7 +8778,8 @@ var serviceContext = (function () {
         errorCallback, {
           filename: TEMP_PATH + '/camera/',
           resolution: 'high',
-          crop
+          crop,
+          sizeType
         });
     }
 
@@ -6762,7 +8790,8 @@ var serviceContext = (function () {
         system: false,
         filename: TEMP_PATH + '/gallery/',
         permissionAlert: true,
-        crop
+        crop,
+        sizeType
       });
     }
 
@@ -6806,39 +8835,20 @@ var serviceContext = (function () {
     const errorCallback = warpPlusErrorCallback(callbackId, 'chooseVideo', 'cancel');
 
     function successCallback (tempFilePath = '') {
-      const dst = `${TEMP_PATH}/compressed/${Date.now()}_${getFileName(tempFilePath)}`;
-      const compressVideo = compressed ? new Promise((resolve) => {
-        plus.zip.compressVideo({
-          src: tempFilePath,
-          dst
-        }, ({ tempFilePath }) => {
-          resolve(tempFilePath);
-        }, () => {
-          resolve(tempFilePath);
-        });
-      }) : Promise.resolve(tempFilePath);
-      if (compressed) {
-        plus.nativeUI.showWaiting();
-      }
-      compressVideo.then(tempFilePath => {
-        if (compressed) {
-          plus.nativeUI.closeWaiting();
-        }
-        plus.io.getVideoInfo({
-          filePath: tempFilePath,
-          success (videoInfo) {
-            const result = {
-              errMsg: 'chooseVideo:ok',
-              tempFilePath: tempFilePath
-            };
-            result.size = videoInfo.size;
-            result.duration = videoInfo.duration;
-            result.width = videoInfo.width;
-            result.height = videoInfo.height;
-            invoke$1(callbackId, result);
-          },
-          fail: errorCallback
-        });
+      plus.io.getVideoInfo({
+        filePath: tempFilePath,
+        success (videoInfo) {
+          const result = {
+            errMsg: 'chooseVideo:ok',
+            tempFilePath: tempFilePath
+          };
+          result.size = videoInfo.size;
+          result.duration = videoInfo.duration;
+          result.width = videoInfo.width;
+          result.height = videoInfo.height;
+          invoke$1(callbackId, result);
+        },
+        fail: errorCallback
       });
     }
 
@@ -6850,7 +8860,8 @@ var serviceContext = (function () {
         multiple: true,
         maximum: 1,
         filename: TEMP_PATH + '/gallery/',
-        permissionAlert: true
+        permissionAlert: true,
+        videoCompress: compressed
       });
     }
 
@@ -6859,7 +8870,8 @@ var serviceContext = (function () {
       plusCamera.startVideoCapture(successCallback, errorCallback, {
         index: camera === 'front' ? 2 : 1,
         videoMaximumDuration: maxDuration,
-        filename: TEMP_PATH + '/camera/'
+        filename: TEMP_PATH + '/camera/',
+        videoCompress: compressed
       });
     }
 
@@ -6894,9 +8906,16 @@ var serviceContext = (function () {
     });
   }
 
-  function compressImage$2 (options, callbackId) {
+  function compressImage$1 (options, callbackId) {
     const dst = `${TEMP_PATH}/compressed/${Date.now()}_${getFileName(options.src)}`;
     const errorCallback = warpPlusErrorCallback(callbackId, 'compressImage');
+    const { compressedWidth, compressedHeight } = options;
+    if (typeof compressedWidth === 'number') {
+      options.width = compressedWidth + 'px';
+    }
+    if (typeof compressedHeight === 'number') {
+      options.height = compressedHeight + 'px';
+    }
     plus.zip.compressImage(Object.assign({}, options, {
       dst
     }), () => {
@@ -6908,11 +8927,11 @@ var serviceContext = (function () {
   }
 
   function compressVideo$1 (options, callbackId) {
-    const dst = `${TEMP_PATH}/compressed/${Date.now()}_${getFileName(options.src)}`;
+    const filename = `${TEMP_PATH}/compressed/${Date.now()}_${getFileName(options.src)}`;
     const successCallback = warpPlusSuccessCallback(callbackId, 'compressVideo');
     const errorCallback = warpPlusErrorCallback(callbackId, 'compressVideo');
     plus.zip.compressVideo(Object.assign({}, options, {
-      dst
+      filename
     }), successCallback, errorCallback);
   }
 
@@ -6929,7 +8948,7 @@ var serviceContext = (function () {
       orientation: data.orientation,
       type: data.type,
       duration: data.duration,
-      size: data.size,
+      size: data.size / 1024,
       height: data.height,
       width: data.width,
       fps: data.fps || 30,
@@ -7010,6 +9029,19 @@ var serviceContext = (function () {
     });
     return {
       errMsg: 'previewImage:ok'
+    }
+  }
+
+  function closePreviewImagePlus () {
+    try {
+      plus.nativeUI.closePreviewImage();
+      return {
+        errMsg: 'closePreviewImagePlus:ok'
+      }
+    } catch (error) {
+      return {
+        errMsg: 'closePreviewImagePlus:fail'
+      }
     }
   }
 
@@ -7285,46 +9317,59 @@ var serviceContext = (function () {
       firstIpv4: firstIpv4,
       tls
     };
+    let withArrayBuffer;
     if (method !== 'GET') {
-      options.body = typeof data === 'string' ? data : JSON.stringify(data);
+      if (toString.call(data) === '[object ArrayBuffer]') {
+        withArrayBuffer = true;
+      } else {
+        options.body = typeof data === 'string' ? data : JSON.stringify(data);
+      }
     }
+    const callback = ({
+      ok,
+      status,
+      data,
+      headers,
+      errorMsg
+    }) => {
+      if (aborted) {
+        return
+      }
+      if (abortTimeout) {
+        clearTimeout(abortTimeout);
+      }
+      const statusCode = status;
+      if (statusCode > 0) {
+        publishStateChange$1({
+          requestTaskId,
+          state: 'success',
+          data: ok && responseType === 'arraybuffer' ? base64ToArrayBuffer$2(data) : data,
+          statusCode,
+          header: headers,
+          cookies: cookiesParse(headers)
+        });
+      } else {
+        let errMsg = 'abort statusCode:' + statusCode;
+        if (errorMsg) {
+          errMsg = errMsg + ' ' + errorMsg;
+        }
+        publishStateChange$1({
+          requestTaskId,
+          state: 'fail',
+          statusCode,
+          errMsg
+        });
+      }
+    };
     try {
-      stream.fetch(options, ({
-        ok,
-        status,
-        data,
-        headers,
-        errorMsg
-      }) => {
-        if (aborted) {
-          return
-        }
-        if (abortTimeout) {
-          clearTimeout(abortTimeout);
-        }
-        const statusCode = status;
-        if (statusCode > 0) {
-          publishStateChange$1({
-            requestTaskId,
-            state: 'success',
-            data: ok && responseType === 'arraybuffer' ? base64ToArrayBuffer$2(data) : data,
-            statusCode,
-            header: headers,
-            cookies: cookiesParse(headers)
-          });
-        } else {
-          let errMsg = 'abort statusCode:' + statusCode;
-          if (errorMsg) {
-            errMsg = errMsg + ' ' + errorMsg;
-          }
-          publishStateChange$1({
-            requestTaskId,
-            state: 'fail',
-            statusCode,
-            errMsg
-          });
-        }
-      });
+      if (withArrayBuffer) {
+        stream.fetchWithArrayBuffer({
+          '@type': 'binary',
+          base64: arrayBufferToBase64$2(data)
+        }, options, callback);
+      } else {
+        stream.fetch(options, callback);
+      }
       requestTasks[requestTaskId] = {
         abort () {
           aborted = true;
@@ -7369,6 +9414,26 @@ var serviceContext = (function () {
     return {
       errMsg: 'operateRequestTask:fail'
     }
+  }
+
+  function configMTLS$1 ({ certificates }, callbackId) {
+    const stream = requireNativePlugin('stream');
+    stream.configMTLS(certificates, ({ type, code, message }) => {
+      switch (type) {
+        case 'success':
+          invoke$1(callbackId, {
+            errMsg: 'configMTLS:ok',
+            code
+          });
+          break
+        case 'fail':
+          invoke$1(callbackId, {
+            errMsg: 'configMTLS:fail ' + message,
+            code
+          });
+          break
+      }
+    });
   }
 
   const socketTasks = {};
@@ -7498,8 +9563,12 @@ var serviceContext = (function () {
     files,
     header,
     formData,
-    timeout = __uniConfig.networkTimeout.uploadFile ? __uniConfig.networkTimeout.uploadFile / 1000 : 120
+    timeout
   } = {}) {
+    timeout =
+      (timeout ||
+        (__uniConfig.networkTimeout && __uniConfig.networkTimeout.uploadFile) ||
+        60 * 1000) / 1000;
     const uploader = plus.uploader.createUpload(url, {
       timeout,
       // 需要与其它平台上的表现保持一致，不走重试的逻辑。
@@ -7536,7 +9605,7 @@ var serviceContext = (function () {
     }
     if (files && files.length) {
       files.forEach(file => {
-        uploader.addFile(getRealPath$1(file.uri), {
+        uploader.addFile(getRealPath$1(file.uri || file.filePath), {
           key: file.name || 'file'
         });
       });
@@ -7599,7 +9668,7 @@ var serviceContext = (function () {
         }) => {
           provider.push(id);
         });
-        callback(null, provider);
+        callback(null, provider, services);
       }, err => {
         callback(err);
       });
@@ -7612,7 +9681,7 @@ var serviceContext = (function () {
         }) => {
           provider.push(id);
         });
-        callback(null, provider);
+        callback(null, provider, services);
       }, err => {
         callback(err);
       });
@@ -7625,14 +9694,15 @@ var serviceContext = (function () {
         }) => {
           provider.push(id);
         });
-        callback(null, provider);
+        callback(null, provider, services);
       }, err => {
         callback(err);
       });
     },
     push (callback) {
       if (typeof weex !== 'undefined' || typeof plus !== 'undefined') {
-        callback(null, [plus.push.getClientInfo().id]);
+        const clientInfo = plus.push.getClientInfo();
+        callback(null, [clientInfo.id], [clientInfo]);
       } else {
         callback(null, []);
       }
@@ -7643,7 +9713,7 @@ var serviceContext = (function () {
     service
   }, callbackId) {
     if (providers[service]) {
-      providers[service]((err, provider) => {
+      providers[service]((err, provider, providers) => {
         if (err) {
           invoke$1(callbackId, {
             errMsg: 'getProvider:fail ' + err.message
@@ -7652,7 +9722,16 @@ var serviceContext = (function () {
           invoke$1(callbackId, {
             errMsg: 'getProvider:ok',
             service,
-            provider
+            provider,
+            providers: providers.map((provider) => {
+              if (typeof provider.serviceReady === 'boolean') {
+                provider.isAppExist = provider.serviceReady;
+              }
+              if (typeof provider.nativeClient === 'boolean') {
+                provider.isAppExist = provider.nativeClient;
+              }
+              return provider
+            })
           });
         }
       });
@@ -7662,6 +9741,8 @@ var serviceContext = (function () {
       });
     }
   }
+
+  let univerifyManager;
 
   function getService (provider) {
     return new Promise((resolve, reject) => {
@@ -7675,24 +9756,43 @@ var serviceContext = (function () {
   /**
    * 微信登录
    */
-  function login (params, callbackId) {
+  function login (params, callbackId, plus = true) {
     const provider = params.provider || 'weixin';
-    const errorCallback = warpPlusErrorCallback(callbackId, 'login');
+    const errorCallback = warpErrorCallback(callbackId, 'login', plus);
+    const isAppleLogin = provider === 'apple';
+    const authOptions = isAppleLogin
+      ? { scope: 'email' }
+      : params.univerifyStyle
+        ? { univerifyStyle: univerifyButtonsClickHandling(params.univerifyStyle, errorCallback) }
+        : {};
+    const _invoke = plus ? invoke$1 : callback.invoke;
 
     getService(provider).then(service => {
       function login () {
+        if (params.onlyAuthorize && provider === 'weixin') {
+          service.authorize(({ code }) => {
+            _invoke(callbackId, {
+              code,
+              authResult: '',
+              errMsg: 'login:ok'
+            });
+          }, errorCallback);
+          return
+        }
         service.login(res => {
           const authResult = res.target.authResult;
-          invoke$1(callbackId, {
+          const appleInfo = res.target.appleInfo;
+          _invoke(callbackId, {
             code: authResult.code,
             authResult: authResult,
+            appleInfo,
             errMsg: 'login:ok'
           });
-        }, errorCallback, provider === 'apple' ? { scope: 'email' } : { univerifyStyle: univerifyButtonsClickHandling(params.univerifyStyle, errorCallback) } || {});
+        }, errorCallback, authOptions);
       }
       // 先注销再登录
       // apple登录logout之后无法重新触发获取email,fullname；一键登录无logout
-      if (provider === 'apple' || provider === 'univerify') {
+      if (isAppleLogin || provider === 'univerify') {
         login();
       } else {
         service.logout(login, login);
@@ -7778,9 +9878,9 @@ var serviceContext = (function () {
     }
   }
 
-  function preLogin$1 (params, callbackId) {
-    const successCallback = warpPlusSuccessCallback(callbackId, 'preLogin');
-    const errorCallback = warpPlusErrorCallback(callbackId, 'preLogin');
+  function preLogin$1 (params, callbackId, plus) {
+    const successCallback = warpSuccessCallback(callbackId, 'preLogin', plus);
+    const errorCallback = warpErrorCallback(callbackId, 'preLogin', plus);
     getService(params.provider).then(service => service.preLogin(successCallback, errorCallback)).catch(errorCallback);
   }
 
@@ -7788,28 +9888,111 @@ var serviceContext = (function () {
     return getService('univerify').then(service => service.closeAuthView())
   }
 
+  function getCheckBoxState (params, callbackId, plus) {
+    const successCallback = warpSuccessCallback(callbackId, 'getCheckBoxState', plus);
+    const errorCallback = warpErrorCallback(callbackId, 'getCheckBoxState', plus);
+    try {
+      getService('univerify').then(service => {
+        const state = service.getCheckBoxState();
+        successCallback({ state });
+      });
+    } catch (error) {
+      errorCallback(error);
+    }
+  }
+
   /**
    * 一键登录自定义登陆按钮点击处理
    */
   function univerifyButtonsClickHandling (univerifyStyle, errorCallback) {
-    if (univerifyStyle && isPlainObject(univerifyStyle) && univerifyStyle.buttons &&
-      Object.prototype.toString.call(univerifyStyle.buttons.list) === '[object Array]' &&
-      univerifyStyle.buttons.list.length > 0
-    ) {
+    if (isPlainObject(univerifyStyle) && isPlainObject(univerifyStyle.buttons) && toRawType(univerifyStyle.buttons.list) === 'Array') {
       univerifyStyle.buttons.list.forEach((button, index) => {
         univerifyStyle.buttons.list[index].onclick = function () {
-          closeAuthView().then(() => {
-            errorCallback({
-              code: '30008',
-              message: '用户点击了自定义按钮',
-              index,
-              provider: button.provider
+          const res = {
+            code: '30008',
+            message: '用户点击了自定义按钮',
+            index,
+            provider: button.provider
+          };
+          isPlainObject(univerifyManager)
+            ? univerifyManager._triggerUniverifyButtonsClick(res)
+            : closeAuthView().then(() => {
+              errorCallback(res);
             });
-          });
         };
       });
     }
     return univerifyStyle
+  }
+
+  class UniverifyManager {
+    constructor () {
+      this.provider = 'univerify';
+      this.eventName = 'api.univerifyButtonsClick';
+    }
+
+    close () {
+      closeAuthView();
+    }
+
+    login (options) {
+      this._warp((data, callbackId) => login(data, callbackId, false), options);
+    }
+
+    getCheckBoxState (options) {
+      this._warp((_, callbackId) => getCheckBoxState(_, callbackId, false), options);
+    }
+
+    preLogin (options) {
+      this._warp((data, callbackId) => preLogin$1(data, callbackId, false), options);
+    }
+
+    onButtonsClick (callback) {
+      UniServiceJSBridge.on(this.eventName, callback);
+    }
+
+    offButtonsClick (callback) {
+      UniServiceJSBridge.off(this.eventName, callback);
+    }
+
+    _triggerUniverifyButtonsClick (res) {
+      UniServiceJSBridge.emit(this.eventName, res);
+    }
+
+    _warp (fn, options) {
+      return callback.warp(fn)(this._getOptions(options))
+    }
+
+    _getOptions (options = {}) {
+      return Object.assign({}, options, { provider: this.provider })
+    }
+  }
+
+  function getUniverifyManager () {
+    return univerifyManager || (univerifyManager = new UniverifyManager())
+  }
+
+  function warpSuccessCallback (callbackId, name, plus = true) {
+    return plus
+      ? warpPlusSuccessCallback(callbackId, name)
+      : (options) => {
+        callback.invoke(callbackId, Object.assign({}, options, {
+          errMsg: `${name}:ok`
+        }));
+      }
+  }
+
+  function warpErrorCallback (callbackId, name, plus = true) {
+    return plus
+      ? warpPlusErrorCallback(callbackId, name)
+      : (error) => {
+        const { code = 0, message: errorMessage } = error;
+        callback.invoke(callbackId, {
+          errMsg: `${name}:fail ${errorMessage || ''}`,
+          errCode: code,
+          code
+        });
+      }
   }
 
   function requestPayment (params, callbackId) {
@@ -7895,6 +10078,22 @@ var serviceContext = (function () {
     }
   }
 
+  function createPushMessage (params, callbackId) {
+    const setting = getAppAuthorizeSetting();
+    if (setting.notificationAuthorized !== 'authorized') {
+      return invoke$1(callbackId, {
+        errMsg: 'createPushMessage:fail notificationAuthorized: ' + setting.notificationAuthorized
+      })
+    }
+    const options = Object.assign({}, params);
+    delete options.content;
+    delete options.payload;
+    plus.push.createMessage(params.content, params.payload, options);
+    invoke$1(callbackId, {
+      errMsg: 'createPushMessage:ok'
+    });
+  }
+
   function requireNativePlugin$1 (name) {
     return weex.requireModule(name)
   }
@@ -7939,7 +10138,10 @@ var serviceContext = (function () {
       imageUrl,
       mediaUrl: media,
       scene,
-      miniProgram
+      miniProgram,
+      openCustomerServiceChat,
+      corpid,
+      customerUrl: url
     } = args;
 
     if (typeof imageUrl === 'string' && imageUrl) {
@@ -7960,7 +10162,10 @@ var serviceContext = (function () {
         miniProgram,
         extra: {
           scene
-        }
+        },
+        openCustomerServiceChat,
+        corpid,
+        url
       };
       if (provider === 'weixin' && (type === 1 || type === 2)) {
         delete sendMsg.thumbs;
@@ -7972,12 +10177,18 @@ var serviceContext = (function () {
 
   const sendShareMsg = function (service, params, callbackId, method = 'share') {
     const errorCallback = warpPlusErrorCallback(callbackId, method);
-
-    service.send(params, () => {
-      invoke$1(callbackId, {
-        errMsg: method + ':ok'
+    const serviceMethod = params.openCustomerServiceChat ? 'openCustomerServiceChat' : 'send';
+    try {
+      service[serviceMethod](params, () => {
+        invoke$1(callbackId, {
+          errMsg: method + ':ok'
+        });
+      }, errorCallback);
+    } catch (error) {
+      errorCallback({
+        message: `${params.provider} ${serviceMethod} 方法调用失败`
       });
-    }, errorCallback);
+    }
   };
 
   function shareAppMessageDirectly ({
@@ -8117,6 +10328,29 @@ var serviceContext = (function () {
     __uniConfig.serviceReady = true;
   }
 
+  function requireGlobal () {
+    const list = [
+      'ArrayBuffer',
+      'Int8Array',
+      'Uint8Array',
+      'Uint8ClampedArray',
+      'Int16Array',
+      'Uint16Array',
+      'Int32Array',
+      'Uint32Array',
+      'Float32Array',
+      'Float64Array',
+      'BigInt64Array',
+      'BigUint64Array'
+    ];
+    const object = {};
+    for (let i = 0; i < list.length; i++) {
+      const key = list[i];
+      object[key] = global[key];
+    }
+    return object
+  }
+
   function wrapper$1 (webview) {
     webview.$processed = true;
 
@@ -8210,6 +10444,10 @@ var serviceContext = (function () {
     });
   });
 
+  function onHostEventReceive (callbackId) {
+    callbacks$3.push(callbackId);
+  }
+
   function onNativeEventReceive (callbackId) {
     callbacks$3.push(callbackId);
   }
@@ -8217,94 +10455,6 @@ var serviceContext = (function () {
   function sendNativeEvent (event, data, callback) {
     // 实时获取weex module（weex可能会变化，比如首页nvue加速显示时）
     return weex.requireModule('plus').sendNativeEvent(event, data, callback)
-  }
-
-  const loadedSubPackages = [];
-
-  /**
-   * 指定路由 ready 后，检查是否触发分包预加载
-   * @param {Object} route
-   */
-  function preloadSubPackages (route) {
-    if (!__uniConfig.preloadRule) {
-      return
-    }
-    const options = __uniConfig.preloadRule[route];
-    if (!options || !Array.isArray(options.packages)) {
-      return
-    }
-    const packages = options.packages.filter(root => loadedSubPackages.indexOf(root) === -1);
-    if (!packages.length) {
-      return
-    }
-    loadSubPackages(options.packages);
-    // 暂不需要网络下载
-    // const network = options.network || 'wifi'
-    // if (network === 'wifi') {
-    //   uni.getNetworkType({
-    //     success (res) {
-    //       if (process.env.NODE_ENV !== 'production') {
-    //         console.log('UNIAPP[preloadRule]:' + res.networkType + ':' + JSON.stringify(options))
-    //       }
-    //       if (res.networkType === 'wifi') {
-    //         loadSubPackages(options.packages)
-    //       }
-    //     }
-    //   })
-    // } else {
-    //   if (process.env.NODE_ENV !== 'production') {
-    //     console.log('UNIAPP[preloadRule]:' + JSON.stringify(options))
-    //   }
-    //   loadSubPackages(options.packages)
-    // }
-  }
-
-  function loadPage (route, callback) {
-    let isInSubPackage = false;
-    const subPackages = __uniConfig.subPackages;
-    if (Array.isArray(subPackages)) {
-      const subPackage = subPackages.find(subPackage => route.indexOf(subPackage.root) === 0);
-      if (subPackage) {
-        isInSubPackage = true;
-        loadSubPackage$1(subPackage.root, callback);
-      }
-    }
-    if (!isInSubPackage) {
-      callback();
-    }
-  }
-
-  function loadSubPackage$1 (root, callback) {
-    if (loadedSubPackages.indexOf(root) !== -1) {
-      return callback()
-    }
-    loadSubPackages([root], () => {
-      callback();
-    });
-  }
-
-  const SUB_FILENAME = 'app-sub-service.js';
-
-  function evaluateScriptFiles (files, callback) {
-    __uniConfig.onServiceReady(() => {
-      weex.requireModule('plus').evalJSFiles(files, callback);
-    });
-  }
-
-  function loadSubPackages (packages, callback) {
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('UNIAPP[loadSubPackages]:' + JSON.stringify(packages));
-    }
-    const startTime = Date.now();
-    evaluateScriptFiles(packages.map(root => {
-      loadedSubPackages.push(root);
-      return root + '/' + SUB_FILENAME
-    }), res => {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('UNIAPP[loadSubPackages]:耗时(' + (Date.now() - startTime) + ')');
-      }
-      callback && callback(true);
-    });
   }
 
   const SUB_FILENAME$1 = 'app-sub-service.js';
@@ -8338,704 +10488,269 @@ var serviceContext = (function () {
     });
   }
 
-  const VD_SYNC_VERSION = 2;
+  const sendHostEvent = sendNativeEvent;
 
-  const PAGE_CREATE = 2;
-  const MOUNTED_DATA = 4;
-  const UPDATED_DATA = 6;
-  const PAGE_CREATED = 10;
-
-  const UI_EVENT = 20;
-
-  const VD_SYNC = 'vdSync';
-
-  const WEBVIEW_READY = 'webviewReady';
-  const VD_SYNC_CALLBACK = 'vdSyncCallback';
-  const INVOKE_API = 'invokeApi';
-  const WEB_INVOKE_APPSERVICE$1 = 'WEB_INVOKE_APPSERVICE';
-  const WEBVIEW_INSERTED = 'webviewInserted';
-  const WEBVIEW_REMOVED = 'webviewRemoved';
-  const WEBVIEW_ID_PREFIX = 'webviewId';
-
-  function createButtonOnClick (index) {
-    return function onClick (btn) {
-      const pages = getCurrentPages();
-      if (!pages.length) {
-        return
-      }
-      btn.index = index;
-      const page = pages[pages.length - 1];
-      page.$vm &&
-        page.$vm.__call_hook &&
-        page.$vm.__call_hook('onNavigationBarButtonTap', btn);
-    }
-  }
-
-  function parseTitleNViewButtons (titleNView) {
-    const buttons = titleNView.buttons;
-    if (!Array.isArray(buttons)) {
-      return titleNView
-    }
-    buttons.forEach((btn, index) => {
-      btn.onclick = createButtonOnClick(index);
-    });
-    return titleNView
-  }
-
-  function parseTitleNView (routeOptions) {
-    const windowOptions = routeOptions.window;
-    const titleNView = windowOptions.titleNView;
-    routeOptions.meta.statusBarStyle = windowOptions.navigationBarTextStyle === 'black' ? 'dark' : 'light';
-    if ( // 无头
-      titleNView === false ||
-      titleNView === 'false' ||
-      (
-        windowOptions.navigationStyle === 'custom' &&
-        !isPlainObject(titleNView)
-      ) || (
-        windowOptions.transparentTitle === 'always' &&
-        !isPlainObject(titleNView)
-      )
-    ) {
-      return false
-    }
-
-    const titleImage = windowOptions.titleImage || '';
-    const transparentTitle = windowOptions.transparentTitle || 'none';
-    const titleNViewTypeList = {
-      none: 'default',
-      auto: 'transparent',
-      always: 'float'
-    };
-
-    const navigationBarBackgroundColor = windowOptions.navigationBarBackgroundColor;
-    const ret = {
-      autoBackButton: !routeOptions.meta.isQuit,
-      titleText: titleImage === '' ? windowOptions.navigationBarTitleText || '' : '',
-      titleColor: windowOptions.navigationBarTextStyle === 'black' ? '#000000' : '#ffffff',
-      type: titleNViewTypeList[transparentTitle],
-      backgroundColor: (/^#[a-z0-9]{6}$/i.test(navigationBarBackgroundColor) || navigationBarBackgroundColor === 'transparent') ? navigationBarBackgroundColor : '#f7f7f7',
-      tags: titleImage === '' ? [] : [{
-        tag: 'img',
-        src: titleImage,
-        position: {
-          left: 'auto',
-          top: 'auto',
-          width: 'auto',
-          height: '26px'
+  function navigateToMiniProgram (data, callbackId) {
+    sendHostEvent(
+      'navigateToUniMP',
+      data,
+      (res) => {
+        if (res.errMsg && res.errMsg.indexOf(':ok') === -1) {
+          return invoke$1(callbackId, {
+            errMsg: res.errMsg
+          })
         }
-      }]
-    };
-
-    if (isPlainObject(titleNView)) {
-      return Object.assign(ret, parseTitleNViewButtons(titleNView))
-    }
-
-    return ret
+        invoke$1(callbackId, {
+          errMsg: 'navigateToMiniProgram:ok'
+        });
+      }
+    );
   }
 
-  function parsePullToRefresh (routeOptions) {
-    const windowOptions = routeOptions.window;
+  function getLaunchOptionsSync () {
+    return getLaunchOptions()
+  }
+  function getEnterOptionsSync () {
+    return getEnterOptions()
+  }
 
-    if (windowOptions.enablePullDownRefresh || (windowOptions.pullToRefresh && windowOptions.pullToRefresh.support)) {
-      const pullToRefreshStyles = Object.create(null);
-      // 初始化默认值
-      if (plus.os.name === 'Android') {
-        Object.assign(pullToRefreshStyles, {
-          support: true,
-          style: 'circle'
-        });
-      } else {
-        Object.assign(pullToRefreshStyles, {
-          support: true,
-          style: 'default',
-          height: '50px',
-          range: '200px',
-          contentdown: {
-            caption: ''
-          },
-          contentover: {
-            caption: ''
-          },
-          contentrefresh: {
-            caption: ''
+  let callbackId = 1;
+  let proxy;
+  const callbacks$4 = {};
+  function normalizeArg(arg) {
+      if (typeof arg === 'function') {
+          // 查找该函数是否已缓存
+          const oldId = Object.keys(callbacks$4).find((id) => callbacks$4[id] === arg);
+          const id = oldId ? parseInt(oldId) : callbackId++;
+          callbacks$4[id] = arg;
+          return id;
+      }
+      else if (isPlainObject(arg)) {
+          Object.keys(arg).forEach((name) => {
+              arg[name] = normalizeArg(arg[name]);
+          });
+      }
+      return arg;
+  }
+  function initUTSInstanceMethod(async, opts, instanceId) {
+      return initProxyFunction(async, opts, instanceId);
+  }
+  function getProxy() {
+      if (!proxy) {
+          proxy = uni.requireNativePlugin('UTS-Proxy');
+      }
+      return proxy;
+  }
+  function resolveSyncResult(res) {
+      if ((process.env.NODE_ENV !== 'production')) {
+          console.log('uts.invokeSync.result', res);
+      }
+      if (res.errMsg) {
+          throw new Error(res.errMsg);
+      }
+      return res.params;
+  }
+  function invokePropGetter(args) {
+      if (args.errMsg) {
+          throw new Error(args.errMsg);
+      }
+      delete args.errMsg;
+      if ((process.env.NODE_ENV !== 'production')) {
+          console.log('uts.invokePropGetter.args', args);
+      }
+      return resolveSyncResult(getProxy().invokeSync(args, () => { }));
+  }
+  function initProxyFunction(async, { moduleName, moduleType, package: pkg, class: cls, name: propOrMethod, method, companion, params: methodParams, errMsg, }, instanceId) {
+      const invokeCallback = ({ id, name, params, keepAlive, }) => {
+          const callback = callbacks$4[id];
+          if (callback) {
+              callback(...params);
+              if (!keepAlive) {
+                  delete callbacks$4[id];
+              }
           }
-        });
-      }
-
-      if (windowOptions.backgroundTextStyle) {
-        pullToRefreshStyles.color = windowOptions.backgroundTextStyle;
-        pullToRefreshStyles.snowColor = windowOptions.backgroundTextStyle;
-      }
-
-      Object.assign(pullToRefreshStyles, windowOptions.pullToRefresh || {});
-
-      return pullToRefreshStyles
-    }
-  }
-
-  const REGEX_UPX = /(\d+(\.\d+)?)[r|u]px/g;
-
-  function transformCSS (css) {
-    return css.replace(REGEX_UPX, (a, b) => {
-      return uni.upx2px(parseInt(b) || 0) + 'px'
-    })
-  }
-
-  function parseStyleUnit (styles) {
-    let newStyles = {};
-    const stylesStr = JSON.stringify(styles);
-    if (~stylesStr.indexOf('upx') || ~stylesStr.indexOf('rpx')) {
-      try {
-        newStyles = JSON.parse(transformCSS(stylesStr));
-      } catch (e) {
-        newStyles = styles;
-        console.error(e);
-      }
-    } else {
-      newStyles = JSON.parse(stylesStr);
-    }
-
-    return newStyles
-  }
-
-  const WEBVIEW_STYLE_BLACKLIST = [
-    'navigationBarBackgroundColor',
-    'navigationBarTextStyle',
-    'navigationBarTitleText',
-    'navigationBarShadow',
-    'navigationStyle',
-    'disableScroll',
-    'backgroundColor',
-    'backgroundTextStyle',
-    'enablePullDownRefresh',
-    'onReachBottomDistance',
-    'usingComponents',
-    // 需要解析的
-    'titleNView',
-    'pullToRefresh'
-  ];
-
-  function parseWebviewStyle (id, path, routeOptions = {}) {
-    const webviewStyle = {
-      bounce: 'vertical'
-    };
-
-    // 合并
-    routeOptions.window = parseStyleUnit(Object.assign(
-      JSON.parse(JSON.stringify(__uniConfig.window || {})),
-      routeOptions.window || {}
-    ));
-
-    Object.keys(routeOptions.window).forEach(name => {
-      if (WEBVIEW_STYLE_BLACKLIST.indexOf(name) === -1) {
-        webviewStyle[name] = routeOptions.window[name];
-      }
-    });
-
-    const backgroundColor = routeOptions.window.backgroundColor;
-    if (/^#[a-z0-9]{6}$/i.test(backgroundColor) || backgroundColor === 'transparent') {
-      if (!webviewStyle.background) {
-        webviewStyle.background = backgroundColor;
-      }
-      if (!webviewStyle.backgroundColorTop) {
-        webviewStyle.backgroundColorTop = backgroundColor;
-      }
-    }
-
-    const titleNView = parseTitleNView(routeOptions);
-    if (titleNView) {
-      if (
-        id === 1 &&
-        __uniConfig.realEntryPagePath &&
-        !routeOptions.meta.isQuit // 可能是tabBar
-      ) {
-        titleNView.autoBackButton = true;
-      }
-      webviewStyle.titleNView = titleNView;
-    }
-
-    const pullToRefresh = parsePullToRefresh(routeOptions);
-    if (pullToRefresh) {
-      if (pullToRefresh.style === 'circle') {
-        webviewStyle.bounce = 'none';
-      }
-      webviewStyle.pullToRefresh = pullToRefresh;
-    }
-
-    // 不支持 hide
-    if (webviewStyle.popGesture === 'hide') {
-      delete webviewStyle.popGesture;
-    }
-
-    if (routeOptions.meta.isQuit) { // 退出
-      webviewStyle.popGesture = plus.os.name === 'iOS' ? 'appback' : 'none';
-    }
-
-    // TODO 下拉刷新
-
-    if (path && routeOptions.meta.isNVue) {
-      webviewStyle.uniNView = {
-        path,
-        defaultFontSize: __uniConfig.defaultFontSize,
-        viewport: __uniConfig.viewport
+          else {
+              console.error(`${pkg}${cls}.${propOrMethod} ${name} is not found`);
+          }
       };
-    }
-
-    return webviewStyle
-  }
-
-  function backbuttonListener () {
-    uni.navigateBack({
-      from: 'backbutton'
-    });
-  }
-
-  function initPopupSubNVue (subNVueWebview, style, maskWebview) {
-    if (!maskWebview.popupSubNVueWebviews) {
-      maskWebview.popupSubNVueWebviews = {};
-    }
-
-    maskWebview.popupSubNVueWebviews[subNVueWebview.id] = subNVueWebview;
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(
-        `UNIAPP[webview][${maskWebview.id}]:add.popupSubNVueWebview[${subNVueWebview.id}]`
-      );
-    }
-
-    const hideSubNVue = function () {
-      maskWebview.setStyle({
-        mask: 'none'
-      });
-      subNVueWebview.hide('auto');
-    };
-    maskWebview.addEventListener('maskClick', hideSubNVue);
-    let isRemoved = false; // 增加个 remove 标记，防止出错
-    subNVueWebview.addEventListener('show', () => {
-      if (!isRemoved) {
-        plus.key.removeEventListener('backbutton', backbuttonListener);
-        plus.key.addEventListener('backbutton', hideSubNVue);
-        isRemoved = true;
-      }
-    });
-    subNVueWebview.addEventListener('hide', () => {
-      if (isRemoved) {
-        plus.key.removeEventListener('backbutton', hideSubNVue);
-        plus.key.addEventListener('backbutton', backbuttonListener);
-        isRemoved = false;
-      }
-    });
-    subNVueWebview.addEventListener('close', () => {
-      delete maskWebview.popupSubNVueWebviews[subNVueWebview.id];
-      if (isRemoved) {
-        plus.key.removeEventListener('backbutton', hideSubNVue);
-        plus.key.addEventListener('backbutton', backbuttonListener);
-        isRemoved = false;
-      }
-    });
-  }
-
-  function initNormalSubNVue (subNVueWebview, style, webview) {
-    webview.append(subNVueWebview);
-  }
-
-  function initSubNVue (subNVue, routeOptions, webview) {
-    if (!subNVue.path) {
-      return
-    }
-    const style = subNVue.style || {};
-    const isNavigationBar = subNVue.type === 'navigationBar';
-    const isPopup = subNVue.type === 'popup';
-
-    delete style.type;
-
-    if (isPopup && !subNVue.id) {
-      console.warn('subNVue[' + subNVue.path + '] is missing id');
-    }
-    // TODO lazyload
-
-    style.uniNView = {
-      path: subNVue.path.replace('.nvue', '.js'),
-      defaultFontSize: __uniConfig.defaultFontSize,
-      viewport: __uniConfig.viewport
-    };
-
-    const extras = {
-      __uniapp_host: routeOptions.path,
-      __uniapp_origin: style.uniNView.path.split('?')[0].replace('.js', ''),
-      __uniapp_origin_id: webview.id,
-      __uniapp_origin_type: webview.__uniapp_type
-    };
-
-    let maskWebview;
-
-    if (isNavigationBar) {
-      style.position = 'dock';
-      style.dock = 'top';
-      style.top = 0;
-      style.width = '100%';
-      style.height = NAVBAR_HEIGHT + getStatusbarHeight();
-      delete style.left;
-      delete style.right;
-      delete style.bottom;
-      delete style.margin;
-    } else if (isPopup) {
-      style.position = 'absolute';
-      if (isTabBarPage(routeOptions.path)) {
-        maskWebview = tabBar$1;
-      } else {
-        maskWebview = webview;
-      }
-      extras.__uniapp_mask = style.mask || 'rgba(0,0,0,0.5)';
-      extras.__uniapp_mask_id = maskWebview.id;
-    }
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(
-        `UNIAPP[webview][${webview.id}]:create[${subNVue.id}]:${JSON.stringify(style)}`
-      );
-    }
-    delete style.mask;
-    const subNVueWebview = plus.webview.create('', subNVue.id, style, extras);
-
-    if (isPopup) {
-      initPopupSubNVue(subNVueWebview, style, maskWebview);
-    } else {
-      initNormalSubNVue(subNVueWebview, style, webview);
-    }
-  }
-
-  function initSubNVues (routeOptions, webview) {
-    const subNVues = routeOptions.window.subNVues;
-    if (!subNVues || !subNVues.length) {
-      return
-    }
-    subNVues.forEach(subNVue => {
-      initSubNVue(subNVue, routeOptions, webview);
-    });
-  }
-
-  function onWebviewClose (webview) {
-    webview.popupSubNVueWebviews && webview.addEventListener('close', () => {
-      Object.keys(webview.popupSubNVueWebviews).forEach(id => {
-        if (process.env.NODE_ENV !== 'production') {
-          console.log(
-            `UNIAPP[webview][${webview.id}]:popupSubNVueWebview[${id}].close`
-          );
-        }
-        webview.popupSubNVueWebviews[id].close('none');
-      });
-    });
-  }
-
-  function onWebviewResize (webview) {
-    const onResize = function ({
-      width,
-      height
-    }) {
-      const landscape = Math.abs(plus.navigator.getOrientation()) === 90;
-      const res = {
-        deviceOrientation: landscape ? 'landscape' : 'portrait',
-        size: {
-          windowWidth: Math.ceil(width),
-          windowHeight: Math.ceil(height)
-        }
+      const baseArgs = instanceId
+          ? {
+              moduleName,
+              moduleType,
+              id: instanceId,
+              name: propOrMethod,
+              method: methodParams,
+          }
+          : {
+              moduleName,
+              moduleType,
+              package: pkg,
+              class: cls,
+              name: method || propOrMethod,
+              companion,
+              method: methodParams,
+          };
+      return (...args) => {
+          if (errMsg) {
+              throw new Error(errMsg);
+          }
+          const invokeArgs = extend({}, baseArgs, {
+              params: args.map((arg) => normalizeArg(arg)),
+          });
+          if (async) {
+              return new Promise((resolve, reject) => {
+                  if ((process.env.NODE_ENV !== 'production')) {
+                      console.log('uts.invokeAsync.args', invokeArgs);
+                  }
+                  getProxy().invokeAsync(invokeArgs, (res) => {
+                      if ((process.env.NODE_ENV !== 'production')) {
+                          console.log('uts.invokeAsync.result', res);
+                      }
+                      if (res.type !== 'return') {
+                          invokeCallback(res);
+                      }
+                      else {
+                          if (res.errMsg) {
+                              reject(res.errMsg);
+                          }
+                          else {
+                              resolve(res.params);
+                          }
+                      }
+                  });
+              });
+          }
+          if ((process.env.NODE_ENV !== 'production')) {
+              console.log('uts.invokeSync.args', invokeArgs);
+          }
+          return resolveSyncResult(getProxy().invokeSync(invokeArgs, invokeCallback));
       };
-      publish('onViewDidResize', res); // API
-      UniServiceJSBridge.emit('onResize', res, parseInt(webview.id)); // Page lifecycle
-    };
-    webview.addEventListener('resize', debounce(onResize, 50));
   }
-
-  function onWebviewRecovery (webview, routeOptions) {
-    const {
-      subscribe,
-      unsubscribe
-    } = UniServiceJSBridge;
-
-    const id = webview.id;
-    const onWebviewRecoveryReady = function (data, pageId) {
-      if (id !== pageId) {
-        return
+  function initUTSStaticMethod(async, opts) {
+      if (opts.main && !opts.method) {
+          if (typeof plus !== 'undefined' && plus.os.name === 'iOS') {
+              opts.method = 's_' + opts.name;
+          }
       }
-      unsubscribe(WEBVIEW_READY, onWebviewRecoveryReady);
-      if (process.env.NODE_ENV !== 'production') {
-        console.log(`UNIAPP[webview][${id}]:onWebviewRecoveryReady ready`);
-      }
-      // 恢复目标页面
-      pageId = parseInt(pageId);
-      const page = getCurrentPages(true).find(page => page.$page.id === pageId);
-      if (!page) {
-        return console.error(`Page[${pageId}] not found`)
-      }
-      page.$vm._$vd.restore();
-    };
-
-    webview.addEventListener('recovery', e => {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log(`UNIAPP[webview][${this.id}].recovery.reload:` + JSON.stringify({
-          path: routeOptions.path,
-          webviewId: id
-        }));
-      }
-      subscribe(WEBVIEW_READY, onWebviewRecoveryReady);
-    });
+      return initProxyFunction(async, opts, 0);
   }
-
-  function onWebviewPopGesture (webview) {
-    let popStartStatusBarStyle;
-    webview.addEventListener('popGesture', e => {
-      if (e.type === 'start') {
-        // 设置下一个页面的 statusBarStyle
-        const pages = getCurrentPages();
-        const page = pages[pages.length - 2];
-        popStartStatusBarStyle = lastStatusBarStyle;
-        const statusBarStyle = page && page.$page.meta.statusBarStyle;
-        statusBarStyle && setStatusBarStyle(statusBarStyle);
-      } else if (e.type === 'end' && !e.result) {
-        // 拖拽未完成,设置为当前状态栏前景色
-        setStatusBarStyle(popStartStatusBarStyle);
-      } else if (e.type === 'end' && e.result) {
-        const pages = getCurrentPages();
-        const page = pages[pages.length - 1];
-        page && page.$remove();
-
-        setStatusBarStyle();
-
-        UniServiceJSBridge.emit('onAppRoute', {
-          type: 'navigateBack'
-        });
+  const initUTSProxyFunction = initUTSStaticMethod;
+  function parseClassMethodName(name, methods) {
+      if (hasOwn(methods, name + 'ByJs')) {
+          return name + 'ByJs';
       }
-    });
+      return name;
   }
-
-  let preloadWebview;
-
-  let id$1 = 2;
-
-  const WEBVIEW_LISTENERS = {
-    pullToRefresh: 'onPullDownRefresh',
-    titleNViewSearchInputChanged: 'onNavigationBarSearchInputChanged',
-    titleNViewSearchInputConfirmed: 'onNavigationBarSearchInputConfirmed',
-    titleNViewSearchInputClicked: 'onNavigationBarSearchInputClicked',
-    titleNViewSearchInputFocusChanged: 'onNavigationBarSearchInputFocusChanged'
-  };
-
-  function setPreloadWebview (webview) {
-    preloadWebview = webview;
-  }
-
-  function noop$1 (str) {
-    return str
-  }
-
-  function getUniPageUrl (path, query) {
-    const queryString = query ? stringifyQuery(query, noop$1) : '';
-    return {
-      path: path.substr(1),
-      query: queryString ? queryString.substr(1) : queryString
-    }
-  }
-
-  function getDebugRefresh (path, query, routeOptions) {
-    const queryString = query ? stringifyQuery(query, noop$1) : '';
-    return {
-      isTab: routeOptions.meta.isTabBar,
-      arguments: JSON.stringify({
-        path: path.substr(1),
-        query: queryString ? queryString.substr(1) : queryString
-      })
-    }
-  }
-
-  function createWebview (path, routeOptions, query, extras = {}) {
-    if (routeOptions.meta.isNVue) {
-      const webviewId = id$1++;
-      const webviewStyle = parseWebviewStyle(
-        webviewId,
-        path,
-        routeOptions
-      );
-      webviewStyle.uniPageUrl = getUniPageUrl(path, query);
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('[uni-app] createWebview', webviewId, path, webviewStyle);
+  function initUTSProxyClass({ moduleName, moduleType, package: pkg, class: cls, constructor: { params: constructorParams }, methods, props, staticProps, staticMethods, errMsg, }) {
+      const baseOptions = {
+          moduleName,
+          moduleType,
+          package: pkg,
+          class: cls,
+          errMsg,
+      };
+      // iOS 需要为 ByJs 的 class 构造函数（如果包含JSONObject或UTSCallback类型）补充最后一个参数
+      if (typeof plus !== 'undefined' && plus.os.name === 'iOS') {
+          if (constructorParams.find((p) => p.type === 'UTSCallback' || p.type.indexOf('JSONObject') > 0)) {
+              constructorParams.push({ name: '_byJs', type: 'boolean' });
+          }
       }
-      // android 需要使用
-      webviewStyle.isTab = !!routeOptions.meta.isTabBar;
-      return plus.webview.create('', String(webviewId), webviewStyle, Object.assign({
-        nvue: true
-      }, extras))
-    }
-    if (id$1 === 2) { // 如果首页非 nvue，则直接返回 Launch Webview
-      return plus.webview.getLaunchWebview()
-    }
-    const webview = preloadWebview;
-    return webview
-  }
-
-  function initWebview (webview, routeOptions, path, query) {
-    // 首页或非 nvue 页面
-    if (webview.id === '1' || !routeOptions.meta.isNVue) {
-      const webviewStyle = parseWebviewStyle(
-        parseInt(webview.id),
-        '',
-        routeOptions
-      );
-
-      webviewStyle.uniPageUrl = getUniPageUrl(path, query);
-
-      if (!routeOptions.meta.isNVue) {
-        webviewStyle.debugRefresh = getDebugRefresh(path, query, routeOptions);
-      } else {
-        // android 需要使用
-        webviewStyle.isTab = !!routeOptions.meta.isTabBar;
-      }
-      if (process.env.NODE_ENV !== 'production') {
-        console.log('[uni-app] updateWebview', webviewStyle);
-      }
-
-      webview.setStyle(webviewStyle);
-    }
-
-    const {
-      on,
-      emit
-    } = UniServiceJSBridge;
-
-    initSubNVues(routeOptions, webview);
-
-    Object.keys(WEBVIEW_LISTENERS).forEach(name => {
-      webview.addEventListener(name, (e) => {
-        emit(WEBVIEW_LISTENERS[name], e, parseInt(webview.id));
+      const ProxyClass = class UTSClass {
+          constructor(...params) {
+              if (errMsg) {
+                  throw new Error(errMsg);
+              }
+              const target = {};
+              // 初始化实例 ID
+              const instanceId = initProxyFunction(false, extend({ name: 'constructor', params: constructorParams }, baseOptions), 0).apply(null, params);
+              if (!instanceId) {
+                  throw new Error(`new ${cls} is failed`);
+              }
+              return new Proxy(this, {
+                  get(_, name) {
+                      if (!target[name]) {
+                          //实例方法
+                          name = parseClassMethodName(name, methods);
+                          if (hasOwn(methods, name)) {
+                              const { async, params } = methods[name];
+                              target[name] = initUTSInstanceMethod(!!async, extend({
+                                  name,
+                                  params,
+                              }, baseOptions), instanceId);
+                          }
+                          else if (props.includes(name)) {
+                              // 实例属性
+                              return invokePropGetter({
+                                  moduleName,
+                                  moduleType,
+                                  id: instanceId,
+                                  name: name,
+                                  errMsg,
+                              });
+                          }
+                      }
+                      return target[name];
+                  },
+              });
+          }
+      };
+      const staticMethodCache = {};
+      return new Proxy(ProxyClass, {
+          get(target, name, receiver) {
+              name = parseClassMethodName(name, staticMethods);
+              if (hasOwn(staticMethods, name)) {
+                  if (!staticMethodCache[name]) {
+                      const { async, params } = staticMethods[name];
+                      // 静态方法
+                      staticMethodCache[name] = initUTSStaticMethod(!!async, extend({ name, companion: true, params }, baseOptions));
+                  }
+                  return staticMethodCache[name];
+              }
+              if (staticProps.includes(name)) {
+                  // 静态属性
+                  return invokePropGetter(extend({ name: name, companion: true }, baseOptions));
+              }
+              return Reflect.get(target, name, receiver);
+          },
       });
-    });
-
-    onWebviewClose(webview);
-    onWebviewResize(webview);
-
-    if (plus.os.name === 'iOS') {
-      !webview.nvue && onWebviewRecovery(webview, routeOptions);
-      onWebviewPopGesture(webview);
-    }
-
-    on(webview.id + '.startPullDownRefresh', () => {
-      webview.beginPullToRefresh();
-    });
-
-    on(webview.id + '.stopPullDownRefresh', () => {
-      webview.endPullToRefresh();
-    });
-
-    return webview
   }
-
-  function createPreloadWebview () {
-    if (!preloadWebview || preloadWebview.__uniapp_route) { // 不存在，或已被使用
-      preloadWebview = plus.webview.create(VIEW_WEBVIEW_PATH, String(id$1++));
-      if (process.env.NODE_ENV !== 'production') {
-        console.log(`[uni-app] preloadWebview[${preloadWebview.id}]`);
+  function initUTSPackageName(name, is_uni_modules) {
+      if (typeof plus !== 'undefined' && plus.os.name === 'Android') {
+          return 'uts.sdk.' + (is_uni_modules ? 'modules.' : '') + name;
       }
-    }
-    return preloadWebview
+      return '';
   }
-
-  const webviewReadyCallbacks = {};
-
-  function registerWebviewReady (pageId, callback) {
-    (webviewReadyCallbacks[pageId] || (webviewReadyCallbacks[pageId] = [])).push(callback);
+  function initUTSIndexClassName(moduleName, is_uni_modules) {
+      if (typeof plus === 'undefined') {
+          return '';
+      }
+      return initUTSClassName(moduleName, plus.os.name === 'iOS' ? 'IndexSwift' : 'IndexKt', is_uni_modules);
   }
-
-  function consumeWebviewReady (pageId) {
-    const callbacks = webviewReadyCallbacks[pageId];
-    Array.isArray(callbacks) && callbacks.forEach(callback => callback());
-    delete webviewReadyCallbacks[pageId];
+  function initUTSClassName(moduleName, className, is_uni_modules) {
+      if (typeof plus === 'undefined') {
+          return '';
+      }
+      if (plus.os.name === 'Android') {
+          return className;
+      }
+      if (plus.os.name === 'iOS') {
+          return ('UTSSDK' +
+              (is_uni_modules ? 'Modules' : '') +
+              capitalize(moduleName) +
+              capitalize(className));
+      }
+      return '';
   }
-
-  let todoNavigator = false;
-
-  function setTodoNavigator (path, callback, msg) {
-    todoNavigator = {
-      path: path,
-      nvue: __uniRoutes.find(route => route.path === path).meta.isNVue,
-      navigate: callback
-    };
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`todoNavigator:${todoNavigator.path} ${msg}`);
-    }
+  const pluginDefines = {};
+  function registerUTSPlugin(name, define) {
+      pluginDefines[name] = define;
   }
-
-  function navigate (path, callback, isAppLaunch) {
-    {
-      if (isAppLaunch && __uniConfig.splashscreen && __uniConfig.splashscreen.autoclose && (!__uniConfig.splashscreen.alwaysShowBeforeRender)) {
-        plus.navigator.closeSplashscreen();
+  function requireUTSPlugin(name) {
+      const define = pluginDefines[name];
+      if (!define) {
+          console.error(`${name} is not found`);
       }
-      if (!isAppLaunch && todoNavigator) {
-        return console.error(`Waiting to navigate to: ${todoNavigator.path}, do not operate continuously: ${path}.`)
-      }
-      if (__uniConfig.renderer === 'native') { // 纯原生无需wait逻辑
-        // 如果是首页还未初始化，需要等一等，其他无需等待
-        if (getCurrentPages().length === 0) {
-          return setTodoNavigator(path, callback, 'waitForReady')
-        }
-        return callback()
-      }
-      // 未创建 preloadWebview 或 preloadWebview 已被使用
-      const waitPreloadWebview = !preloadWebview || (preloadWebview && preloadWebview.__uniapp_route);
-      // 已创建未 loaded
-      const waitPreloadWebviewReady = preloadWebview && !preloadWebview.loaded;
-
-      if (waitPreloadWebview || waitPreloadWebviewReady) {
-        setTodoNavigator(path, callback, waitPreloadWebview ? 'waitForCreate' : 'waitForReady');
-      } else {
-        callback();
-      }
-      if (waitPreloadWebviewReady) {
-        registerWebviewReady(preloadWebview.id, todoNavigate);
-      }
-    }
-  }
-
-  function todoNavigate () {
-    if (!todoNavigator) {
-      return
-    }
-    const {
-      navigate
-    } = todoNavigator;
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`todoNavigate:${todoNavigator.path}`);
-    }
-    todoNavigator = false;
-    return navigate()
-  }
-
-  function navigateFinish () {
-    {
-      if (__uniConfig.renderer === 'native') {
-        if (!todoNavigator) {
-          return
-        }
-        if (todoNavigator.nvue) {
-          return todoNavigate()
-        }
-        return
-      }
-      // 创建预加载
-      const preloadWebview = createPreloadWebview();
-      if (process.env.NODE_ENV !== 'production') {
-        console.log(`navigateFinish.preloadWebview:${preloadWebview.id}`);
-      }
-      if (!todoNavigator) {
-        return
-      }
-      if (todoNavigator.nvue) {
-        return todoNavigate()
-      }
-      preloadWebview.loaded
-        ? todoNavigator.navigate()
-        : registerWebviewReady(preloadWebview.id, todoNavigate);
-    }
+      return define;
   }
 
   function closeWebview (webview, animationType, animationDuration) {
@@ -9281,294 +10996,6 @@ var serviceContext = (function () {
     id$2++;
     const eventChannel = new EventChannel(id$2, events);
     return eventChannel
-  }
-
-  const pageFactory = Object.create(null);
-
-  function definePage (name, createPageVueComponent) {
-    pageFactory[name] = createPageVueComponent;
-  }
-
-  const getPageVueComponent = cached(function (pagePath) {
-    return pageFactory[pagePath]()
-  });
-
-  function createPage (pagePath, pageId, pageQuery, pageInstance) {
-    if (!pageFactory[pagePath]) {
-      console.error(`${pagePath} not found`);
-    }
-    const startTime = Date.now();
-    const pageVm = new (getPageVueComponent(pagePath))({
-      mpType: 'page',
-      pageId,
-      pagePath,
-      pageQuery,
-      pageInstance
-    });
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`new ${pagePath}[${pageId}]:time(${Date.now() - startTime})`);
-    }
-    return pageVm
-  }
-
-  let isInitEntryPage = false;
-
-  function initEntryPage () {
-    if (isInitEntryPage) {
-      return
-    }
-    isInitEntryPage = true;
-
-    let entryPagePath;
-    let entryPageQuery;
-
-    const weexPlus = weex.requireModule('plus');
-
-    if (weexPlus.getRedirectInfo) {
-      const info = weexPlus.getRedirectInfo() || {};
-      entryPagePath = info.path;
-      entryPageQuery = info.query ? ('?' + info.query) : '';
-    } else {
-      const argsJsonStr = plus.runtime.arguments;
-      if (!argsJsonStr) {
-        return
-      }
-      try {
-        const args = JSON.parse(argsJsonStr);
-        entryPagePath = args.path || args.pathName;
-        entryPageQuery = args.query ? ('?' + args.query) : '';
-      } catch (e) {}
-    }
-
-    if (!entryPagePath || entryPagePath === __uniConfig.entryPagePath) {
-      if (entryPageQuery) {
-        __uniConfig.entryPageQuery = entryPageQuery;
-      }
-      return
-    }
-
-    const entryRoute = '/' + entryPagePath;
-    const routeOptions = __uniRoutes.find(route => route.path === entryRoute);
-    if (!routeOptions) {
-      console.error(`[uni-app] ${entryPagePath} not found...`);
-      return
-    }
-
-    if (!routeOptions.meta.isTabBar) {
-      __uniConfig.realEntryPagePath = __uniConfig.realEntryPagePath || __uniConfig.entryPagePath;
-    }
-
-    __uniConfig.entryPagePath = entryPagePath;
-    __uniConfig.entryPageQuery = entryPageQuery;
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`[uni-app] entryPagePath(${entryPagePath + entryPageQuery})`);
-    }
-  }
-
-  const pages = [];
-
-  function getCurrentPages$1 (returnAll) {
-    return returnAll ? pages.slice(0) : pages.filter(page => {
-      return !page.$page.meta.isTabBar || page.$page.meta.visible
-    })
-  }
-
-  const preloadWebviews = {};
-
-  function removePreloadWebview (webview) {
-    const url = Object.keys(preloadWebviews).find(url => preloadWebviews[url].id === webview.id);
-    if (url) {
-      if (process.env.NODE_ENV !== 'production') {
-        console.log(`[uni-app] removePreloadWebview(${webview.id})`);
-      }
-      delete preloadWebviews[url];
-    }
-  }
-
-  function closePreloadWebview ({
-    url
-  }) {
-    const webview = preloadWebviews[url];
-    if (webview) {
-      if (webview.__page__) {
-        if (!getCurrentPages$1(true).find(page => page === webview.__page__)) {
-          // 未使用
-          webview.close('none');
-        } else { // 被使用
-          webview.__preload__ = false;
-        }
-      } else { // 未使用
-        webview.close('none');
-      }
-      delete preloadWebviews[url];
-    }
-    return webview
-  }
-
-  function preloadWebview$1 ({
-    url,
-    path,
-    query
-  }) {
-    if (!preloadWebviews[url]) {
-      const routeOptions = JSON.parse(JSON.stringify(__uniRoutes.find(route => route.path === path)));
-      preloadWebviews[url] = createWebview(path, routeOptions, query, {
-        __preload__: true,
-        __query__: JSON.stringify(query)
-      });
-    }
-    return preloadWebviews[url]
-  }
-
-  /**
-   * 首页需要主动registerPage，二级页面路由跳转时registerPage
-   */
-  function registerPage ({
-    url,
-    path,
-    query,
-    openType,
-    webview,
-    eventChannel
-  }) {
-    // fast 模式，nvue 首页时，初始化下 entry page
-    webview && initEntryPage();
-
-    if (preloadWebviews[url]) {
-      webview = preloadWebviews[url];
-      if (webview.__page__) {
-        // 该预载页面已处于显示状态,不再使用该预加载页面,直接新开
-        if (getCurrentPages$1(true).find(page => page === webview.__page__)) {
-          if (process.env.NODE_ENV !== 'production') {
-            console.log(`[uni-app] preloadWebview(${path},${webview.id}) already in use`);
-          }
-          webview = null;
-        } else {
-          if (eventChannel) {
-            webview.__page__.eventChannel = eventChannel;
-          }
-          pages.push(webview.__page__);
-          if (process.env.NODE_ENV !== 'production') {
-            console.log(`[uni-app] reuse preloadWebview(${path},${webview.id})`);
-          }
-          return webview
-        }
-      }
-    }
-    const routeOptions = JSON.parse(JSON.stringify(__uniRoutes.find(route => route.path === path)));
-
-    if (
-      openType === 'reLaunch' ||
-      (
-        !__uniConfig.realEntryPagePath &&
-        getCurrentPages$1().length === 0 // redirectTo
-      )
-    ) {
-      routeOptions.meta.isQuit = true;
-    } else if (!routeOptions.meta.isTabBar) {
-      routeOptions.meta.isQuit = false;
-    }
-
-    if (!webview) {
-      webview = createWebview(path, routeOptions, query);
-    } else {
-      webview = plus.webview.getWebviewById(webview.id);
-      webview.nvue = routeOptions.meta.isNVue;
-    }
-
-    if (routeOptions.meta.isTabBar) {
-      routeOptions.meta.visible = true;
-    }
-
-    if (routeOptions.meta.isTabBar) {
-      tabBar$1.append(webview);
-    }
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log(`[uni-app] registerPage(${path},${webview.id})`);
-    }
-
-    const isLaunchNVuePage = webview.id === '1' && webview.nvue;
-
-    initWebview(webview, routeOptions, path, query);
-
-    const route = path.slice(1);
-
-    webview.__uniapp_route = route;
-
-    const pageInstance = {
-      route,
-      options: Object.assign({}, query || {}),
-      $getAppWebview () {
-        // 重要，不能直接返回 webview 对象，因为 plus 可能会被二次替换，返回的 webview 对象内部的 plus 不正确
-        // 导致 webview.getStyle 等逻辑出错(旧的 webview 内部 plus 被释放)
-        return plus.webview.getWebviewById(webview.id)
-      },
-      eventChannel,
-      $page: {
-        id: parseInt(webview.id),
-        meta: routeOptions.meta,
-        path,
-        route,
-        fullPath: url,
-        openType
-      },
-      $remove () {
-        const index = pages.findIndex(page => page === this);
-        if (index !== -1) {
-          if (!webview.nvue) {
-            this.$vm.$destroy();
-          }
-          pages.splice(index, 1);
-          if (process.env.NODE_ENV !== 'production') {
-            console.log('[uni-app] removePage(' + path + ')[' + webview.id + ']');
-          }
-        }
-      },
-      // 兼容小程序框架
-      selectComponent (selector) {
-        return this.$vm.selectComponent(selector)
-      },
-      selectAllComponents (selector) {
-        return this.$vm.selectAllComponents(selector)
-      }
-    };
-
-    pages.push(pageInstance);
-
-    if (webview.__preload__) {
-      webview.__page__ = pageInstance;
-    }
-
-    // 首页是 nvue 时，在 registerPage 时，执行路由堆栈
-    if (isLaunchNVuePage) {
-      if (
-        __uniConfig.splashscreen &&
-        __uniConfig.splashscreen.autoclose &&
-        !__uniConfig.splashscreen.alwaysShowBeforeRender
-      ) {
-        plus.navigator.closeSplashscreen();
-      }
-      __uniConfig.onReady(function () {
-        navigateFinish();
-      });
-    }
-
-    {
-      if (!webview.nvue) {
-        const pageId = webview.id;
-        try {
-          loadPage(route, () => {
-            createPage(route, pageId, query, pageInstance).$mount();
-          });
-        } catch (e) {
-          console.error(e);
-        }
-      }
-    }
-
-    return webview
   }
 
   function _navigateTo ({
@@ -10335,31 +11762,56 @@ var serviceContext = (function () {
     cancelText,
     cancelColor,
     confirmText,
-    confirmColor
+    confirmColor,
+    editable = false,
+    placeholderText = ''
   } = {}, callbackId) {
+    const buttons = showCancel ? [cancelText, confirmText] : [confirmText];
+    const tip = editable ? placeholderText : buttons;
+
     content = content || ' ';
-    plus.nativeUI.confirm(content, (e) => {
+    plus.nativeUI[editable ? 'prompt' : 'confirm'](content, (e) => {
       if (showCancel) {
-        invoke$1(callbackId, {
+        const isConfirm = e.index === 1;
+        const res = {
           errMsg: 'showModal:ok',
-          confirm: e.index === 1,
+          confirm: isConfirm,
           cancel: e.index === 0 || e.index === -1
-        });
+        };
+        isConfirm && editable && (res.content = e.value);
+        invoke$1(callbackId, res);
       } else {
-        invoke$1(callbackId, {
+        const res = {
           errMsg: 'showModal:ok',
           confirm: e.index === 0,
           cancel: false
-        });
+        };
+        editable && (res.content = e.value);
+        invoke$1(callbackId, res);
       }
-    }, title, showCancel ? [cancelText, confirmText] : [confirmText]);
+    }, title, tip, buttons);
   }
+
+  const ACTION_SHEET_THEME = {
+    light: {
+      itemColor: '#000000'
+    },
+    dark: {
+      itemColor: 'rgba(255, 255, 255, 0.8)'
+    }
+  };
   function showActionSheet$1 ({
     itemList = [],
-    itemColor = '#000000',
+    itemColor,
     title = '',
     popover
   }, callbackId) {
+    // #000 by default in protocols
+    if (itemColor === '#000' && __uniConfig.darkmode) {
+      itemColor =
+        ACTION_SHEET_THEME[plus.navigator.getUIStyle()]
+          .itemColor;
+    }
     const options = {
       buttons: itemList.map(item => ({
         title: item,
@@ -10446,9 +11898,11 @@ var serviceContext = (function () {
     text,
     iconPath,
     selectedIconPath,
-    pagePath
+    pagePath,
+    visible,
+    iconfont
   }) {
-    tabBar$1.setTabBarItem(index, text, iconPath, selectedIconPath);
+    tabBar$1.setTabBarItem(index, text, iconPath, selectedIconPath, visible, iconfont);
     const route = pagePath && __uniRoutes.find(({ path }) => path === pagePath);
     if (route) {
       const meta = route.meta;
@@ -10513,16 +11967,16 @@ var serviceContext = (function () {
     }
   }
 
-  const callbacks$4 = {};
+  const callbacks$5 = {};
 
   function createCallbacks (namespace) {
-    let scopedCallbacks = callbacks$4[namespace];
+    let scopedCallbacks = callbacks$5[namespace];
     if (!scopedCallbacks) {
       scopedCallbacks = {
         id: 1,
         callbacks: Object.create(null)
       };
-      callbacks$4[namespace] = scopedCallbacks;
+      callbacks$5[namespace] = scopedCallbacks;
     }
     return {
       get (id) {
@@ -10760,9 +12214,7 @@ var serviceContext = (function () {
         this._dispatchEvent('adClicked', {});
       });
 
-      if (this._preload) {
-        this._loadAd();
-      }
+      this._loadAd();
     }
 
     get isExpired () {
@@ -10901,7 +12353,9 @@ var serviceContext = (function () {
 
         const data = {
           code: e.code,
-          errMsg: e.message
+          errCode: e.code,
+          errMsg: e.message,
+          detail: e.detail
         };
 
         this._adError = data;
@@ -10911,6 +12365,7 @@ var serviceContext = (function () {
         const error = new Error(JSON.stringify(this._adError));
         error.code = e.code;
         error.errMsg = e.message;
+        error.detail = e.detail;
 
         if (this._loadPromiseReject != null) {
           this._loadPromiseReject(error);
@@ -11019,8 +12474,8 @@ var serviceContext = (function () {
     if (!sdkCache[provider]) {
       sdkCache[provider] = {};
     }
-    if (typeof sdkCache[provider].plugin === 'object') {
-      options.success(sdkCache[provider].plugin);
+    if (typeof sdkCache[provider].instance === 'object') {
+      options.success(sdkCache[provider].instance);
       return
     }
 
@@ -11029,14 +12484,14 @@ var serviceContext = (function () {
     }
     sdkQueue[provider].push(options);
 
-    if (sdkCache[provider].status === true) {
+    if (sdkCache[provider].loading === true) {
       options.__plugin = sdkCache[provider].plugin;
       return
     }
-    sdkCache[provider].status = true;
-
-    const plugin = requireNativePlugin(provider);
-    if (!plugin || !plugin.initSDK) {
+    sdkCache[provider].loading = true;
+    const plugin = requireNativePlugin(provider) || {};
+    const initFunction = plugin.init || plugin.initSDK;
+    if (!initFunction) {
       sdkQueue[provider].forEach((item) => {
         item.fail({
           code: -1,
@@ -11044,19 +12499,18 @@ var serviceContext = (function () {
         });
       });
       sdkQueue[provider].length = 0;
-      sdkCache[provider].status = false;
+      sdkCache[provider].loading = false;
       return
     }
-
-    // TODO
     sdkCache[provider].plugin = plugin;
     options.__plugin = plugin;
-    plugin.initSDK((res) => {
-      const isSuccess = (res.code === 1 || res.code === '1');
+    initFunction((res) => {
+      const code = res.code;
+      const isSuccess = (provider === 'BXM-AD') ? (code === 0 || code === 1) : (code === 0);
       if (isSuccess) {
-        sdkCache[provider].plugin = plugin;
+        sdkCache[provider].instance = plugin;
       } else {
-        sdkCache[provider].status = false;
+        sdkCache[provider].loading = false;
       }
 
       sdkQueue[provider].forEach((item) => {
@@ -11085,7 +12539,7 @@ var serviceContext = (function () {
       this._adError = '';
       this._adpid = options.adpid;
       this._provider = options.provider;
-      this._userData = options.userData;
+      this._userData = options.userData || {};
       this._isLoaded = false;
       this._isLoading = false;
       this._loadPromiseResolve = null;
@@ -11173,7 +12627,7 @@ var serviceContext = (function () {
     }
 
     bindUserData (data) {
-      if (this._ad !== null) {
+      if (this._ad !== null && this._ad.bindUserData) {
         this._ad.bindUserData(data);
       }
     }
@@ -11186,7 +12640,8 @@ var serviceContext = (function () {
         this._isLoading = true;
 
         this._ad.loadData({
-          adpid: this._adpid
+          adpid: this._adpid,
+          ...this._userData
         }, (res) => {
           this._isLoaded = true;
           this._isLoading = false;
@@ -11262,6 +12717,13 @@ var serviceContext = (function () {
 
   var api = /*#__PURE__*/Object.freeze({
     __proto__: null,
+    initUTSProxyClass: initUTSProxyClass,
+    initUTSProxyFunction: initUTSProxyFunction,
+    initUTSIndexClassName: initUTSIndexClassName,
+    initUTSClassName: initUTSClassName,
+    initUTSPackageName: initUTSPackageName,
+    requireUTSPlugin: requireUTSPlugin,
+    registerUTSPlugin: registerUTSPlugin,
     startPullDownRefresh: startPullDownRefresh,
     stopPullDownRefresh: stopPullDownRefresh,
     $on: $on$1,
@@ -11280,12 +12742,13 @@ var serviceContext = (function () {
     getBackgroundAudioState: getBackgroundAudioState,
     operateMapPlayer: operateMapPlayer$2,
     operateVideoPlayer: operateVideoPlayer$2,
+    LivePusherContext: LivePusherContext$1,
     createLivePusherContext: createLivePusherContext$1,
     startAccelerometer: startAccelerometer,
     stopAccelerometer: stopAccelerometer,
     onAccelerometerChange: onAccelerometerChange,
     offAccelerometerChange: offAccelerometerChange,
-    addPhoneContact: addPhoneContact,
+    addPhoneContact: addPhoneContact$1,
     onBluetoothDeviceFound: onBluetoothDeviceFound,
     onBluetoothAdapterStateChange: onBluetoothAdapterStateChange,
     onBLEConnectionStateChange: onBLEConnectionStateChange,
@@ -11326,10 +12789,17 @@ var serviceContext = (function () {
     checkIsSupportSoterAuthentication: checkIsSupportSoterAuthentication,
     checkIsSoterEnrolledInDevice: checkIsSoterEnrolledInDevice,
     startSoterAuthentication: startSoterAuthentication,
+    weexGetSystemInfoSync: weexGetSystemInfoSync,
+    getDeviceInfo: getDeviceInfo,
+    getAppBaseInfo: getAppBaseInfo,
     getSystemInfoSync: getSystemInfoSync,
     getSystemInfo: getSystemInfo,
     vibrateLong: vibrateLong,
     vibrateShort: vibrateShort,
+    getWindowInfo: getWindowInfo,
+    getSystemSetting: getSystemSetting,
+    getAppAuthorizeSetting: getAppAuthorizeSetting,
+    openAppAuthorizeSetting: openAppAuthorizeSetting,
     saveFile: saveFile$1,
     getSavedFileList: getSavedFileList,
     getFileInfo: getFileInfo$1,
@@ -11339,6 +12809,12 @@ var serviceContext = (function () {
     chooseLocation: chooseLocation$3,
     getLocation: getLocation$1,
     openLocation: openLocation$3,
+    startLocationUpdate: startLocationUpdate,
+    stopLocationUpdate: stopLocationUpdate,
+    onLocationChange: onLocationChange,
+    offLocationChange: offLocationChange,
+    onLocationChangeError: onLocationChangeError,
+    offLocationChangeError: offLocationChangeError,
     startRecord: startRecord,
     stopRecord: stopRecord,
     playVoice: playVoice,
@@ -11346,11 +12822,12 @@ var serviceContext = (function () {
     stopVoice: stopVoice,
     chooseImage: chooseImage$1,
     chooseVideo: chooseVideo$1,
-    compressImage: compressImage$2,
+    compressImage: compressImage$1,
     compressVideo: compressVideo$1,
     getImageInfo: getImageInfo$1,
     getVideoInfo: getVideoInfo$1,
     previewImagePlus: previewImagePlus,
+    closePreviewImagePlus: closePreviewImagePlus,
     operateRecorder: operateRecorder,
     saveImageToPhotosAlbum: saveImageToPhotosAlbum$1,
     saveVideoToPhotosAlbum: saveVideoToPhotosAlbum,
@@ -11359,6 +12836,7 @@ var serviceContext = (function () {
     createRequestTaskById: createRequestTaskById,
     createRequestTask: createRequestTask,
     operateRequestTask: operateRequestTask,
+    configMTLS: configMTLS$1,
     createSocketTask: createSocketTask,
     operateSocketTask: operateSocketTask,
     operateUploadTask: operateUploadTask,
@@ -11370,21 +12848,30 @@ var serviceContext = (function () {
     operateWXData: operateWXData,
     preLogin: preLogin$1,
     closeAuthView: closeAuthView,
+    getCheckBoxState: getCheckBoxState,
+    getUniverifyManager: getUniverifyManager,
     requestPayment: requestPayment,
     subscribePush: subscribePush,
     unsubscribePush: unsubscribePush,
     onPush: onPush,
     offPush: offPush,
+    createPushMessage: createPushMessage,
     requireNativePlugin: requireNativePlugin$1,
     shareAppMessageDirectly: shareAppMessageDirectly,
     share: share,
     shareWithSystem: shareWithSystem,
     restoreGlobal: restoreGlobal,
+    requireGlobal: requireGlobal,
     getSubNVueById: getSubNVueById,
     getCurrentSubNVue: getCurrentSubNVue,
+    onHostEventReceive: onHostEventReceive,
     onNativeEventReceive: onNativeEventReceive,
     sendNativeEvent: sendNativeEvent,
     loadSubPackage: loadSubPackage$2,
+    sendHostEvent: sendHostEvent,
+    navigateToMiniProgram: navigateToMiniProgram,
+    getLaunchOptionsSync: getLaunchOptionsSync,
+    getEnterOptionsSync: getEnterOptionsSync,
     navigateBack: navigateBack$1,
     navigateTo: navigateTo$1,
     reLaunch: reLaunch$1,
@@ -11454,7 +12941,7 @@ var serviceContext = (function () {
     return page.$vm
   }
 
-  function getCurrentPageId () {
+  function getCurrentPageId$1 () {
     const pages = getCurrentPages();
     const page = pages[pages.length - 1];
     return page && page.$page.id
@@ -11472,9 +12959,9 @@ var serviceContext = (function () {
     'error',
     'waiting'
   ];
-  const callbacks$5 = {};
+  const callbacks$6 = {};
   eventNames$2.forEach(name => {
-    callbacks$5[name] = [];
+    callbacks$6[name] = [];
   });
 
   const props = [
@@ -11527,8 +13014,15 @@ var serviceContext = (function () {
       name: 'protocol',
       readonly: true,
       default: 'http'
+    },
+    {
+      name: 'playbackRate',
+      default: 1,
+      cache: true
     }
   ];
+
+  const backgroundEvents = ['prev', 'next'];
 
   class BackgroundAudioManager {
     constructor () {
@@ -11538,13 +13032,22 @@ var serviceContext = (function () {
         errMsg,
         errCode
       }) => {
-        callbacks$5[state].forEach(callback => {
+        callbacks$6[state].forEach(callback => {
           if (typeof callback === 'function') {
             callback(state === 'error' ? {
               errMsg,
               errCode
             } : {});
           }
+        });
+      });
+      backgroundEvents.forEach((name) => {
+        onMethod(`onBackgroundAudio${name[0].toUpperCase() + name.substr(1)}`, () => {
+          callbacks$6[name].forEach(callback => {
+            if (typeof callback === 'function') {
+              callback({});
+            }
+          });
         });
       });
       props.forEach(item => {
@@ -11560,7 +13063,7 @@ var serviceContext = (function () {
             this._options[name] = value;
             invokeMethod('setBackgroundAudioState', Object.assign({}, this._options, {
               audioId: this.id
-            }));
+            }), name);
           };
         }
         Object.defineProperty(this, name, data);
@@ -11595,7 +13098,7 @@ var serviceContext = (function () {
   eventNames$2.forEach(item => {
     const name = item[0].toUpperCase() + item.substr(1);
     BackgroundAudioManager.prototype[`on${name}`] = function (callback) {
-      callbacks$5[item].push(callback);
+      callbacks$6[item].push(callback);
     };
   });
 
@@ -15211,7 +16714,7 @@ var serviceContext = (function () {
 
   var zstream = ZStream;
 
-  var toString = Object.prototype.toString;
+  var toString$1 = Object.prototype.toString;
 
   /* Public constants ==========================================================*/
   /* ===========================================================================*/
@@ -15375,7 +16878,7 @@ var serviceContext = (function () {
       if (typeof opt.dictionary === 'string') {
         // If we need to compress text, change encoding to utf8.
         dict = strings.string2buf(opt.dictionary);
-      } else if (toString.call(opt.dictionary) === '[object ArrayBuffer]') {
+      } else if (toString$1.call(opt.dictionary) === '[object ArrayBuffer]') {
         dict = new Uint8Array(opt.dictionary);
       } else {
         dict = opt.dictionary;
@@ -15433,7 +16936,7 @@ var serviceContext = (function () {
     if (typeof data === 'string') {
       // If we need to compress text, change encoding to utf8.
       strm.input = strings.string2buf(data);
-    } else if (toString.call(data) === '[object ArrayBuffer]') {
+    } else if (toString$1.call(data) === '[object ArrayBuffer]') {
       strm.input = new Uint8Array(data);
     } else {
       strm.input = data;
@@ -17985,7 +19488,7 @@ var serviceContext = (function () {
 
   var gzheader = GZheader;
 
-  var toString$1 = Object.prototype.toString;
+  var toString$2 = Object.prototype.toString;
 
   /**
    * class Inflate
@@ -18126,7 +19629,7 @@ var serviceContext = (function () {
       // Convert data if needed
       if (typeof opt.dictionary === 'string') {
         opt.dictionary = strings.string2buf(opt.dictionary);
-      } else if (toString$1.call(opt.dictionary) === '[object ArrayBuffer]') {
+      } else if (toString$2.call(opt.dictionary) === '[object ArrayBuffer]') {
         opt.dictionary = new Uint8Array(opt.dictionary);
       }
       if (opt.raw) { //In raw mode we need to set the dictionary early
@@ -18184,7 +19687,7 @@ var serviceContext = (function () {
     if (typeof data === 'string') {
       // Only binary strings can be decompressed on practice
       strm.input = strings.binstring2buf(data);
-    } else if (toString$1.call(data) === '[object ArrayBuffer]') {
+    } else if (toString$2.call(data) === '[object ArrayBuffer]') {
       strm.input = new Uint8Array(data);
     } else {
       strm.input = data;
@@ -18633,8 +20136,9 @@ var serviceContext = (function () {
   }
 
   function Pattern (image, repetition) {
-    this.image = image;
-    this.repetition = repetition;
+    this.type = 'pattern';
+    this.data = image;
+    this.colorStop = repetition;
   }
 
   class CanvasGradient {
@@ -18770,6 +20274,10 @@ var serviceContext = (function () {
     beginPath () {
       this.path = [];
       this.subpath = [];
+      this.path.push({
+        method: 'beginPath',
+        data: []
+      });
     }
 
     moveTo (x, y) {
@@ -19184,7 +20692,7 @@ var serviceContext = (function () {
     if (context) {
       return new CanvasContext(id, context.$page.id)
     }
-    const pageId = getCurrentPageId();
+    const pageId = getCurrentPageId$1();
     if (pageId) {
       return new CanvasContext(id, pageId)
     } else {
@@ -19199,7 +20707,7 @@ var serviceContext = (function () {
     width,
     height
   }, callbackId) {
-    const pageId = getCurrentPageId();
+    const pageId = getCurrentPageId$1();
     if (!pageId) {
       invoke$1(callbackId, {
         errMsg: 'canvasGetImageData:fail'
@@ -19235,7 +20743,7 @@ var serviceContext = (function () {
     width,
     height
   }, callbackId) {
-    var pageId = getCurrentPageId();
+    var pageId = getCurrentPageId$1();
     if (!pageId) {
       invoke$1(callbackId, {
         errMsg: 'canvasPutImageData:fail'
@@ -19278,7 +20786,7 @@ var serviceContext = (function () {
     fileType,
     quality
   }, callbackId) {
-    var pageId = getCurrentPageId();
+    var pageId = getCurrentPageId$1();
     if (!pageId) {
       invoke$1(callbackId, {
         errMsg: 'canvasToTempFilePath:fail'
@@ -19323,7 +20831,7 @@ var serviceContext = (function () {
     callback.invoke(callbackId, data);
   });
 
-  const methods = ['getCenterLocation',
+  const methods$1 = ['getCenterLocation',
     'moveToLocation',
     'getScale',
     'getRegion',
@@ -19338,12 +20846,20 @@ var serviceContext = (function () {
     'addMarkers',
     'removeMarkers',
     'moveAlong',
+    'setLocMarkerIcon',
     'openMapApp'];
 
   class MapContext {
     constructor (id, pageVm) {
       this.id = id;
       this.pageVm = pageVm;
+    }
+
+    on (name, callback) {
+      operateMapPlayer$3(this.id, this.pageVm, 'on', {
+        name,
+        callback
+      });
     }
   }
 
@@ -19353,7 +20869,7 @@ var serviceContext = (function () {
     }
   };
 
-  methods.forEach(function (method) {
+  methods$1.forEach(function (method) {
     MapContext.prototype[method] = callback.warp(function (options, callbackId) {
       options.callbackId = callbackId;
       operateMapPlayer$3(this.id, this.pageVm, method, options);
@@ -19461,7 +20977,7 @@ var serviceContext = (function () {
     callback.invoke(callbackId, data);
   });
 
-  const methods$1 = ['insertDivider', 'insertImage', 'insertText', 'setContents', 'getContents', 'clear', 'removeFormat', 'undo', 'redo', 'blur', 'getSelectionText', 'scrollIntoView'];
+  const methods$2 = ['insertDivider', 'insertImage', 'insertText', 'setContents', 'getContents', 'clear', 'removeFormat', 'undo', 'redo', 'blur', 'getSelectionText', 'scrollIntoView'];
 
   class EditorContext {
     constructor (id, pageId) {
@@ -19479,7 +20995,7 @@ var serviceContext = (function () {
     }
   }
 
-  methods$1.forEach(function (method) {
+  methods$2.forEach(function (method) {
     EditorContext.prototype[method] = callback.warp(function (options, callbackId) {
       operateEditor(this.id, this.pageId, method, {
         options,
@@ -19550,6 +21066,13 @@ var serviceContext = (function () {
     },
     {
       name: 'volume'
+    },
+    {
+      name: 'sessionCategory'
+    },
+    {
+      name: 'playbackRate',
+      cache: true
     }
   ];
 
@@ -19655,6 +21178,7 @@ var serviceContext = (function () {
       emit(audio, state, errMsg, errCode);
       if (state === 'play') {
         const oldCurrentTime = audio.currentTime;
+        emit(audio, 'timeupdate');
         audio.__timing = setInterval(() => {
           const currentTime = audio.currentTime;
           if (currentTime !== oldCurrentTime) {
@@ -19683,24 +21207,24 @@ var serviceContext = (function () {
     createInnerAudioContext: createInnerAudioContext
   });
 
-  const callbacks$6 = [];
+  const callbacks$7 = [];
 
   onMethod('onNetworkStatusChange', res => {
-    callbacks$6.forEach(callbackId => {
+    callbacks$7.forEach(callbackId => {
       invoke$1(callbackId, res);
     });
   });
 
   function onNetworkStatusChange (callbackId) {
-    callbacks$6.push(callbackId);
+    callbacks$7.push(callbackId);
   }
 
   function offNetworkStatusChange (callbackId) {
     // 暂不支持移除所有监听
     if (callbackId) {
-      const index = callbacks$6.indexOf(callbackId);
+      const index = callbacks$7.indexOf(callbackId);
       if (index >= 0) {
-        callbacks$6.splice(index, 1);
+        callbacks$7.splice(index, 1);
       }
     }
   }
@@ -19711,33 +21235,45 @@ var serviceContext = (function () {
     offNetworkStatusChange: offNetworkStatusChange
   });
 
-  const callbacks$7 = [];
+  const callbacks$8 = [];
+  const oldCallbacks = [];
 
-  onMethod('onThemeChange', function (res) {
-    callbacks$7.forEach(callbackId => {
+  onMethod(ON_THEME_CHANGE, function (res) {
+    callbacks$8.forEach(callbackId => {
       invoke$1(callbackId, res);
     });
   });
 
-  function onThemeChange (callbackId) {
-    callbacks$7.push(callbackId);
+  function onThemeChange$1 (callbackId) {
+    callbacks$8.push(callbackId);
+  }
+
+  function offThemeChange$1 (callbackId) {
+    // 暂不支持移除所有监听
+    if (callbackId) {
+      const index = callbacks$8.indexOf(callbackId);
+      if (index >= 0) {
+        callbacks$8.splice(index, 1);
+      }
+    }
   }
 
   // 旧版本 API，后期文档更新后考虑移除
   onMethod('onUIStyleChange', function (res) {
-    callbacks$7.forEach(callbackId => {
+    oldCallbacks.forEach(callbackId => {
       invoke$1(callbackId, res);
     });
   });
 
   function onUIStyleChange (callbackId) {
-    callbacks$7.push(callbackId);
+    oldCallbacks.push(callbackId);
     console.warn('The "uni.onUIStyleChange" API is deprecated, please use "uni.onThemeChange". Learn more: https://uniapp.dcloud.net.cn/api/system/theme.');
   }
 
   var require_context_module_1_12 = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    onThemeChange: onThemeChange,
+    onThemeChange: onThemeChange$1,
+    offThemeChange: offThemeChange$1,
     onUIStyleChange: onUIStyleChange
   });
 
@@ -19755,7 +21291,7 @@ var serviceContext = (function () {
   });
 
   function getSelectedTextRange (_, callbackId) {
-    const pageId = getCurrentPageId();
+    const pageId = getCurrentPageId$1();
     UniServiceJSBridge.publishHandler('getSelectedTextRange', {
       pageId,
       callbackId: getSelectedTextRangeEventCallbacks.push(function (res) {
@@ -19817,12 +21353,17 @@ var serviceContext = (function () {
     return invokeMethod('previewImagePlus', args)
   }
 
+  function closePreviewImage (args = {}) {
+    return invokeMethod('closePreviewImagePlus', args)
+  }
+
   var require_context_module_1_15 = /*#__PURE__*/Object.freeze({
     __proto__: null,
-    previewImage: previewImage$1
+    previewImage: previewImage$1,
+    closePreviewImage: closePreviewImage
   });
 
-  const callbacks$8 = {
+  const callbacks$9 = {
     pause: null,
     resume: null,
     start: null,
@@ -19836,14 +21377,14 @@ var serviceContext = (function () {
         const state = res.state;
         delete res.state;
         delete res.errMsg;
-        if (typeof callbacks$8[state] === 'function') {
-          callbacks$8[state](res);
+        if (typeof callbacks$9[state] === 'function') {
+          callbacks$9[state](res);
         }
       });
     }
 
     onError (callback) {
-      callbacks$8.error = callback;
+      callbacks$9.error = callback;
     }
 
     onFrameRecorded (callback) {
@@ -19859,19 +21400,19 @@ var serviceContext = (function () {
     }
 
     onPause (callback) {
-      callbacks$8.pause = callback;
+      callbacks$9.pause = callback;
     }
 
     onResume (callback) {
-      callbacks$8.resume = callback;
+      callbacks$9.resume = callback;
     }
 
     onStart (callback) {
-      callbacks$8.start = callback;
+      callbacks$9.start = callback;
     }
 
     onStop (callback) {
-      callbacks$8.stop = callback;
+      callbacks$9.stop = callback;
     }
 
     pause () {
@@ -20203,7 +21744,7 @@ var serviceContext = (function () {
 
   const socketTasks$1 = Object.create(null);
   const socketTasksArray = [];
-  const callbacks$9 = Object.create(null);
+  const callbacks$a = Object.create(null);
   onMethod('onSocketTaskStateChange', ({
     socketTaskId,
     state,
@@ -20217,8 +21758,8 @@ var serviceContext = (function () {
     if (state === 'open') {
       socketTask.readyState = socketTask.OPEN;
     }
-    if (socketTask === socketTasksArray[0] && callbacks$9[state]) {
-      invoke$1(callbacks$9[state], state === 'message' ? {
+    if (socketTask === socketTasksArray[0] && callbacks$a[state]) {
+      invoke$1(callbacks$a[state], state === 'message' ? {
         data
       } : {});
     }
@@ -20284,19 +21825,19 @@ var serviceContext = (function () {
   }
 
   function onSocketOpen (callbackId) {
-    callbacks$9.open = callbackId;
+    callbacks$a.open = callbackId;
   }
 
   function onSocketError (callbackId) {
-    callbacks$9.error = callbackId;
+    callbacks$a.error = callbackId;
   }
 
   function onSocketMessage (callbackId) {
-    callbacks$9.message = callbackId;
+    callbacks$a.message = callbackId;
   }
 
   function onSocketClose (callbackId) {
-    callbacks$9.close = callbackId;
+    callbacks$a.close = callbackId;
   }
 
   var require_context_module_1_19 = /*#__PURE__*/Object.freeze({
@@ -20433,6 +21974,169 @@ var serviceContext = (function () {
     uploadFile: uploadFile$1
   });
 
+  let cid;
+  let cidErrMsg;
+  let enabled;
+  let offline;
+
+  function normalizePushMessage (message) {
+    try {
+      return JSON.parse(message)
+    } catch (e) {}
+    return message
+  }
+
+  function invokePushCallback (
+    args
+  ) {
+    if (args.type === 'enabled') {
+      enabled = true;
+      {
+        offline = args.offline;
+      }
+    } else if (args.type === 'clientId') {
+      cid = args.cid;
+      cidErrMsg = args.errMsg;
+      invokeGetPushCidCallbacks(cid, args.errMsg);
+    } else if (args.type === 'pushMsg') {
+      const message = {
+        type: 'receive',
+        data: normalizePushMessage(args.message)
+      };
+      for (let i = 0; i < onPushMessageCallbacks.length; i++) {
+        const callback = onPushMessageCallbacks[i];
+        callback(message);
+        // 该消息已被阻止
+        if (message.stopped) {
+          break
+        }
+      }
+    } else if (args.type === 'click') {
+      onPushMessageCallbacks.forEach((callback) => {
+        callback({
+          type: 'click',
+          data: normalizePushMessage(args.message)
+        });
+      });
+    }
+  }
+
+  const getPushCidCallbacks = [];
+
+  function invokeGetPushCidCallbacks (cid, errMsg) {
+    getPushCidCallbacks.forEach((callback) => {
+      callback(cid, errMsg);
+    });
+    getPushCidCallbacks.length = 0;
+  }
+
+  function getPushClientId (args) {
+    if (!isPlainObject(args)) {
+      args = {};
+    }
+    const {
+      success,
+      fail,
+      complete
+    } = getApiCallbacks(args);
+    const hasSuccess = isFn(success);
+    const hasFail = isFn(fail);
+    const hasComplete = isFn(complete);
+
+    // App 端且启用离线时，使用 getClientInfoAsync 来调用
+    if ( offline) {
+      plus.push.getClientInfoAsync(
+        (info) => {
+          const res = {
+            errMsg: 'getPushClientId:ok',
+            cid: info.clientid
+          };
+          hasSuccess && success(res);
+          hasComplete && complete(res);
+        },
+        (res) => {
+          res = {
+            errMsg: 'getPushClientId:fail ' + (res.code + ': ' + res.message)
+          };
+          hasFail && fail(res);
+          hasComplete && complete(res);
+        }
+      );
+      return
+    }
+
+    Promise.resolve().then(() => {
+      if (typeof enabled === 'undefined') {
+        enabled = false;
+        cid = '';
+        cidErrMsg = 'uniPush is not enabled';
+      }
+      getPushCidCallbacks.push((cid, errMsg) => {
+        let res;
+        if (cid) {
+          res = {
+            errMsg: 'getPushClientId:ok',
+            cid
+          };
+          hasSuccess && success(res);
+        } else {
+          res = {
+            errMsg: 'getPushClientId:fail' + (errMsg ? ' ' + errMsg : '')
+          };
+          hasFail && fail(res);
+        }
+        hasComplete && complete(res);
+      });
+      if (typeof cid !== 'undefined') {
+        invokeGetPushCidCallbacks(cid, cidErrMsg);
+      }
+    });
+  }
+
+  const onPushMessageCallbacks = [];
+  let listening = false;
+  // 不使用 defineOnApi 实现，是因为 defineOnApi 依赖 UniServiceJSBridge ，该对象目前在小程序上未提供，故简单实现
+  const onPushMessage = (fn) => {
+    if (onPushMessageCallbacks.indexOf(fn) === -1) {
+      onPushMessageCallbacks.push(fn);
+    }
+    // 不能程序启动时就监听，因为离线事件，仅触发一次，框架监听后，无法转发给还没开始监听的开发者
+    if ( !listening) {
+      listening = true;
+      plus.push.addEventListener('click', (result) => {
+        invokePushCallback({
+          type: 'click',
+          message: result
+        });
+      });
+      plus.push.addEventListener('receive', (result) => {
+        invokePushCallback({
+          type: 'pushMsg',
+          message: result
+        });
+      });
+    }
+  };
+
+  const offPushMessage = (fn) => {
+    if (!fn) {
+      onPushMessageCallbacks.length = 0;
+    } else {
+      const index = onPushMessageCallbacks.indexOf(fn);
+      if (index > -1) {
+        onPushMessageCallbacks.splice(index, 1);
+      }
+    }
+  };
+
+  var require_context_module_1_22 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    invokePushCallback: invokePushCallback,
+    getPushClientId: getPushClientId,
+    onPushMessage: onPushMessage,
+    offPushMessage: offPushMessage
+  });
+
   const defaultOption = {
     duration: 400,
     timingFunction: 'linear',
@@ -20517,7 +22221,7 @@ var serviceContext = (function () {
     return new MPAnimation(option)
   }
 
-  var require_context_module_1_22 = /*#__PURE__*/Object.freeze({
+  var require_context_module_1_23 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     createAnimation: createAnimation
   });
@@ -20587,7 +22291,7 @@ var serviceContext = (function () {
     return new ServiceIntersectionObserver(getCurrentPageVm('createIntersectionObserver'), options)
   }
 
-  var require_context_module_1_23 = /*#__PURE__*/Object.freeze({
+  var require_context_module_1_24 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     createIntersectionObserver: createIntersectionObserver
   });
@@ -20634,7 +22338,7 @@ var serviceContext = (function () {
     return new ServiceMediaQueryObserver(getCurrentPageVm('createMediaQueryObserver'), options)
   }
 
-  var require_context_module_1_24 = /*#__PURE__*/Object.freeze({
+  var require_context_module_1_25 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     createMediaQueryObserver: createMediaQueryObserver
   });
@@ -20719,6 +22423,7 @@ var serviceContext = (function () {
       this._page = page;
       this._queue = [];
       this._queueCb = [];
+      this._nodesRef = null;
     }
 
     exec (callback) {
@@ -20737,6 +22442,8 @@ var serviceContext = (function () {
         });
         isFn(callback) && callback.call(this, res);
       });
+
+      return this._nodesRef
     }
 
     ['in'] (component) {
@@ -20746,15 +22453,15 @@ var serviceContext = (function () {
     }
 
     select (selector) {
-      return new NodesRef(this, this._component, selector, true)
+      return (this._nodesRef = new NodesRef(this, this._component, selector, true))
     }
 
     selectAll (selector) {
-      return new NodesRef(this, this._component, selector, false)
+      return (this._nodesRef = new NodesRef(this, this._component, selector, false))
     }
 
     selectViewport () {
-      return new NodesRef(this, 0, '', true)
+      return (this._nodesRef = new NodesRef(this, 0, '', true))
     }
 
     _push (selector, component, single, fields, callback) {
@@ -20775,7 +22482,7 @@ var serviceContext = (function () {
     return new SelectorQuery(getCurrentPageVm('createSelectorQuery'))
   }
 
-  var require_context_module_1_25 = /*#__PURE__*/Object.freeze({
+  var require_context_module_1_26 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     createSelectorQuery: createSelectorQuery
   });
@@ -20788,7 +22495,7 @@ var serviceContext = (function () {
   });
 
   function loadFontFace$1 (options, callbackId) {
-    const pageId = getCurrentPageId();
+    const pageId = getCurrentPageId$1();
     if (!pageId) {
       return {
         errMsg: 'loadFontFace:fail not font page'
@@ -20800,9 +22507,54 @@ var serviceContext = (function () {
     }, pageId);
   }
 
-  var require_context_module_1_26 = /*#__PURE__*/Object.freeze({
+  var require_context_module_1_27 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     loadFontFace: loadFontFace$1
+  });
+
+  function getLocale$1 () {
+    // 优先使用 $locale
+    const app = getApp({
+      allowDefault: true
+    });
+    if (app && app.$vm) {
+      return app.$vm.$locale
+    }
+    return i18n.getLocale()
+  }
+
+  function setLocale (locale) {
+    const oldLocale = getApp().$vm.$locale;
+    if (oldLocale !== locale) {
+      getApp().$vm.$locale = locale;
+      {
+        const pages = getCurrentPages();
+        pages.forEach((page) => {
+          UniServiceJSBridge.publishHandler(
+            'setLocale',
+            locale,
+            page.$page.id
+          );
+        });
+        weex.requireModule('plus').setLanguage(locale);
+      }
+      callbacks$b.forEach(callbackId => {
+        invoke$1(callbackId, { locale });
+      });
+      return true
+    }
+    return false
+  }
+  const callbacks$b = [];
+  function onLocaleChange (callbackId) {
+    callbacks$b.push(callbackId);
+  }
+
+  var require_context_module_1_28 = /*#__PURE__*/Object.freeze({
+    __proto__: null,
+    getLocale: getLocale$1,
+    setLocale: setLocale,
+    onLocaleChange: onLocaleChange
   });
 
   function pageScrollTo$1 (args) {
@@ -20813,7 +22565,7 @@ var serviceContext = (function () {
     return {}
   }
 
-  var require_context_module_1_27 = /*#__PURE__*/Object.freeze({
+  var require_context_module_1_29 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     pageScrollTo: pageScrollTo$1
   });
@@ -20826,7 +22578,7 @@ var serviceContext = (function () {
     return {}
   }
 
-  var require_context_module_1_28 = /*#__PURE__*/Object.freeze({
+  var require_context_module_1_30 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     setPageMeta: setPageMeta$1
   });
@@ -20851,19 +22603,19 @@ var serviceContext = (function () {
 
   const hideTabBarRedDot$1 = removeTabBarBadge$1;
 
-  const callbacks$a = [];
+  const callbacks$c = [];
 
   onMethod('onTabBarMidButtonTap', res => {
-    callbacks$a.forEach(callbackId => {
+    callbacks$c.forEach(callbackId => {
       invoke$1(callbackId, res);
     });
   });
 
   function onTabBarMidButtonTap (callbackId) {
-    callbacks$a.push(callbackId);
+    callbacks$c.push(callbackId);
   }
 
-  var require_context_module_1_29 = /*#__PURE__*/Object.freeze({
+  var require_context_module_1_31 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     removeTabBarBadge: removeTabBarBadge$1,
     showTabBarRedDot: showTabBarRedDot$1,
@@ -20871,23 +22623,23 @@ var serviceContext = (function () {
     onTabBarMidButtonTap: onTabBarMidButtonTap
   });
 
-  const callbacks$b = [];
+  const callbacks$d = [];
   onMethod('onViewDidResize', res => {
-    callbacks$b.forEach(callbackId => {
+    callbacks$d.forEach(callbackId => {
       invoke$1(callbackId, res);
     });
   });
 
   function onWindowResize (callbackId) {
-    callbacks$b.push(callbackId);
+    callbacks$d.push(callbackId);
   }
 
   function offWindowResize (callbackId) {
     // 此处和微信平台一致查询不到去掉最后一个
-    callbacks$b.splice(callbacks$b.indexOf(callbackId), 1);
+    callbacks$d.splice(callbacks$d.indexOf(callbackId), 1);
   }
 
-  var require_context_module_1_30 = /*#__PURE__*/Object.freeze({
+  var require_context_module_1_32 = /*#__PURE__*/Object.freeze({
     __proto__: null,
     onWindowResize: onWindowResize,
     offWindowResize: offWindowResize
@@ -20920,15 +22672,17 @@ var serviceContext = (function () {
   './network/socket.js': require_context_module_1_19,
   './network/update.js': require_context_module_1_20,
   './network/upload-file.js': require_context_module_1_21,
-  './ui/create-animation.js': require_context_module_1_22,
-  './ui/create-intersection-observer.js': require_context_module_1_23,
-  './ui/create-media-query-observer.js': require_context_module_1_24,
-  './ui/create-selector-query.js': require_context_module_1_25,
-  './ui/load-font-face.js': require_context_module_1_26,
-  './ui/page-scroll-to.js': require_context_module_1_27,
-  './ui/set-page-meta.js': require_context_module_1_28,
-  './ui/tab-bar.js': require_context_module_1_29,
-  './ui/window.js': require_context_module_1_30,
+  './plugin/push.js': require_context_module_1_22,
+  './ui/create-animation.js': require_context_module_1_23,
+  './ui/create-intersection-observer.js': require_context_module_1_24,
+  './ui/create-media-query-observer.js': require_context_module_1_25,
+  './ui/create-selector-query.js': require_context_module_1_26,
+  './ui/load-font-face.js': require_context_module_1_27,
+  './ui/locale.js': require_context_module_1_28,
+  './ui/page-scroll-to.js': require_context_module_1_29,
+  './ui/set-page-meta.js': require_context_module_1_30,
+  './ui/tab-bar.js': require_context_module_1_31,
+  './ui/window.js': require_context_module_1_32,
 
       };
       var req = function req(key) {
@@ -20967,6 +22721,9 @@ var serviceContext = (function () {
     }
     const evalJSCode =
       `typeof UniViewJSBridge !== 'undefined' && UniViewJSBridge.subscribeHandler("${eventType}",${args},__PAGE_ID__)`;
+    if (process.env.NODE_ENV !== 'production') {
+      console.log(`UNIAPP[publishHandler]:[${+new Date()}]`, 'length', evalJSCode.length);
+    }
     pageIds.forEach(id => {
       const webview = plus.webview.getWebviewById(String(id));
       webview && webview.evalJS(evalJSCode.replace('__PAGE_ID__', id));
@@ -21079,18 +22836,12 @@ var serviceContext = (function () {
       callCurrentPageHook('onHide');
     }
 
-    function onAppEnterForeground () {
+    function onAppEnterForeground (enterOptions) {
+      callAppHook(getApp(), 'onShow', enterOptions);
       const pages = getCurrentPages();
       if (pages.length === 0) {
         return
       }
-      const page = pages[pages.length - 1];
-      const args = {
-        path: page.route,
-        query: page.options
-      };
-
-      callAppHook(getApp(), 'onShow', args);
       callCurrentPageHook('onShow');
     }
 
@@ -21410,7 +23161,11 @@ var serviceContext = (function () {
     });
 
     plus.globalEvent.addEventListener('resume', () => {
-      emit('onAppEnterForeground');
+      const info = parseRedirectInfo();
+      if (info && info.userAction) {
+        initEnterOptions(info);
+      }
+      emit('onAppEnterForeground', getEnterOptions());
     });
 
     plus.globalEvent.addEventListener('netchange', () => {
@@ -21437,13 +23192,14 @@ var serviceContext = (function () {
         theme: event.uistyle
       };
 
-      callAppHook(appCtx, 'onThemeChange', args);
-      publish('onThemeChange', args);
-
+      callAppHook(appCtx, ON_THEME_CHANGE, args);
+      publish(ON_THEME_CHANGE, args);
+      UniServiceJSBridge.publishHandler(ON_THEME_CHANGE, args, getCurrentPageId());
       // 兼容旧版本 API
       publish('onUIStyleChange', {
         style: event.uistyle
       });
+      changePagesNavigatorStyle();
     });
 
     globalEvent.addEventListener('uniMPNativeEvent', function (event) {
@@ -21467,14 +23223,20 @@ var serviceContext = (function () {
   }
 
   function initAppLaunch (appVm) {
-    const args = {
+    const args = initLaunchOptions({
       path: __uniConfig.entryPagePath,
-      query: {},
-      scene: 1001
-    };
+      query: __uniConfig.entryPageQuery,
+      referrerInfo: __uniConfig.referrerInfo
+    });
 
     callAppHook(appVm, 'onLaunch', args);
     callAppHook(appVm, 'onShow', args);
+    // https://tower.im/teams/226535/todos/16905/
+    const getAppState = weex.requireModule('plus').getAppState;
+    const appState = getAppState && Number(getAppState());
+    if (appState === 2) {
+      callAppHook(appVm, 'onHide', args);
+    }
   }
 
   function initTabBar () {
@@ -21535,12 +23297,13 @@ var serviceContext = (function () {
     });
   }
 
-  function registerApp (appVm) {
+  function registerApp (appVm, Vue) {
     if (process.env.NODE_ENV !== 'production') {
       console.log('[uni-app] registerApp');
     }
     appCtx = appVm;
     appCtx.$vm = appVm;
+    initAppLocale(Vue, appVm);
 
     Object.assign(appCtx, defaultApp); // 拷贝默认实现
 
@@ -22197,6 +23960,11 @@ var serviceContext = (function () {
         break
       case V_FOR:
         return setForData.call(this, id, value)
+      case 'is': {
+        if (typeof value === 'function') {
+          value = value.options;
+        }
+      }
     }
 
     return ((this._$newData[id] || (this._$newData[id] = {}))[name] = value)
@@ -22327,6 +24095,21 @@ var serviceContext = (function () {
         });
       }
 
+      // script setup onPageScroll、onReachBottom not effective
+      const setup = extendOptions.setup;
+      if (setup) {
+        const injectHooks = ['onPageScroll', 'onReachBottom'];
+        let setupString = '';
+        try {
+          setupString = setup.toString();
+        } catch (error) {}
+        injectHooks.forEach(hook => {
+          if (setupString.indexOf(`uniApp.${hook}`) && !extendOptions[hook]) {
+            extendOptions[hook] = [() => {}];
+          }
+        });
+      }
+
       return oldExtend.call(this, extendOptions)
     };
 
@@ -22367,7 +24150,7 @@ var serviceContext = (function () {
 
     return {
       version: VD_SYNC_VERSION,
-      locale: plus.os.language, // TODO
+      locale: weex.requireModule('plus').getLanguage(),
       disableScroll,
       onPageScroll,
       onPageReachBottom,
@@ -22481,12 +24264,12 @@ var serviceContext = (function () {
                 console.log('[uni-app] launchApp');
               }
               plus.updateConfigInfo && plus.updateConfigInfo();
-              registerApp(this);
+              registerApp(this, Vue);
               oldMount.call(this, el, hydrating);
             });
             return
           }
-          registerApp(this);
+          registerApp(this, Vue);
         }
         return oldMount.call(this, el, hydrating)
       };
@@ -22525,7 +24308,8 @@ var serviceContext = (function () {
     __registerPage: registerPage,
     uni: uni$1,
     getApp: getApp$1,
-    getCurrentPages: getCurrentPages$1
+    getCurrentPages: getCurrentPages$1,
+    EventChannel
   };
 
   return index$1;

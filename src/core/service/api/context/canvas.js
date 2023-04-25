@@ -231,8 +231,9 @@ function checkColor (e) {
 }
 
 function Pattern (image, repetition) {
-  this.image = image
-  this.repetition = repetition
+  this.type = 'pattern'
+  this.data = image
+  this.colorStop = repetition
 }
 
 class CanvasGradient {
@@ -370,6 +371,10 @@ export class CanvasContext {
   beginPath () {
     this.path = []
     this.subpath = []
+    this.path.push({
+      method: 'beginPath',
+      data: []
+    })
   }
 
   moveTo (x, y) {

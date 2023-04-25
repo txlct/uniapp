@@ -5,7 +5,9 @@ import {
   warpPlusSuccessCallback,
   warpPlusErrorCallback
 } from '../util'
-import { isPlainObject } from 'uni-shared'
+import { isPlainObject, toRawType, callback } from 'uni-shared'
+
+let univerifyManager
 
 function getService (provider) {
   return new Promise((resolve, reject) => {
@@ -19,24 +21,43 @@ function getService (provider) {
 /**
  * 微信登录
  */
-export function login (params, callbackId) {
+export function login (params, callbackId, plus = true) {
   const provider = params.provider || 'weixin'
-  const errorCallback = warpPlusErrorCallback(callbackId, 'login')
+  const errorCallback = warpErrorCallback(callbackId, 'login', plus)
+  const isAppleLogin = provider === 'apple'
+  const authOptions = isAppleLogin
+    ? { scope: 'email' }
+    : params.univerifyStyle
+      ? { univerifyStyle: univerifyButtonsClickHandling(params.univerifyStyle, errorCallback) }
+      : {}
+  const _invoke = plus ? invoke : callback.invoke
 
   getService(provider).then(service => {
     function login () {
+      if (params.onlyAuthorize && provider === 'weixin') {
+        service.authorize(({ code }) => {
+          _invoke(callbackId, {
+            code,
+            authResult: '',
+            errMsg: 'login:ok'
+          })
+        }, errorCallback)
+        return
+      }
       service.login(res => {
         const authResult = res.target.authResult
-        invoke(callbackId, {
+        const appleInfo = res.target.appleInfo
+        _invoke(callbackId, {
           code: authResult.code,
           authResult: authResult,
+          appleInfo,
           errMsg: 'login:ok'
         })
-      }, errorCallback, provider === 'apple' ? { scope: 'email' } : { univerifyStyle: univerifyButtonsClickHandling(params.univerifyStyle, errorCallback) } || {})
+      }, errorCallback, authOptions)
     }
     // 先注销再登录
     // apple登录logout之后无法重新触发获取email,fullname；一键登录无logout
-    if (provider === 'apple' || provider === 'univerify') {
+    if (isAppleLogin || provider === 'univerify') {
       login()
     } else {
       service.logout(login, login)
@@ -122,9 +143,9 @@ export function operateWXData (params, callbackId) {
   }
 }
 
-export function preLogin (params, callbackId) {
-  const successCallback = warpPlusSuccessCallback(callbackId, 'preLogin')
-  const errorCallback = warpPlusErrorCallback(callbackId, 'preLogin')
+export function preLogin (params, callbackId, plus) {
+  const successCallback = warpSuccessCallback(callbackId, 'preLogin', plus)
+  const errorCallback = warpErrorCallback(callbackId, 'preLogin', plus)
   getService(params.provider).then(service => service.preLogin(successCallback, errorCallback)).catch(errorCallback)
 }
 
@@ -132,26 +153,109 @@ export function closeAuthView () {
   return getService('univerify').then(service => service.closeAuthView())
 }
 
+export function getCheckBoxState (params, callbackId, plus) {
+  const successCallback = warpSuccessCallback(callbackId, 'getCheckBoxState', plus)
+  const errorCallback = warpErrorCallback(callbackId, 'getCheckBoxState', plus)
+  try {
+    getService('univerify').then(service => {
+      const state = service.getCheckBoxState()
+      successCallback({ state })
+    })
+  } catch (error) {
+    errorCallback(error)
+  }
+}
+
 /**
  * 一键登录自定义登陆按钮点击处理
  */
 function univerifyButtonsClickHandling (univerifyStyle, errorCallback) {
-  if (univerifyStyle && isPlainObject(univerifyStyle) && univerifyStyle.buttons &&
-    Object.prototype.toString.call(univerifyStyle.buttons.list) === '[object Array]' &&
-    univerifyStyle.buttons.list.length > 0
-  ) {
+  if (isPlainObject(univerifyStyle) && isPlainObject(univerifyStyle.buttons) && toRawType(univerifyStyle.buttons.list) === 'Array') {
     univerifyStyle.buttons.list.forEach((button, index) => {
       univerifyStyle.buttons.list[index].onclick = function () {
-        closeAuthView().then(() => {
-          errorCallback({
-            code: '30008',
-            message: '用户点击了自定义按钮',
-            index,
-            provider: button.provider
+        const res = {
+          code: '30008',
+          message: '用户点击了自定义按钮',
+          index,
+          provider: button.provider
+        }
+        isPlainObject(univerifyManager)
+          ? univerifyManager._triggerUniverifyButtonsClick(res)
+          : closeAuthView().then(() => {
+            errorCallback(res)
           })
-        })
       }
     })
   }
   return univerifyStyle
+}
+
+class UniverifyManager {
+  constructor () {
+    this.provider = 'univerify'
+    this.eventName = 'api.univerifyButtonsClick'
+  }
+
+  close () {
+    closeAuthView()
+  }
+
+  login (options) {
+    this._warp((data, callbackId) => login(data, callbackId, false), options)
+  }
+
+  getCheckBoxState (options) {
+    this._warp((_, callbackId) => getCheckBoxState(_, callbackId, false), options)
+  }
+
+  preLogin (options) {
+    this._warp((data, callbackId) => preLogin(data, callbackId, false), options)
+  }
+
+  onButtonsClick (callback) {
+    UniServiceJSBridge.on(this.eventName, callback)
+  }
+
+  offButtonsClick (callback) {
+    UniServiceJSBridge.off(this.eventName, callback)
+  }
+
+  _triggerUniverifyButtonsClick (res) {
+    UniServiceJSBridge.emit(this.eventName, res)
+  }
+
+  _warp (fn, options) {
+    return callback.warp(fn)(this._getOptions(options))
+  }
+
+  _getOptions (options = {}) {
+    return Object.assign({}, options, { provider: this.provider })
+  }
+}
+
+export function getUniverifyManager () {
+  return univerifyManager || (univerifyManager = new UniverifyManager())
+}
+
+function warpSuccessCallback (callbackId, name, plus = true) {
+  return plus
+    ? warpPlusSuccessCallback(callbackId, name)
+    : (options) => {
+      callback.invoke(callbackId, Object.assign({}, options, {
+        errMsg: `${name}:ok`
+      }))
+    }
+}
+
+function warpErrorCallback (callbackId, name, plus = true) {
+  return plus
+    ? warpPlusErrorCallback(callbackId, name)
+    : (error) => {
+      const { code = 0, message: errorMessage } = error
+      callback.invoke(callbackId, {
+        errMsg: `${name}:fail ${errorMessage || ''}`,
+        errCode: code,
+        code
+      })
+    }
 }

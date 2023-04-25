@@ -18,7 +18,7 @@ import {
 export default function parseBaseComponent (vueComponentOptions, {
   isPage,
   initRelation
-} = {}) {
+} = {}, needVueOptions) {
   const [VueComponent, vueOptions] = initVueComponent(Vue, vueComponentOptions)
 
   const options = {
@@ -38,7 +38,7 @@ export default function parseBaseComponent (vueComponentOptions, {
     options,
     data: initData(vueOptions, Vue.prototype),
     behaviors: initBehaviors(vueOptions, initBehavior),
-    properties: initProperties(vueOptions.props, false, vueOptions.__file),
+    properties: initProperties(vueOptions.props, false, vueOptions.__file, options),
     lifetimes: {
       attached () {
         const properties = this.properties
@@ -114,6 +114,9 @@ export default function parseBaseComponent (vueComponentOptions, {
     })
   }
 
+  if (needVueOptions) {
+    return [componentOptions, vueOptions, VueComponent]
+  }
   if (isPage) {
     return componentOptions
   }

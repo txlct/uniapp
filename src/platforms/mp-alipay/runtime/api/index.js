@@ -4,12 +4,23 @@ import {
   hasOwn
 } from 'uni-shared'
 
+import { $on, $off } from 'uni-core/runtime/event-bus'
+
+let onKeyboardHeightChangeCallback
+
 export {
   setStorageSync,
   getStorageSync,
   removeStorageSync
-} from '../../helpers/storage'
-
+}
+  from '../../helpers/storage'
+export {
+  getPushClientId,
+  onPushMessage,
+  offPushMessage,
+  invokePushCallback
+}
+  from 'uni-core/service/api/plugin/push'
 export function startGyroscope (params) {
   if (hasOwn(params, 'interval')) {
     console.warn('支付宝小程序 startGyroscope暂不支持interval')
@@ -65,7 +76,11 @@ export function createSelectorQuery () {
   }
 
   if (!query.fields) {
-    query.fields = function ({ rect, size, scrollOffset } = {}, callback) {
+    query.fields = function ({
+      rect,
+      size,
+      scrollOffset
+    } = {}, callback) {
       if (rect || size) {
         this.boundingClientRect()
       }
@@ -93,4 +108,21 @@ export function createIntersectionObserver (component, options) {
   return my.createIntersectionObserver(options)
 }
 
-export { createMediaQueryObserver }
+export function onKeyboardHeightChange (callback) {
+  // 与微信小程序一致仅保留最后一次监听
+  if (onKeyboardHeightChangeCallback) {
+    $off('uni:keyboardHeightChange', onKeyboardHeightChangeCallback)
+  }
+  onKeyboardHeightChangeCallback = callback
+  $on('uni:keyboardHeightChange', onKeyboardHeightChangeCallback)
+}
+
+export function offKeyboardHeightChange () {
+  // 与微信小程序一致移除最后一次监听
+  $off('uni:keyboardHeightChange', onKeyboardHeightChangeCallback)
+  onKeyboardHeightChangeCallback = null
+}
+
+export {
+  createMediaQueryObserver
+}

@@ -7,11 +7,14 @@ const {
 module.exports = function processRef (paths, path, state) {
   const modelPath = paths.model
   if (modelPath) {
-    const callbackProperty = modelPath.node.value.properties.find(property => {
+    const properties = modelPath.node.value.properties
+    const [callbackProperty] = properties.splice(properties.findIndex(property => {
       return property.key.name === 'callback'
-    })
-
-    const exprProperty = modelPath.node.value.properties.find(
+    }), 1)
+    const valueProperty = properties.find(
+      property => property.key.name === 'value'
+    )
+    const exprProperty = properties.find(
       property => property.key.name === 'expression'
     )
 
@@ -62,8 +65,8 @@ module.exports = function processRef (paths, path, state) {
 
     return [ // attrs:{value:value}
       t.objectProperty(
-        t.stringLiteral('value'),
-        t.identifier(prop)
+        t.stringLiteral(process.env.UNI_USING_VUE3 ? 'modelValue' : 'value'),
+        valueProperty.value
       )
     ]
   }

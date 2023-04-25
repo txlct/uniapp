@@ -1,7 +1,7 @@
 const path = require('path')
+const webpack = require('webpack')
 
 const {
-  md5,
   parseEntry,
   normalizePath
 } = require('@dcloudio/uni-cli-shared')
@@ -10,25 +10,18 @@ const {
   pagesJsonJsFileName
 } = require('@dcloudio/uni-cli-shared/lib/pages')
 
+const { createSource, getModuleId } = require('../shared')
+
 const generateApp = require('./generate-app')
 const generateJson = require('./generate-json')
 const generateComponent = require('./generate-component')
-
-const emitFileCaches = {}
+const clearStyleFile = require('./clear-style-file')
+const mockGenericComponent = require('./mock-generic-component')
+const addEmptyComponent = require('./add-empty-component')
+const addPluginWrapper = require('./add-plugin-wrapper')
 
 function emitFile (filePath, source, compilation) {
-  const emitFileMD5 = md5(filePath + source)
-  if (emitFileCaches[filePath] !== emitFileMD5) {
-    emitFileCaches[filePath] = emitFileMD5
-    compilation.assets[filePath] = {
-      size () {
-        return Buffer.byteLength(source, 'utf8')
-      },
-      source () {
-        return source
-      }
-    }
-  }
+  compilation.emitAsset(filePath, createSource(source))
 }
 
 function addSubPackagesRequire (compilation) {
@@ -47,18 +40,13 @@ function addSubPackagesRequire (compilation) {
           name.indexOf(root + '/') === 0 &&
           name !== subPackageVendorPath
         ) {
-          const source =
-            `require('${normalizePath(path.relative(path.dirname(name), subPackageVendorPath))}');` +
-            compilation.assets[name].source()
-
-          compilation.assets[name] = {
-            size () {
-              return Buffer.byteLength(source, 'utf8')
-            },
-            source () {
-              return source
-            }
+          let relativePath = normalizePath(path.relative(path.dirname(name), subPackageVendorPath))
+          if (!relativePath.startsWith('.')) {
+            relativePath = './' + relativePath
           }
+          const source = `require('${relativePath}');` + compilation.getAsset(name).source.source()
+
+          compilation.updateAsset(name, createSource(source))
         }
       })
     }
@@ -67,58 +55,71 @@ function addSubPackagesRequire (compilation) {
 
 function addMPPluginRequire (compilation) {
   // 编译到小程序插件 特殊处理入口文件
-  if (process.env.UNI_MP_PLUGIN) {
-    const assetsKeys = Object.keys(compilation.assets)
-    assetsKeys.forEach(name => {
-      if (name === process.env.UNI_MP_PLUGIN_MAIN) {
-        const modules = compilation.modules
-
-        const mainFilePath = path.resolve(process.env.UNI_INPUT_DIR, process.env.UNI_MP_PLUGIN_MAIN).replace(/\\/g, '/')
-
-        const uniModuleId = modules.find(module => module.resource && normalizePath(module.resource) === mainFilePath).id
-
-        const newlineIndex = compilation.assets[name].source().lastIndexOf('\n')
-
-        const source = compilation.assets[name].source().substring(0, newlineIndex) +
-        `\nmodule.exports = wx.__webpack_require_${process.env.UNI_MP_PLUGIN.replace('-', '_')}__(${uniModuleId});\n` +
-        compilation.assets[name].source().substring(newlineIndex + 1)
-
-        compilation.assets[name] = {
-          size () {
-            return Buffer.byteLength(source, 'utf8')
-          },
-          source () {
-            return source
-          }
-        }
+  const assetsKeys = Object.keys(compilation.assets)
+  const UNI_MP_PLUGIN_MAIN = process.env.UNI_MP_PLUGIN_MAIN
+  const UNI_MP_PLUGIN_EXPORT = JSON.parse(process.env.UNI_MP_PLUGIN_EXPORT)
+  assetsKeys.forEach(name => {
+    const needProcess = process.env.UNI_MP_PLUGIN ? name === UNI_MP_PLUGIN_MAIN : UNI_MP_PLUGIN_EXPORT.includes(name)
+    if (needProcess) {
+      const modules = Array.from(compilation.modules)
+      const orignalSource = compilation.getAsset(name).source.source()
+      const globalEnv = process.env.UNI_PLATFORM === 'mp-alipay' ? 'my' : 'wx'
+      const filePath = normalizePath(path.resolve(process.env.UNI_INPUT_DIR, name))
+      let uniModule = modules.find(module => module.resource && normalizePath(module.resource) === filePath)
+      if (!uniModule && webpack.version[0] > 4) {
+        uniModule = modules.find(module =>
+          module.rootModule && module.rootModule.resource && normalizePath(module.rootModule.resource) === filePath
+        )
       }
-    })
-  }
+      const uniModuleId = getModuleId(compilation, uniModule)
+
+      const source = orignalSource + `\nmodule.exports = ${globalEnv}.__webpack_require_UNI_MP_PLUGIN__('${uniModuleId}');\n`
+
+      compilation.updateAsset(name, createSource(source))
+    }
+  })
+}
+
+function processAssets (compiler, compilation) {
+  addSubPackagesRequire(compilation)
+
+  addMPPluginRequire(compilation)
+
+  generateJson(compilation)
+
+  // app.js,app.wxss
+  generateApp(compilation)
+    .forEach(({
+      file,
+      source
+    }) => emitFile(file, source, compilation))
+
+  generateComponent(compilation, compiler.options.output[webpack.version[0] > 4 ? 'chunkLoadingGlobal' : 'jsonpFunction'])
+
+  clearStyleFile(compilation)
+
+  mockGenericComponent(compilation)
+
+  addEmptyComponent(compilation)
+
+  addPluginWrapper(compilation)
 }
 
 class WebpackUniMPPlugin {
   apply (compiler) {
     if (!process.env.UNI_USING_NATIVE && !process.env.UNI_USING_V3_NATIVE) {
-      compiler.hooks.emit.tapPromise('webpack-uni-mp-emit', compilation => {
-        return new Promise((resolve, reject) => {
-          addSubPackagesRequire(compilation)
-
-          addMPPluginRequire(compilation)
-
-          generateJson(compilation)
-
-          // app.js,app.wxss
-          generateApp(compilation)
-            .forEach(({
-              file,
-              source
-            }) => emitFile(file, source, compilation))
-
-          generateComponent(compilation, compiler.options.output.jsonpFunction)
-
-          resolve()
+      if (webpack.version[0] > 4) {
+        compiler.hooks.compilation.tap('WebpackUniMPPlugin', compilation => {
+          compilation.hooks.processAssets.tap({
+            name: 'WebpackUniMPPlugin',
+            stage: webpack.Compilation.PROCESS_ASSETS_STAGE_ADDITIONAL
+          }, (_) => {
+            processAssets(compiler, compilation)
+          })
         })
-      })
+      } else {
+        compiler.hooks.emit.tap('webpack-uni-mp-emit', (compilation) => processAssets(compiler, compilation))
+      }
     }
     compiler.hooks.invalid.tap('webpack-uni-mp-invalid', (fileName, changeTime) => {
       if (

@@ -18,10 +18,17 @@ const alipayWindowMap = {
   navigationBarShadow: 'navigationBarShadow',
   titleImage: 'titleImage',
   transparentTitle: 'transparentTitle',
-  titlePenetrate: 'titlePenetrate'
+  titlePenetrate: 'titlePenetrate',
+  barButtonTheme: {
+    key: 'navigationBarTextStyle',
+    transform: function (value) {
+
+    }
+  }
 }
 
 const alipayTabBarMap = {
+  customize: 'customize',
   textColor: 'color',
   selectedColor: 'selectedColor',
   backgroundColor: 'backgroundColor',
@@ -67,12 +74,17 @@ function parseStyle (style = {}, root = '') {
     }
   })
 
-  if (root && process.env.UNI_PLATFORM === 'app-plus') { // 处理分包逻辑
-    if (Array.isArray(platformStyle.subNVues) && platformStyle.subNVues.length) {
+  if (process.env.UNI_PLATFORM === 'app-plus') {
+    if (root && Array.isArray(platformStyle.subNVues) && platformStyle.subNVues.length) { // 处理分包逻辑
       platformStyle.subNVues.forEach(subNVue => {
         subNVue.path = normalizePath(path.join(root, subNVue.path))
       })
     }
+
+    style.disableSwipeBack === true
+      ? platformStyle.popGesture = 'none'
+      : delete platformStyle.popGesture
+    delete style.disableSwipeBack
   }
 
   if (process.env.UNI_PLATFORM === 'mp-alipay') {
@@ -124,10 +136,21 @@ function parseTabBar (style = {}) {
 
   return style
 }
-
+const NON_APP_JSON_KEYS = [
+  'appid',
+  'unipush',
+  'secureNetwork',
+  'usingComponents',
+  'optimization',
+  'scopedSlotsCompiler',
+  'usingComponents',
+  'uniStatistics',
+  'mergeVirtualHostAttributes'
+]
 module.exports = {
   hasOwn,
   parseStyle,
   parseTabBar,
-  trimMPJson
+  trimMPJson,
+  NON_APP_JSON_KEYS
 }

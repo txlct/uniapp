@@ -54,6 +54,43 @@ describe('mp:compiler-mp-weixin', () => {
     )
   })
 
+  it('generate string express with escape quote', () => {
+    assertCodegen(
+      '<view :data-text="text+\'\\\'\'"></view>',
+      '<view data-text="{{$root.a0}}"></view>',
+      'with(this){var a0=text+"\'";$mp.data=Object.assign({},{$root:{a0:a0}})}'
+    )
+    assertCodegen(
+      /* eslint-disable no-template-curly-in-string */
+      '<view :data-text="`${text}\'`"></view>',
+      '<view data-text="{{$root.a0}}"></view>',
+      /* eslint-disable no-template-curly-in-string */
+      'with(this){var a0=`${text}\'`;$mp.data=Object.assign({},{$root:{a0:a0}})}'
+    )
+    assertCodegen(
+      '<view>{{text+\'\\\'\'}}</view>',
+      '<view>{{$root.t0}}</view>',
+      'with(this){var t0=text+"\'";$mp.data=Object.assign({},{$root:{t0:t0}})}'
+    )
+    assertCodegen(
+      /* eslint-disable no-template-curly-in-string */
+      '<view>{{`${text}\'`}}</view>',
+      '<view>{{$root.t0}}</view>',
+      /* eslint-disable no-template-curly-in-string */
+      'with(this){var t0=`${text}\'`;$mp.data=Object.assign({},{$root:{t0:t0}})}'
+    )
+    assertCodegen(
+      /* eslint-disable no-template-curly-in-string */
+      '<view>{{`${text}"`}}</view>',
+      '<view>{{text+\'"\'}}</view>'
+    )
+    assertCodegen(
+      '<view>{{text+"\\""}}</view>',
+      '<view>{{$root.t0}}</view>',
+      'with(this){var t0=text+"\\"";$mp.data=Object.assign({},{$root:{t0:t0}})}'
+    )
+  })
+
   it('generate named scoped slot', () => {
     assertCodegen(
       '<foo><template slot="foo" slot-scope="{bar}">{{ bar.foo }}</template></foo>',
@@ -98,8 +135,16 @@ describe('mp:compiler-mp-weixin', () => {
       }
     )
     assertCodegen(
+      '<my-component><template v-slot="{item}"><view @click="getValue(item)">{{item}}</view><template></my-component>',
+      '<my-component generic:scoped-slots-default="test-my-component-default" data-vue-generic="scoped" vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}"></my-component>',
+      'with(this){}',
+      {
+        scopedSlotsCompiler: 'auto'
+      }
+    )
+    assertCodegen(
       '<my-component><template v-slot="{item}">{{getValue(item)}}<template></my-component>',
-      '<my-component scoped-slots-compiler="augmented" vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}"><block><block wx:if="{{$root.m0}}">{{$root.m1}}</block></block></my-component>',
+      '<my-component scoped-slots-compiler="augmented" vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}"><block wx:if="{{$root.m0}}">{{$root.m1}}</block></my-component>',
       'with(this){var m0=$hasScopedSlotsParams("551070e6-1");var m1=m0?getValue($getScopedSlotsParams("551070e6-1","default","item")):null;$mp.data=Object.assign({},{$root:{m0:m0,m1:m1}})}',
       {
         scopedSlotsCompiler: 'auto'
@@ -107,7 +152,7 @@ describe('mp:compiler-mp-weixin', () => {
     )
     assertCodegen(
       '<my-component><template v-slot="item">{{getValue(item.text)}}<template></my-component>',
-      '<my-component scoped-slots-compiler="augmented" vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}"><block><block wx:if="{{$root.m0}}">{{$root.m1}}</block></block></my-component>',
+      '<my-component scoped-slots-compiler="augmented" vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}"><block wx:if="{{$root.m0}}">{{$root.m1}}</block></my-component>',
       'with(this){var m0=$hasScopedSlotsParams("551070e6-1");var m1=m0?getValue($getScopedSlotsParams("551070e6-1","default").text):null;$mp.data=Object.assign({},{$root:{m0:m0,m1:m1}})}',
       {
         scopedSlotsCompiler: 'auto'
@@ -174,7 +219,7 @@ describe('mp:compiler-mp-weixin', () => {
   it('generate scoped slot with scopedSlotsCompiler: augmented', () => {
     assertCodegen(
       '<my-component><template v-slot="{item}">{{getValue(item)}}<template></my-component>',
-      '<my-component vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}"><block><block wx:if="{{$root.m0}}">{{$root.m1}}</block></block></my-component>',
+      '<my-component vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}"><block wx:if="{{$root.m0}}">{{$root.m1}}</block></my-component>',
       'with(this){var m0=$hasScopedSlotsParams("551070e6-1");var m1=m0?getValue($getScopedSlotsParams("551070e6-1","default","item")):null;$mp.data=Object.assign({},{$root:{m0:m0,m1:m1}})}',
       {
         scopedSlotsCompiler: 'augmented'
@@ -182,7 +227,7 @@ describe('mp:compiler-mp-weixin', () => {
     )
     assertCodegen(
       '<my-component><template v-slot="{item}">{{item}}<template></my-component>',
-      '<my-component vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}"><block><block wx:if="{{$root.m0}}">{{$root.m1}}</block></block></my-component>',
+      '<my-component vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}"><block wx:if="{{$root.m0}}">{{$root.m1}}</block></my-component>',
       'with(this){var m0=$hasScopedSlotsParams("551070e6-1");var m1=m0?$getScopedSlotsParams("551070e6-1","default","item"):null;$mp.data=Object.assign({},{$root:{m0:m0,m1:m1}})}',
       {
         scopedSlotsCompiler: 'augmented'
@@ -190,7 +235,7 @@ describe('mp:compiler-mp-weixin', () => {
     )
     assertCodegen(
       '<my-component><template v-slot="item">{{getValue(item.text)}}<template></my-component>',
-      '<my-component vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}"><block><block wx:if="{{$root.m0}}">{{$root.m1}}</block></block></my-component>',
+      '<my-component vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}"><block wx:if="{{$root.m0}}">{{$root.m1}}</block></my-component>',
       'with(this){var m0=$hasScopedSlotsParams("551070e6-1");var m1=m0?getValue($getScopedSlotsParams("551070e6-1","default").text):null;$mp.data=Object.assign({},{$root:{m0:m0,m1:m1}})}',
       {
         scopedSlotsCompiler: 'augmented'
@@ -198,7 +243,7 @@ describe('mp:compiler-mp-weixin', () => {
     )
     assertCodegen(
       '<my-component1><my-component2><template v-slot="{item}">{{getValue(item)}}<template></my-component2></my-component1>',
-      '<my-component1 vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}"><my-component2 vue-id="{{(\'551070e6-2\')+\',\'+(\'551070e6-1\')}}" bind:__l="__l" vue-slots="{{[\'default\']}}"><block><block wx:if="{{$root.m0}}">{{$root.m1}}</block></block></my-component2></my-component1>',
+      '<my-component1 vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}"><my-component2 vue-id="{{(\'551070e6-2\')+\',\'+(\'551070e6-1\')}}" bind:__l="__l" vue-slots="{{[\'default\']}}"><block wx:if="{{$root.m0}}">{{$root.m1}}</block></my-component2></my-component1>',
       'with(this){var m0=$hasScopedSlotsParams("551070e6-2");var m1=m0?getValue($getScopedSlotsParams("551070e6-2","default","item")):null;$mp.data=Object.assign({},{$root:{m0:m0,m1:m1}})}',
       {
         scopedSlotsCompiler: 'augmented'
@@ -224,6 +269,14 @@ describe('mp:compiler-mp-weixin', () => {
       '<view><slot v-bind="object"><slot></view>',
       '<view><block wx:if="{{$slots.default}}"><slot></slot></block><block wx:else><slot></slot></block></view>',
       'with(this){{$setScopedSlotsParams("default",object)}}',
+      {
+        scopedSlotsCompiler: 'augmented'
+      }
+    )
+    assertCodegen(
+      '<my-component><template v-slot="{item}">{{item}}<my-component><template v-slot="{item}">{{item}}</template></my-component></template></my-component>',
+      '<my-component vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}"><block wx:if="{{$root.m0}}">{{$root.m1}}<my-component vue-id="{{(\'551070e6-2\')+\',\'+(\'551070e6-1\')}}" bind:__l="__l" vue-slots="{{[\'default\']}}"><block wx:if="{{$root.m2}}">{{$root.m3}}</block></my-component></block></my-component>',
+      'with(this){var m0=$hasScopedSlotsParams("551070e6-1");var m1=m0?$getScopedSlotsParams("551070e6-1","default","item"):null;var m2=$hasScopedSlotsParams("551070e6-2");var m3=m2?$getScopedSlotsParams("551070e6-2","default","item"):null;$mp.data=Object.assign({},{$root:{m0:m0,m1:m1,m2:m2,m3:m3}})}',
       {
         scopedSlotsCompiler: 'augmented'
       }
@@ -256,7 +309,7 @@ describe('mp:compiler-mp-weixin', () => {
   it('generate page-meta', () => {
     assertCodegen( // TODO vue-id
       '<view><page-meta/><view><button></button></view></view>',
-      '<page-meta vue-id="551070e6-1" bind:__l="__l"></page-meta><view><button></button></view>'
+      '<page-meta></page-meta><view><button></button></view>'
     )
   })
 
@@ -304,6 +357,92 @@ describe('mp:compiler-mp-weixin', () => {
     assertCodegen(
       '<test v-show="shown">hello world</test>',
       '<test data-custom-hidden="{{!(shown)}}" vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}">hello world</test>'
+    )
+  })
+
+  it('template with array length', () => {
+    assertCodegen(
+      '<view>{{array.length}}</view>',
+      '<view>{{$root.g0}}</view>',
+      'with(this){var g0=array.length;$mp.data=Object.assign({},{$root:{g0:g0}})}'
+    )
+    assertCodegen(
+      '<view>{{array[\'length\']}}</view>',
+      '<view>{{$root.g0}}</view>',
+      'with(this){var g0=array["length"];$mp.data=Object.assign({},{$root:{g0:g0}})}'
+    )
+    assertCodegen(
+      '<button :disabled="array.length===0">hello world</button>',
+      '<button disabled="{{$root.g0===0}}">hello world</button>',
+      'with(this){var g0=array.length;$mp.data=Object.assign({},{$root:{g0:g0}})}'
+    )
+    assertCodegen(
+      '<button :disabled="array.test&&test(array.test.test).length===0">hello world</button>',
+      '<button disabled="{{$root.g0}}">hello world</button>',
+      'with(this){var g0=array.test&&test(array.test.test).length===0;$mp.data=Object.assign({},{$root:{g0:g0}})}'
+    )
+    assertCodegen(
+      '<view :class="\'c\'+array.length">hello world</view>',
+      '<view class="{{[\'c\'+$root.g0]}}">hello world</view>',
+      'with(this){var g0=array.length;$mp.data=Object.assign({},{$root:{g0:g0}})}'
+    )
+    assertCodegen(
+      '<view :style="array.length===0?\'height:30px;\':\'height:10px;\'">hello world</view>',
+      '<view style="{{($root.g0===0?\'height:30px;\':\'height:10px;\')}}">hello world</view>',
+      'with(this){var g0=array.length;$mp.data=Object.assign({},{$root:{g0:g0}})}'
+    )
+    assertCodegen(
+      '<view v-if="array.length">hello</view>',
+      '<block wx:if="{{$root.g0}}"><view>hello</view></block>',
+      'with(this){var g0=array.length;$mp.data=Object.assign({},{$root:{g0:g0}})}'
+    )
+    assertCodegen(
+      '<view v-if="array&&array.length">hello</view>',
+      '<block wx:if="{{$root.g0}}"><view>hello</view></block>',
+      'with(this){var g0=array&&array.length;$mp.data=Object.assign({},{$root:{g0:g0}})}'
+    )
+    assertCodegen(
+      '<view v-if="test1&&!test2&&array&&array.length">hello</view>',
+      '<block wx:if="{{$root.g0}}"><view>hello</view></block>',
+      'with(this){var g0=test1&&!test2&&array&&array.length;$mp.data=Object.assign({},{$root:{g0:g0}})}'
+    )
+    assertCodegen(
+      '<view v-show="array.length">hello</view>',
+      '<view hidden="{{!($root.g0)}}">hello</view>',
+      'with(this){var g0=array.length;$mp.data=Object.assign({},{$root:{g0:g0}})}'
+    )
+    assertCodegen(
+      '<view v-for="(item,index) in list" :key="index"><view v-if="item.length">{{getValue(item)}}</view></view>',
+      '<block wx:for="{{$root.l0}}" wx:for-item="item" wx:for-index="index" wx:key="index"><view><block wx:if="{{item.g0}}"><view>{{item.m0}}</view></block></view></block>',
+      'with(this){var l0=__map(list,function(item,index){var $orig=__get_orig(item);var g0=item.length;var m0=g0?getValue(item):null;return{$orig:$orig,g0:g0,m0:m0}});$mp.data=Object.assign({},{$root:{l0:l0}})}'
+    )
+    assertCodegen(
+      '<view v-for="(item,index) in list" :key="index"><view v-if="Object.values(item.list).length">{{test(item.list)}}</view></view>',
+      '<block wx:for="{{$root.l0}}" wx:for-item="item" wx:for-index="index" wx:key="index"><view><block wx:if="{{item.g0}}"><view>{{item.m0}}</view></block></view></block>',
+      'with(this){var l0=__map(list,function(item,index){var $orig=__get_orig(item);var g0=Object.values(item.list).length;var m0=g0?test(item.list):null;return{$orig:$orig,g0:g0,m0:m0}});$mp.data=Object.assign({},{$root:{l0:l0}})}'
+    )
+    assertCodegen(
+      '<my-component><template v-slot="{item}">{{item.length}}<template></my-component>',
+      '<my-component scoped-slots-compiler="augmented" vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}"><block wx:if="{{$root.m0}}">{{$root.g0}}</block></my-component>',
+      'with(this){var m0=$hasScopedSlotsParams("551070e6-1");var g0=m0?$getScopedSlotsParams("551070e6-1","default","item").length:null;$mp.data=Object.assign({},{$root:{m0:m0,g0:g0}})}',
+      {
+        scopedSlotsCompiler: 'auto'
+      }
+    )
+    assertCodegen(
+      '<my-component><template v-slot="{item}">{{item.length}}<template></my-component>',
+      '<my-component generic:scoped-slots-default="test-my-component-default" data-vue-generic="scoped" vue-id="551070e6-1" bind:__l="__l" vue-slots="{{[\'default\']}}"></my-component>',
+      undefined,
+      {
+        scopedSlotsCompiler: 'legacy'
+      }
+    )
+  })
+
+  it('skyline gesture', () => {
+    assertCodegen(
+      '<vertical-drag-gesture-handler onGestureEvent="handlePan" native-view="scroll-view" shouldResponseOnMove="shouldResponse" shouldAcceptGesture="shouldAccept"/>',
+      '<vertical-drag-gesture-handler onGestureEvent="handlePan" native-view="scroll-view" shouldResponseOnMove="shouldResponse" shouldAcceptGesture="shouldAccept"></vertical-drag-gesture-handler>'
     )
   })
 })

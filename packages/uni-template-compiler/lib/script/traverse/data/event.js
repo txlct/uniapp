@@ -1,5 +1,5 @@
 const t = require('@babel/types')
-const parser = require('@babel/parser')
+const template = require('@babel/template').default
 
 const {
   IDENTIFIER_EVENT,
@@ -7,13 +7,15 @@ const {
   INTERNAL_EVENT_PROXY,
   ATTR_DATA_EVENT_OPTS,
   ATTR_DATA_EVENT_PARAMS,
-  INTERNAL_SET_SYNC
+  INTERNAL_SET_SYNC,
+  INTERNAL_SET_MODEL
 } = require('../../../constants')
 
 const {
   getCode,
   customize,
-  processMemberExpression
+  processMemberExpression,
+  replaceMemberExpression
 } = require('../../../util')
 
 const {
@@ -124,18 +126,18 @@ function parseMethod (method, state) {
             if (isForIndex(state.scoped, element)) {
               return element
             } else {
-              extraArrayElements.push(t.stringLiteral(
+              extraArrayElements.push(replaceMemberExpression(t.stringLiteral(
                 getExtraDataPath(getCode(processMemberExpression(element, state)),
                   methodName)
-              ))
+              ), state))
             }
           } else {
             extraArrayElements.push(forExtra)
           }
         } else {
-          extraArrayElements.push(t.stringLiteral(
+          extraArrayElements.push(replaceMemberExpression(t.stringLiteral(
             getExtraDataPath(getCode(processMemberExpression(element, state)), methodName)
-          ))
+          ), state))
         }
         return t.stringLiteral('$' + (extraArrayElements.length - 1))
       } else if ( // +1=>1
@@ -320,17 +322,21 @@ function parseEvent (keyPath, valuePath, state, isComponent, isNativeOn = false,
           }
         }
 
+        const testCatch = function (stop) {
+          return function (path) {
+            // TODO 仅使用 name 容易误判
+            if (path.node.object.name === '$event' && path.node.property.name ===
+              'stopPropagation') {
+              isCatch = true
+              stop && path.stop()
+            }
+          }
+        }
         // 如果 v-for 遍历的值为 数组、对象、方法 则进入底部匿名表达式处理
         if (anonymous && isSafeScoped(state)) {
           funcPath.traverse({
             noScope: true,
-            MemberExpression (path) {
-              if (path.node.object.name === '$event' && path.node.property.name ===
-                'stopPropagation') {
-                isCatch = true
-                path.stop()
-              }
-            },
+            MemberExpression: testCatch(),
             AssignmentExpression (path) { // "update:title": function($event) {title = $event}
               const left = path.node.left
               const right = path.node.right
@@ -368,6 +374,7 @@ function parseEvent (keyPath, valuePath, state, isComponent, isNativeOn = false,
         if (anonymous) {
           // 处理复杂表达式中使用的局部变量（主要在v-for中定义）
           funcPath.traverse({
+            MemberExpression: testCatch(),
             Identifier (path) {
               const scope = path.scope
               const node = path.node
@@ -381,6 +388,13 @@ function parseEvent (keyPath, valuePath, state, isComponent, isNativeOn = false,
             funcPath.node.params.push(t.identifier(name))
           })
           if (params.length) {
+            if (!isCustom) {
+              const bodyStatements = funcPath.get('body.body')
+              const returnStatement = bodyStatements[0]
+              if (t.isReturnStatement(returnStatement) && t.isCallExpression(returnStatement.node.argument) && returnStatement.node.argument.callee.name === INTERNAL_SET_MODEL) {
+                funcPath.node.body.body.unshift(template('$event=$event.target.value')())
+              }
+            }
             let argumentsName = 'arguments'
             if (funcPath.isArrowFunctionExpression()) {
               argumentsName = 'args'
@@ -390,7 +404,7 @@ function parseEvent (keyPath, valuePath, state, isComponent, isNativeOn = false,
             const paramsUid = funcPath.scope.generateDeclaredUidIdentifier().name
             const dataset = ATTR_DATA_EVENT_PARAMS.substring(5)
             const code = `var ${datasetUid}=${argumentsName}[${argumentsName}.length-1].currentTarget.dataset,${paramsUid}=${datasetUid}.${dataset.replace(/-([a-z])/, (_, str) => str.toUpperCase())}||${datasetUid}['${dataset}'],${params.map(item => `${item}=${paramsUid}.${item}`).join(',')}`
-            funcPath.node.body.body.unshift(parser.parse(code).program.body[0])
+            funcPath.node.body.body.unshift(template(code)())
           }
           methods.push(addEventExpressionStatement(funcPath, state, isComponent, isNativeOn))
         }

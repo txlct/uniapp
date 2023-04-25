@@ -129,7 +129,7 @@ function getDefaultStartValue () {
     return '00:00'
   }
   if (this.mode === mode.DATE) {
-    const year = new Date().getFullYear() - 100
+    const year = new Date().getFullYear() - 150
     switch (this.fields) {
       case fields.YEAR:
         return year.toString()
@@ -147,7 +147,7 @@ function getDefaultEndValue () {
     return '23:59'
   }
   if (this.mode === mode.DATE) {
-    const year = new Date().getFullYear() + 100
+    const year = new Date().getFullYear() + 150
     switch (this.fields) {
       case fields.YEAR:
         return year.toString()
@@ -158,6 +158,29 @@ function getDefaultEndValue () {
     }
   }
   return ''
+}
+
+function getYearStartEnd (props) {
+  const year = new Date().getFullYear()
+  let start = year - 150
+  let end = year + 150
+  if (props.start) {
+    const _year = new Date(props.start).getFullYear()
+    if (!isNaN(_year) && _year < start) {
+      start = _year
+    }
+  }
+  if (props.end) {
+    const _year = new Date(props.end).getFullYear()
+    if (!isNaN(_year) && _year > end) {
+      end = _year
+    }
+  }
+
+  return {
+    start,
+    end
+  }
 }
 
 const mode = {
@@ -427,8 +450,8 @@ export default {
     },
     _createDate () {
       var years = []
-      var year = new Date().getFullYear()
-      for (let i = year - 150, end = year + 150; i <= end; i++) {
+      var year = getYearStartEnd(this)
+      for (let i = year.start, end = year.end; i <= end; i++) {
         years.push(String(i))
       }
       var months = []
@@ -462,7 +485,7 @@ export default {
         case mode.MULTISELECTOR:
           {
             if (!Array.isArray(val)) {
-              val = []
+              val = this.valueArray
             }
             if (!Array.isArray(this.valueSync)) {
               this.valueSync = []
@@ -703,7 +726,7 @@ uni-picker[disabled] {
   backface-visibility: hidden;
   z-index: 999;
   width: 100%;
-  background-color: #efeff4;
+  background-color: #fff;
   visibility: hidden;
   transition: transform 0.3s, visibility 0.3s;
 }
@@ -739,7 +762,6 @@ uni-picker[disabled] {
   text-align: center;
   width: 100%;
   height: 45px;
-  background-color: #fff;
 }
 
 .uni-picker-container .uni-picker-header:after {
@@ -868,6 +890,24 @@ uni-picker[disabled] {
   }
   .uni-selector-select .uni-picker-item.selected {
     color: #007aff;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .uni-picker-container .uni-picker-content {
+    background-color: var(--UI-BG-2);
+  }
+  .uni-picker-container .uni-picker-action.uni-picker-action-cancel {
+    color: var(--UI-FG-0);
+  }
+  .uni-picker-container .uni-picker-custom {
+    background-color: var(--UI-BG-2);
+  }
+  .uni-selector-select .uni-picker-item {
+    color: var(--UI-FG-0);
+  }
+  .uni-picker-container .uni-picker-header:after {
+    border-bottom-color: var(--UI-FG-3);
   }
 }
 </style>

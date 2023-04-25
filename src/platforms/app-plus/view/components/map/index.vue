@@ -46,6 +46,7 @@ const attrs = [
   'scale',
   'markers',
   'polyline',
+  'polygons',
   'circles',
   'controls',
   'show-location'
@@ -110,6 +111,12 @@ export default {
       }
     },
     circles: {
+      type: Array,
+      default () {
+        return []
+      }
+    },
+    polygons: {
       type: Array,
       default () {
         return []
@@ -186,37 +193,44 @@ export default {
     },
     circles (val) {
       this.map && this._addMapCircles(val)
+    },
+    polygons (val) {
+      this.map && this._addMapPolygons(val)
     }
   },
   mounted () {
-    const mapStyle = Object.assign({}, this.attrs, this.position)
-    if (this.latitude && this.longitude) {
-      mapStyle.center = new plus.maps.Point(this.longitude, this.latitude)
-    }
-    const map = this.map = plus.maps.create(this.$page.id + '-map-' + (this.id || Date.now()), mapStyle)
-    map.__markers__ = []
-    map.__markers_map__ = {}
-    map.__lines__ = []
-    map.__circles__ = []
-    map.setZoom(parseInt(this.scale))
-    plus.webview.currentWebview().append(map)
-    if (this.hidden) {
-      map.hide()
-    }
-    this.$watch('position', () => {
-      this.map && this.map.setStyles(this.position)
-    }, {
-      deep: true
+    this._onParentReady(() => {
+      const mapStyle = Object.assign({}, this.attrs, this.position)
+      if (this.latitude && this.longitude) {
+        mapStyle.center = new plus.maps.Point(this.longitude, this.latitude)
+      }
+      const map = this.map = plus.maps.create(this.$page.id + '-map-' + (this.id || Date.now()), mapStyle)
+      map.__markers__ = []
+      map.__markers_map__ = {}
+      map.__lines__ = []
+      map.__circles__ = []
+      map.__polygons__ = []
+      map.setZoom(parseInt(this.scale))
+      plus.webview.currentWebview().append(map)
+      if (this.hidden) {
+        map.hide()
+      }
+      this.$watch('position', () => {
+        this.map && this.map.setStyles(this.position)
+      }, {
+        deep: true
+      })
+      map.onclick = (e) => {
+        this.$trigger('click', {}, e)
+      }
+      map.onstatuschanged = (e) => {
+        this.$trigger('regionchange', {}, {})
+      }
+      this._addMarkers(this.markers)
+      this._addMapLines(this.polyline)
+      this._addMapCircles(this.circles)
+      this._addMapPolygons(this.polygons)
     })
-    map.onclick = (e) => {
-      this.$trigger('click', {}, e)
-    }
-    map.onstatuschanged = (e) => {
-      this.$trigger('regionchange', {}, {})
-    }
-    this._addMarkers(this.markers)
-    this._addMapLines(this.polyline)
-    this._addMapCircles(this.circles)
   },
   beforeDestroy () {
     this.map && this.map.close()
@@ -306,7 +320,9 @@ export default {
         if (id || id === 0) {
           nativeMarker.onclick = (e) => {
             this.$trigger('markertap', {}, {
-              markerId: id
+              markerId: id,
+              latitude,
+              longitude
             })
           }
           if (nativeBubble) {
@@ -421,6 +437,46 @@ export default {
         nativeMap.addOverlay(nativeCircle)
         nativeMap.__circles__.push(nativeCircle)
       })
+    },
+    _addMapPolygons (polygons) {
+      const nativeMap = this.map
+
+      const nativeMapPolygons = nativeMap.__polygons__
+      nativeMapPolygons.forEach(polygon => {
+        nativeMap.removeOverlay(polygon)
+      })
+      nativeMapPolygons.length = 0
+
+      polygons.forEach(polygon => {
+        const {
+          points,
+          strokeWidth,
+          strokeColor,
+          fillColor
+        } = polygon
+        const plusPoints = []
+        if (points) {
+          points.forEach(({ latitude, longitude }) => {
+            plusPoints.push(new plus.maps.Point(longitude, latitude))
+          })
+        }
+        const nativePolygon = new plus.maps.Polygon(plusPoints)
+        if (strokeColor) {
+          const strokeStyle = parseHex(strokeColor)
+          nativePolygon.setStrokeColor(strokeStyle.color)
+          nativePolygon.setStrokeOpacity(strokeStyle.opacity)
+        }
+        if (fillColor) {
+          const fillStyle = parseHex(fillColor)
+          nativePolygon.setFillColor(fillStyle.color)
+          nativePolygon.setFillOpacity(fillStyle.opacity)
+        }
+        if (strokeWidth) {
+          nativePolygon.setLineWidth(strokeWidth)
+        }
+        nativeMap.addOverlay(nativePolygon)
+        nativeMapPolygons.push(nativePolygon)
+      })
     }
   }
 }
@@ -447,7 +503,7 @@ export default {
     top: 0;
     left: 0;
     overflow: hidden;
-    background-color: black;
+    background-color: transparent;
   }
 
   .uni-map-slot {

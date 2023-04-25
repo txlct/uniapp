@@ -1,5 +1,9 @@
+const fs = require('fs')
+const path = require('path')
+
 const {
-  parsePages
+  parsePages,
+  getPlatformProject
 } = require('@dcloudio/uni-cli-shared')
 
 const {
@@ -9,7 +13,8 @@ const {
 const {
   hasOwn,
   parseStyle,
-  parseTabBar
+  parseTabBar,
+  NON_APP_JSON_KEYS
 } = require('../util')
 
 function defaultCopy (name, value, json) {
@@ -27,7 +32,8 @@ const pagesJson2AppJson = {
   tabBar: function (name, value, json) {
     json.tabBar = parseTabBar(value)
   },
-  preloadRule: defaultCopy
+  preloadRule: defaultCopy,
+  entryPagePath: defaultCopy
 }
 
 function copyToJson (json, fromJson, options) {
@@ -37,6 +43,8 @@ function copyToJson (json, fromJson, options) {
     }
   })
 }
+
+const projectKeys = ['component2', 'enableAppxNg']
 
 module.exports = function (pagesJson, manifestJson) {
   const app = {
@@ -70,22 +78,28 @@ module.exports = function (pagesJson, manifestJson) {
   copyToJson(app, pagesJson, pagesJson2AppJson)
 
   const platformJson = manifestJson['mp-alipay'] || {}
-  if (hasOwn(platformJson, 'plugins')) {
-    app.plugins = platformJson.plugins
-  }
 
-  if (platformJson.useDynamicPlugins) {
-    app.useDynamicPlugins = true
-  }
+  Object.keys(platformJson).forEach(key => {
+    if (!projectKeys.includes(key) && !NON_APP_JSON_KEYS.includes(key)) {
+      // usingComponents 是编译模式开关，需要过滤，不能拷贝到 app
+      app[key] = platformJson[key]
+    }
+  })
 
   if (app.usingComponents) {
     updateAppJsonUsingComponents(app.usingComponents)
   }
+  const projectName = getPlatformProject()
 
-  const project = Object.assign({}, manifestJson['mp-alipay'] || {})
-  delete project.usingComponents
-  delete project.plugins
-  delete project.useDynamicPlugins
+  let project = {}
+
+  const projectPath = path.resolve(process.env.UNI_INPUT_DIR, projectName)
+  if (fs.existsSync(projectPath)) {
+    project = require(projectPath)
+  } else {
+    project.component2 = hasOwn(platformJson, 'component2') ? platformJson.component2 : true
+    project.enableAppxNg = hasOwn(platformJson, 'enableAppxNg') ? platformJson.enableAppxNg : true
+  }
 
   return [{
     name: 'app',

@@ -21,6 +21,26 @@ function getShadowCss () {
 
   // return `${tagName}::after{position:fixed;content:'';left:-1000px;top:-1000px;-webkit-animation:shadow-preload .1s;-webkit-animation-delay:3s;animation:shadow-preload .1s;animation-delay:3s}@-webkit-keyframes shadow-preload{0%{background-image:url(https://cdn.dcloud.net.cn/img/shadow-grey.png)}100%{background-image:url(https://cdn.dcloud.net.cn/img/shadow-grey.png)}}@keyframes shadow-preload{0%{background-image:url(https://cdn.dcloud.net.cn/img/shadow-grey.png)}100%{background-image:url(https://cdn.dcloud.net.cn/img/shadow-grey.png)}}`
 }
+const cdns = {
+  'mp-weixin': 1,
+  'mp-alipay': 2,
+  'mp-baidu': 3,
+  'mp-toutiao': 4,
+  'mp-qq': 5,
+  'mp-360': 7,
+  'mp-dingtalk': 8,
+  'mp-kuaishou': 9,
+  'mp-lark': 10,
+  'mp-jd': 11,
+  'mp-xhs': 12,
+  'quickapp-webview-huawei': 200,
+  'quickapp-webview-union': 201
+}
+
+function getShadowCdn () {
+  const index = cdns[process.env.UNI_SUB_PLATFORM || process.env.UNI_PLATFORM] || ''
+  return `https://cdn${index}.dcloud.net.cn`
+}
 
 // 解决 vue-cli-service lint 时 UNI_PLATFORM 不存在
 process.env.UNI_PLATFORM = process.env.UNI_PLATFORM || 'h5'
@@ -36,7 +56,8 @@ module.exports = {
   normalizeNodeModules,
   isInHBuilderX,
   isInHBuilderXAlpha,
-  runByHBuilderX: isInHBuilderX || fs.existsSync(path.resolve(process.env.UNI_HBUILDERX_PLUGINS || '', 'weapp-tools')),
+  runByHBuilderX: isInHBuilderX || fs.existsSync(path.resolve(process.env.UNI_HBUILDERX_PLUGINS || '',
+    'weapp-tools')),
   getFlexDirection (json) {
     let flexDir = 'column'
     if (json && json.nvue && json.nvue['flex-direction']) {
@@ -92,7 +113,11 @@ module.exports = {
   },
   getMPRuntimePath () {
     if (process.env.UNI_USING_VUE3) {
-      return require.resolve('@dcloudio/uni-' + process.env.UNI_PLATFORM + '/dist/uni.mp.esm.js')
+      try {
+        return require.resolve('@dcloudio/uni-' + process.env.UNI_PLATFORM + '/dist/uni.mp.esm.js')
+      } catch (error) {
+        throw new Error('Vue3 项目暂不支持当前小程序')
+      }
     }
     return require.resolve('@dcloudio/uni-' + process.env.UNI_PLATFORM)
   },
@@ -124,10 +149,11 @@ module.exports = {
   getShadowCss,
   getShadowTemplate (colorType = 'grey') {
     let tagName = 'cover-image'
-    if (process.env.UNI_PLATFORM === 'mp-toutiao') {
+    if (process.env.UNI_PLATFORM === 'mp-toutiao' || process.env.UNI_PLATFORM === 'mp-lark' || process.env
+      .UNI_PLATFORM === 'mp-xhs') {
       tagName = 'image'
     }
-    return `<${tagName} src="https://cdn.dcloud.net.cn/img/shadow-${colorType}.png" style="z-index:998;position:fixed;left:0;top:0;width:100%;height:3px;"/>`
+    return `<${tagName} src="${getShadowCdn()}/img/shadow-${colorType}.png" style="z-index:998;position:fixed;left:0;top:0;width:100%;height:3px;"/>`
   },
   getPlatformScss () {
     return SCSS
@@ -135,10 +161,36 @@ module.exports = {
   getPlatformSass () {
     return SASS
   },
+  getPlatformStat () {
+    if (!process.env.UNI_USING_STAT) {
+      return ''
+    }
+    return process.env.UNI_USING_STAT === '2' ? 'import \'@dcloudio/uni-stat/dist/uni-cloud-stat.es.js\';'
+      : 'import \'@dcloudio/uni-stat/dist/uni-stat.es.js\';'
+  },
+  getPlatformPush () {
+    if (process.env.UNI_PUSH_V2_OFFLINE || process.env.UNI_PUSH_V1) {
+      return ';import \'@dcloudio/vue-cli-plugin-uni/packages/uni-push/dist/uni-push.plus.es.js\';'
+    } else if (process.env.UNI_PUSH_V2) {
+      return ';import \'@dcloudio/vue-cli-plugin-uni/packages/uni-push/dist/uni-push.es.js\';'
+    }
+    return ''
+  },
+  getPlatformUniCloud () {
+    if (JSON.parse(process.env.UNI_CLOUD_PROVIDER || '[]').length) {
+      const uniCloudLibPath = '@dcloudio/vue-cli-plugin-uni/packages/uni-cloud/dist/index.js'
+      return `import '${uniCloudLibPath}';`
+    }
+    return ''
+  },
   getBabelParserOptions () {
     return {
       sourceType: 'module',
       plugins: [
+        ['pipelineOperator', {
+          proposal: 'minimal'
+        }],
+        'doExpressions',
         'optionalChaining',
         'typescript',
         ['decorators', {

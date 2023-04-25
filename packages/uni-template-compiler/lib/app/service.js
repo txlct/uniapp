@@ -18,6 +18,7 @@ const {
 const {
   parseIs,
   parseRef,
+  parseSlotName,
   parseIf,
   parseFor,
   parseText,
@@ -71,6 +72,9 @@ function parseKey (el, isScopedSlot) {
   } else { // <template v-for="item in items"><view :key="item.id+'1'"></view><view :key="item.id+'2'"></view></template>
     const keyIndex = forEl.children.indexOf(el)
     el.key = genVar(V_FOR, `{forIndex:${it},keyIndex:${keyIndex},key:${el.key}}`)
+  }
+  if (el.tag === 'slot') {
+    el.attrs.push({ name: 'key', value: el.key })
   }
 }
 
@@ -134,6 +138,7 @@ function transformNode (el, parent, state, isScopedSlot) {
 
   parseIs(el, genVar)
   parseRef(el, genVar)
+  parseSlotName(el, genVar)
   parseFor(el, createGenVar, isScopedSlot, checkAutoFill(el))
   parseKey(el, isScopedSlot)
 

@@ -34,6 +34,7 @@ const loadMode = {
 const attrs = [
   'pageCurrent',
   'pageSize',
+  'spaceInfo',
   'collection',
   'action',
   'field',
@@ -54,8 +55,14 @@ export default {
         return {}
       }
     },
+    spaceInfo: {
+      type: Object,
+      default () {
+        return {}
+      }
+    },
     collection: {
-      type: String,
+      type: [String, Array],
       default: ''
     },
     action: {
@@ -148,6 +155,14 @@ export default {
       errorMessage: ''
     }
   },
+  computed: {
+    collectionArgs () {
+      return Array.isArray(this.collection) ? this.collection : [this.collection]
+    },
+    isLookup () {
+      return (Array.isArray(this.collection) && this.collection.length > 1) || (typeof this.collection === 'string' && this.collection.indexOf(',') > -1)
+    }
+  },
   created () {
     this._isEnded = false
     this.paginationInternal = {
@@ -163,11 +178,13 @@ export default {
       })
       return al
     }, (newValue, oldValue) => {
+      this.paginationInternal.size = this.pageSize
+      if (newValue[0] !== oldValue[0]) {
+        this.paginationInternal.current = this.pageCurrent
+      }
       if (this.loadtime === loadMode.manual) {
         return
       }
-
-      this.paginationInternal.size = this.pageSize
 
       let needReset = false
       for (let i = 2; i < newValue.length; i++) {
@@ -179,9 +196,6 @@ export default {
       if (needReset) {
         this.clear()
         this.reset()
-      }
-      if (newValue[0] !== oldValue[0]) {
-        this.paginationInternal.current = this.pageCurrent
       }
 
       this._execLoadData()
@@ -309,12 +323,12 @@ export default {
         })
       }
       /* eslint-disable no-undef */
-      let db = uniCloud.database()
+      let db = uniCloud.database(this.spaceInfo)
       if (action) {
         db = db.action(action)
       }
 
-      db.collection(this._getCollection()).add(value).then((res) => {
+      db.collection(this.getMainCollection()).add(value).then((res) => {
         success && success(res)
         if (showToast) {
           uni.showToast({
@@ -383,12 +397,12 @@ export default {
         })
       }
       /* eslint-disable no-undef */
-      let db = uniCloud.database()
+      let db = uniCloud.database(this.spaceInfo)
       if (action) {
         db = db.action(action)
       }
 
-      return db.collection(this._getCollection()).doc(id).update(value).then((res) => {
+      return db.collection(this.getMainCollection()).doc(id).update(value).then((res) => {
         success && success(res)
         if (showToast) {
           uni.showToast({
@@ -410,24 +424,31 @@ export default {
         complete && complete()
       })
     },
-    getTemp(isTemp = true) {
+    getMainCollection () {
+      if (typeof this.collection === 'string') {
+        return this.collection.split(',')[0]
+      }
+      const mainQuery = JSON.parse(JSON.stringify(this.collection[0]))
+      return mainQuery.$db[0].$param[0]
+    },
+    getTemp (isTemp = true) {
       /* eslint-disable no-undef */
-      let db = uniCloud.database()
+      let db = uniCloud.database(this.spaceInfo)
 
       if (this.action) {
         db = db.action(this.action)
       }
 
-      db = db.collection(this.collection)
+      db = db.collection(...this.collectionArgs)
 
+      if (this.foreignKey) {
+        db = db.foreignKey(this.foreignKey)
+      }
       if (!(!this.where || !Object.keys(this.where).length)) {
         db = db.where(this.where)
       }
       if (this.field) {
         db = db.field(this.field)
-      }
-      if (this.foreignKey) {
-        db = db.foreignKey(this.foreignKey)
       }
       if (this.groupby) {
         db = db.groupBy(this.groupby)
@@ -471,7 +492,7 @@ export default {
 
       return db
     },
-    setResult(result) {
+    setResult (result) {
       if (result.code === 0) {
         this._execLoadDataSuccess(result)
       } else {
@@ -505,12 +526,12 @@ export default {
         this._execLoadDataFail(err, callback)
       })
     },
-    _execLoadDataSuccess(result, callback, clear) {
+    _execLoadDataSuccess (result, callback, clear) {
       const {
         data,
         count
       } = result
-      this._isEnded = data.length < this.pageSize
+      this._isEnded = count !== undefined ? (this.paginationInternal.current * this.paginationInternal.size >= count) : (data.length < this.pageSize)
       this.hasMore = !this._isEnded
 
       const data2 = this.getone ? (data.length ? data[0] : undefined) : data
@@ -532,7 +553,7 @@ export default {
         }
       }
     },
-    _execLoadDataFail(err, callback) {
+    _execLoadDataFail (err, callback) {
       this.errorMessage = err
       callback && callback()
       this.$emit(events.error, err)
@@ -561,7 +582,7 @@ export default {
       }
 
       /* eslint-disable no-undef */
-      const db = uniCloud.database()
+      const db = uniCloud.database(this.spaceInfo)
       const dbCmd = db.command
 
       let exec = db
@@ -569,7 +590,7 @@ export default {
         exec = exec.action(action)
       }
 
-      exec.collection(this._getCollection()).where({
+      exec.collection(this.getMainCollection()).where({
         _id: dbCmd.in(ids)
       }).remove().then((res) => {
         success && success(res.result)
@@ -592,11 +613,6 @@ export default {
         }
         complete && complete()
       })
-    },
-    _getCollection () {
-      const index = this.collection.indexOf(',')
-      const collection = index > 0 ? this.collection.substring(0, index) : this.collection
-      return collection
     },
     removeData (ids) {
       const il = ids.slice(0)

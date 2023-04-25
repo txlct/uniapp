@@ -1,8 +1,8 @@
 {
   "name": "@dcloudio/uni-stat",
-  "version": "2.0.0-31920210709003",
+  "version": "2.0.2-3070920230324001",
   "description": "",
-  "main": "dist/index.js",
+  "main": "dist/uni-stat.es.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/txlct/uniapp.git",
@@ -34,5 +34,5 @@
     "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-uglify": "^6.0.2"
   },
-  "gitHead": "2033cd540cff5d8469ff77e87779cd4daa5c9121"
+  "gitHead": "4a974e44466ae58194372e446299cf83c7a3ad2c"
 }

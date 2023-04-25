@@ -1,9 +1,9 @@
 const fs = require('fs')
 const path = require('path')
+const webpack = require('webpack')
 const {
   removeExt,
-  normalizePath,
-  getPlatformExts
+  normalizePath
 } = require('@dcloudio/uni-cli-shared')
 const {
   getComponentSet
@@ -14,7 +14,9 @@ const {
 } = require('@dcloudio/uni-cli-shared/lib/pages')
 
 const {
-  restoreNodeModules
+  restoreNodeModules,
+  createSource,
+  getModuleId
 } = require('../shared')
 
 const EMPTY_COMPONENT_LEN = 'Component({})'.length
@@ -40,21 +42,21 @@ function findModule (modules, resource, altResource) {
   )
 }
 
-function findModuleId (modules, resource, altResource) {
+function findModuleId (compilation, modules, resource, altResource) {
   const module = findModule(modules, resource, altResource)
-  return module && module.id
+  return module && getModuleId(compilation, module)
 }
 
-function findModuleIdFromConcatenatedModules (modules, resource, altResource) {
+function findModuleIdFromConcatenatedModules (compilation, modules, resource, altResource) {
   const module = modules.find(module => {
     return findModule(module.modules, resource, altResource)
   })
-  return module && module.id
+  return module && getModuleId(compilation, module)
 }
 
-function findComponentModuleId (modules, concatenatedModules, resource, altResource) {
-  return findModuleId(modules, resource, altResource) ||
-    findModuleIdFromConcatenatedModules(concatenatedModules, resource, altResource) ||
+function findComponentModuleId (compilation, modules, concatenatedModules, resource, altResource) {
+  return findModuleId(compilation, modules, resource, altResource) ||
+    findModuleIdFromConcatenatedModules(compilation, concatenatedModules, resource, altResource) ||
     resource
 }
 
@@ -62,21 +64,29 @@ let lastComponents = []
 // TODO 解决方案不太理想
 module.exports = function generateComponent (compilation, jsonpFunction = 'webpackJsonp') {
   const curComponents = []
+  const componentChunkNameMap = {}
   const components = getComponentSet()
   if (components.size) {
-    const assets = compilation.assets
-    const modules = compilation.modules
+    const modules = Array.from(compilation.modules)
 
     const concatenatedModules = modules.filter(module => module.modules)
-    const uniModuleId = modules.find(module => module.resource && normalizePath(module.resource) === uniPath).id
-    const styleImports = {}
-    const fixSlots = {}
+    let uniModule = modules.find(module => module.resource && normalizePath(module.resource) === uniPath)
+    if (!uniModule && webpack.version[0] > 4) {
+      uniModule = modules.find(module => module.rootModule && module.rootModule.resource && normalizePath(module.rootModule.resource) === uniPath)
+    }
+    const uniModuleId = getModuleId(compilation, uniModule)
+    const vueOuterComponentSting = 'vueOuterComponents'
 
-    Object.keys(assets).forEach(name => {
-      if (components.has(name.replace('.js', ''))) {
+    compilation.getAssets().forEach(asset => {
+      const name = asset.name
+      // 判断是不是vue
+      const isVueComponent = components.has(name.replace('.js', ''))
+      // 独立分包外面的组件，复制到独立分包内，在components中看不到，所以需要单独处理
+      const isVueOuterComponent = Boolean(name.endsWith('.js') && name.indexOf(vueOuterComponentSting) >= 0)
+      if (isVueComponent || isVueOuterComponent) {
         curComponents.push(name.replace('.js', ''))
 
-        if (assets[name].source.__$wrappered) {
+        if (asset.source.__$wrappered) {
           return
         }
 
@@ -92,13 +102,22 @@ module.exports = function generateComponent (compilation, jsonpFunction = 'webpa
             resource = normalizePath(path.resolve(process.env.UNI_CLI_CONTEXT, modulePath))
           }
 
-          moduleId = findComponentModuleId(modules, concatenatedModules, resource, altResource)
+          moduleId = findComponentModuleId(compilation, modules, concatenatedModules, resource, altResource)
         } else {
           const resource = removeExt(path.resolve(process.env.UNI_INPUT_DIR, name))
-          moduleId = findComponentModuleId(modules, concatenatedModules, resource)
+          moduleId = findComponentModuleId(compilation, modules, concatenatedModules, resource)
         }
 
-        const origSource = assets[name].source()
+        const origSource = asset.source.source()
+
+        if (isVueComponent) {
+          componentChunkNameMap[name] = moduleId
+        } else if (isVueOuterComponent) {
+          const startIndex = name.indexOf(vueOuterComponentSting) + vueOuterComponentSting.length + 1
+          const rightOriginalComponentName = name.substring(startIndex)
+          moduleId = componentChunkNameMap[rightOriginalComponentName]
+        }
+
         if (origSource.length !== EMPTY_COMPONENT_LEN) { // 不是空组件
           const globalVar = process.env.UNI_PLATFORM === 'mp-alipay' ? 'my' : 'global'
           // 主要是为了解决支付宝旧版本， Component 方法只在组件 js 里有，需要挂在 my.defineComponent
@@ -106,8 +125,17 @@ module.exports = function generateComponent (compilation, jsonpFunction = 'webpa
           if (process.env.UNI_PLATFORM === 'mp-alipay') {
             beforeCode = ';my.defineComponent || (my.defineComponent = Component);'
           }
-          const source = beforeCode + origSource +
-            `
+          const source = beforeCode + origSource + (webpack.version[0] > 4
+            ? `
+;(${globalVar}["${jsonpFunction}"] = ${globalVar}["${jsonpFunction}"] || []).push([
+    ['${chunkName}'],
+    {},
+    function(__webpack_require__){
+      __webpack_require__('${uniModuleId}')['createComponent'](__webpack_require__(${JSON.stringify(moduleId)}))
+    }
+]);
+`
+            : `
 ;(${globalVar}["${jsonpFunction}"] = ${globalVar}["${jsonpFunction}"] || []).push([
     '${chunkName}',
     {
@@ -118,83 +146,10 @@ module.exports = function generateComponent (compilation, jsonpFunction = 'webpa
     [['${chunkName}']]
 ]);
 `
-          const newSource = function () {
-            return source
-          }
+          )
+          const newSource = createSource(source)
           newSource.__$wrappered = true
-          assets[name].source = newSource
-        }
-      }
-      const styleExtname = getPlatformExts().style
-      if (name.endsWith(styleExtname)) {
-        // 移除部分含有错误引用的 wxss 文件
-        let origSource = assets[name].source()
-        origSource = origSource.trim ? origSource.trim() : ''
-        const result = origSource.match(/^@import ["'](.+?)["']$/)
-        if (result) {
-          const stylePath = normalizePath(path.join(path.dirname(name), result[1]))
-          if (Object.keys(assets).includes(stylePath)) {
-            styleImports[stylePath] = styleImports[stylePath] || []
-            styleImports[stylePath].push(name)
-          } else {
-            if (styleImports[name]) {
-              styleImports[name].forEach(name => delete assets[name])
-              delete styleImports[name]
-            }
-            delete assets[name]
-          }
-        }
-      }
-      // 处理字节跳动小程序作用域插槽
-      const fixExtname = '.fix'
-      if (name.endsWith(fixExtname)) {
-        const source = assets[name].source()
-        const [ownerName, parentName, componentName, slotName] = source.split(',')
-        const json = assets[ownerName + '.json']
-        const jsonSource = json.source()
-        if (jsonSource) {
-          const data = JSON.parse(jsonSource)
-          const usingComponents = data.usingComponents || {}
-          const componentPath = normalizePath(path.relative('/', usingComponents[parentName]))
-          const slots = fixSlots[componentPath] = fixSlots[componentPath] || {}
-          const slot = slots[slotName] = slots[slotName] || {}
-          slot[componentName] = '/' + name.replace(fixExtname, '')
-          delete assets[name]
-
-          const jsonFile = assets[`${componentPath}.json`]
-          if (jsonFile) {
-            const oldSource = jsonFile.__$oldSource || jsonFile.source()
-            const sourceObj = JSON.parse(oldSource)
-            Object.values(slots).forEach(components => {
-              const usingComponents = sourceObj.usingComponents = sourceObj.usingComponents || {}
-              Object.assign(usingComponents, components)
-            })
-            delete sourceObj.componentGenerics
-            const source = JSON.stringify(sourceObj, null, 2)
-            jsonFile.source = function () {
-              return source
-            }
-            jsonFile.__$oldSource = oldSource
-          }
-
-          const templateFile = assets[`${componentPath}${getPlatformExts().template}`]
-          if (templateFile) {
-            const oldSource = templateFile.__$oldSource || templateFile.source()
-            let templateSource
-            Object.keys(slots).forEach(name => {
-              const reg = new RegExp(`<${name} (.+?)></${name}>`)
-              templateSource = oldSource.replace(reg, string => {
-                const props = string.match(reg)[1]
-                return Object.keys(slots[name]).map(key => {
-                  return `<block tt:if="{{generic['${name.replace(/^scoped-slots-/, '')}']==='${key}'}}"><${key} ${props}></${key}></block>`
-                }).join('')
-              })
-            })
-            templateFile.source = function () {
-              return templateSource
-            }
-            templateFile.__$oldSource = oldSource
-          }
+          compilation.updateAsset(name, newSource)
         }
       }
     })

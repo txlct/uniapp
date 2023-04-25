@@ -1,28 +1,18 @@
-const path = require('path')
-
-const isWin = /^win/.test(process.platform)
-
-const normalizePath = path => (isWin ? path.replace(/\\/g, '/') : path)
+const fileLoader = require('./file-loader.js')
 
 const defaultOptions = {
   limit: -1,
-  fallback: {
-    loader: 'file-loader',
-    options: {
-      publicPath (url, resourcePath, context) {
-        return '/' + normalizePath(path.relative(process.env.UNI_INPUT_DIR, resourcePath))
-      },
-      outputPath (url, resourcePath, context) {
-        return normalizePath(path.relative(process.env.UNI_INPUT_DIR, resourcePath))
-      }
-    }
-  }
+  fallback: fileLoader
 }
 
 const inlineLimit =
   process.env.UNI_PLATFORM === 'mp-weixin' ||
   process.env.UNI_PLATFORM === 'mp-qq' ||
   process.env.UNI_PLATFORM === 'mp-toutiao' ||
+  process.env.UNI_PLATFORM === 'mp-kuaishou' ||
+  process.env.UNI_PLATFORM === 'mp-lark' ||
+  process.env.UNI_PLATFORM === 'mp-jd' ||
+  process.env.UNI_PLATFORM === 'mp-xhs' ||
   process.env.UNI_PLATFORM === 'app-plus' // v2需要base64,v3需要rewriteUrl
 
 // mp-weixin,mp-qq,app-plus 非v3(即：需要base64的平台)

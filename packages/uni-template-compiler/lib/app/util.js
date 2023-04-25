@@ -15,10 +15,14 @@ const GET_CHANGE_DATA = '_$gc' // wxs
 const C_IS = 'is'
 const C_SLOT_TARGET = 'st'
 const C_REF = 'ref'
+const C_NAME = 'name'
 
 const V_FOR = 'f'
 const V_IF = 'i'
 const V_ELSE_IF = 'e'
+
+// web components
+const elements = ['uni-view']
 
 function isVar (str) {
   if (!str) {
@@ -265,6 +269,7 @@ function addHandler (el, name, value, important) {
 module.exports = {
   C_IS,
   C_REF,
+  C_NAME,
   V_FOR,
   V_IF,
   V_ELSE_IF,
@@ -273,6 +278,7 @@ module.exports = {
   GET_DATA,
   SET_MP_CLASS,
   GET_CHANGE_DATA,
+  elements,
   isVar,
   hasOwn,
   addAttr,

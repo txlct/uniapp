@@ -4,6 +4,7 @@ const t = require('@babel/types')
 const babelTraverse = require('@babel/traverse').default
 
 const generate = require('./generate')
+const uniI18n = require('@dcloudio/uni-cli-i18n')
 
 const {
   genCode,
@@ -230,10 +231,10 @@ function traverseDataNode (dataNode, state, node) {
                   let key
                   // 自定义组件不支持 hidden 属性
                   const platform = state.options.platform.name
-                  const platforms = ['mp-weixin', 'mp-qq', 'mp-toutiao']
+                  const platforms = ['mp-weixin', 'mp-qq', 'mp-jd', 'mp-xhs', 'mp-toutiao', 'mp-lark']
                   if (isComponent(node.type) && platforms.includes(platform)) {
-                    // 字节跳动小程序自定义属性不会反应在DOM上，只能使用事件格式
-                    key = `${platform === 'mp-toutiao' ? 'bind:-' : ''}${ATTE_DATA_CUSTOM_HIDDEN}`
+                    // 字节跳动|飞书小程序自定义属性不会反应在DOM上，只能使用事件格式
+                    key = `${platform === 'mp-toutiao' || platform === 'mp-lark' ? 'bind:-' : ''}${ATTE_DATA_CUSTOM_HIDDEN}`
                   } else {
                     key = 'hidden'
                   }
@@ -269,7 +270,7 @@ function traverseArrayExpression (arrayExprNodes, state) {
   }, [])
 }
 
-function genSlotNode (slotName, slotNode, fallbackNodes, state) {
+function genSlotNode (slotName, slotNode, fallbackNodes, state, isStaticSlotName = true) {
   if (!fallbackNodes || t.isNullLiteral(fallbackNodes)) {
     return slotNode
   }
@@ -281,7 +282,7 @@ function genSlotNode (slotName, slotNode, fallbackNodes, state) {
   return [{
     type: 'block',
     attr: {
-      [prefix + 'if']: '{{$slots.' + slotName + '}}'
+      [prefix + 'if']: isStaticSlotName ? '{{$slots.' + slotName + '}}' : '{{$slots[' + slotName.replace(/^{{/, '').replace(/}}$/, '') + ']}}'
     },
     children: [].concat(slotNode)
   }, {
@@ -296,12 +297,9 @@ function genSlotNode (slotName, slotNode, fallbackNodes, state) {
 }
 
 function traverseRenderSlot (callExprNode, state) {
-  if (!t.isStringLiteral(callExprNode.arguments[0])) {
-    state.errors.add('v-slot 不支持动态插槽名')
-    return
-  }
-
-  const slotName = callExprNode.arguments[0].value
+  const slotNameNode = callExprNode.arguments[0]
+  const isStaticSlotName = t.isStringLiteral(slotNameNode)
+  const slotName = isStaticSlotName ? slotNameNode.value : genCode(slotNameNode)
 
   let deleteSlotName = false // 标记是否组件 slot 手动指定了 name="default"
   if (state.options.scopedSlotsCompiler !== 'augmented' && callExprNode.arguments.length > 2) { // 作用域插槽
@@ -311,6 +309,10 @@ function traverseRenderSlot (callExprNode, state) {
     })
     deleteSlotName = props.SLOT_DEFAULT && Object.keys(props).length === 1
     if (!deleteSlotName) {
+      if (!isStaticSlotName) {
+        state.errors.add(uniI18n.__('templateCompiler.notSupportDynamicSlotName', { 0: 'v-slot' }))
+        return
+      }
       delete props.SLOT_DEFAULT
       return genSlotNode(
         slotName,
@@ -333,28 +335,50 @@ function traverseRenderSlot (callExprNode, state) {
     delete node.attr.name
   }
 
-  return genSlotNode(slotName, node, callExprNode.arguments[1], state)
+  return genSlotNode(slotName, node, callExprNode.arguments[1], state, isStaticSlotName)
 }
 
 function traverseResolveScopedSlots (callExprNode, state) {
-  function single (children, slotName, ignore) {
-    if (Array.isArray(children) && children.length === 1) {
-      const child = children[0]
-      if (!child.type) {
-        return
+  const options = state.options
+  const vIfAttrName = options.platform.directive + 'if'
+  function single (node, slotName, vIfCode, ignore) {
+    let last = node
+    const vIfs = vIfCode ? [vIfCode] : []
+    function find (children) {
+      if (Array.isArray(children) && children.length === 1) {
+        const child = children[0]
+        if (!child.type) {
+          return
+        }
+        last = child
+        if (child.attr && child.attr[vIfAttrName]) {
+          vIfs.push(child.attr[vIfAttrName])
+          delete child.attr[vIfAttrName]
+        }
+        if (ignore.includes(child.type) && !(child.attr && Object.keys(child.attr).length)) {
+          find(child.children, ignore)
+        }
       }
-      if (ignore.includes(child.type)) {
-        return single(child.children, slotName, ignore)
-      }
-      child.attr = child.attr || {}
-      child.attr.slot = slotName
-      return true
     }
+    find(node.children)
+    last.attr = last.attr || {}
+    last.attr.slot = slotName
+    if (vIfs.length) {
+      // 简易合并
+      last.attr[vIfAttrName] = vIfs.length > 1 ? `{{${vIfs.map(str => str.replace(/^\{\{(.+)\}\}$/, '($1)')).join('&&')}}}` : vIfs[0]
+    }
+    return last
   }
   return callExprNode.arguments[0].elements.map(slotNode => {
     let keyProperty = false
     let fnProperty = false
     let proxyProperty = false
+    let vIfCode
+    // TODO v-else
+    if (t.isConditionalExpression(slotNode)) {
+      vIfCode = genCode(slotNode.test)
+      slotNode = slotNode.consequent
+    }
     slotNode.properties.forEach(property => {
       switch (property.key.name) {
         case 'key':
@@ -370,14 +394,14 @@ function traverseResolveScopedSlots (callExprNode, state) {
     const slotName = keyProperty.value.value
     const returnExprNodes = fnProperty.value.body.body[0].argument
     const parentNode = callExprNode.$node
-    if (slotNode.scopedSlotsCompiler !== 'augmented' && !proxyProperty) {
-      const resourcePath = state.options.resourcePath
+    if (options.scopedSlotsCompiler !== 'augmented' && slotNode.scopedSlotsCompiler !== 'augmented' && !proxyProperty) {
+      const resourcePath = options.resourcePath
       const ownerName = path.basename(resourcePath, path.extname(resourcePath))
 
       const parentName = parentNode.type
 
       const paramExprNode = fnProperty.value.params[0]
-      return state.options.platform.resolveScopedSlots(
+      return options.platform.resolveScopedSlots(
         slotName, {
           genCode,
           generate,
@@ -397,21 +421,14 @@ function traverseResolveScopedSlots (callExprNode, state) {
         state
       )
     }
-    if (state.options.scopedSlotsCompiler === 'auto' && slotNode.scopedSlotsCompiler === 'augmented') {
+    if (options.scopedSlotsCompiler === 'auto' && slotNode.scopedSlotsCompiler === 'augmented') {
       parentNode.attr['scoped-slots-compiler'] = 'augmented'
     }
-    const children = normalizeChildren(traverseExpr(returnExprNodes, state))
     // 除百度、字节外其他小程序仅默认插槽可以支持多个节点
-    if (single(children, slotName, ['template', 'block'])) {
-      return children[0]
-    }
-    return {
+    return single({
       type: 'block',
-      attr: {
-        slot: slotName
-      },
-      children
-    }
+      children: normalizeChildren(traverseExpr(returnExprNodes, state))
+    }, slotName, vIfCode, ['template', 'block'])
   })
 }
 
@@ -427,8 +444,15 @@ function traverseRenderList (callExprNode, state) {
 
   const prefix = state.options.platform.directive
 
+  const isBaidu = state.options.platform.name === 'mp-baidu'
+  let forValue = genCode(callExprNode.arguments[0], isBaidu)
+
+  if (isBaidu && forKey) {
+    forValue += ` trackBy ${getForKey(forKey, forIndex, state)}`
+  }
+
   const attr = {
-    [prefix + 'for']: genCode(callExprNode.arguments[0]),
+    [prefix + 'for']: forValue,
     [prefix + 'for-item']: forItem
   }
 
@@ -436,7 +460,7 @@ function traverseRenderList (callExprNode, state) {
     attr[prefix + 'for-index'] = forIndex
   }
 
-  if (forKey) {
+  if (forKey && !isBaidu) {
     const key = getForKey(forKey, forIndex, state)
     if (key) {
       attr[prefix + 'key'] = key

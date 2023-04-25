@@ -124,6 +124,8 @@ export default {
       this.setPageMeta()
     }
     this.backgroundTextStyle && this.setBackgroundTextStyle()
+  },
+  mounted () {
     this.scrollTop && this.pageScrollTo()
   },
   methods: {
@@ -147,7 +149,7 @@ export default {
     setBackgroundTextStyle () {
       // TODO h5 app-plus 暂不支持
       // #ifdef MP
-      uni.setBackgroundTextStyle({
+      uni.setBackgroundTextStyle && uni.setBackgroundTextStyle({
         textStyle: this.backgroundTextStyle
       })
       // #endif
@@ -155,7 +157,7 @@ export default {
     setBackgroundColor () {
       // TODO h5 app-plus 暂不支持
       // #ifdef MP
-      uni.setBackgroundColor({
+      uni.setBackgroundColor && uni.setBackgroundColor({
         backgroundColor: this.backgroundColor,
         backgroundColorTop: this.backgroundColorTop,
         backgroundColorBottom: this.backgroundColorBottom

@@ -39,10 +39,12 @@
         :class="{ 'uni-textarea-textarea-fix-margin': fixMargin }"
         :style="{ 'overflow-y': autoHeight ? 'hidden' : 'auto' }"
         :enterkeyhint="confirmType"
+        :inputmode="inputmode"
         class="uni-textarea-textarea"
         @change.stop
-        @compositionstart.stop="_onCompositionstart"
-        @compositionend.stop="_onCompositionend"
+        @compositionstart.stop="_onComposition"
+        @compositionend.stop="_onComposition"
+        @compositionupdate.stop="_onComposition"
         @input.stop="_onInput"
         @focus="_onFocus"
         @blur="_onBlur"
@@ -71,6 +73,8 @@ import {
   field
 } from 'uni-mixins'
 const DARK_TEST_STRING = '(prefers-color-scheme: dark)'
+const ConfirmTypes = ['done', 'go', 'next', 'search', 'send'] // 'return'
+const INPUT_MODES = ['none', 'text', 'decimal', 'numeric', 'tel', 'search', 'email', 'url']
 export default {
   name: 'Textarea',
   mixins: [field],
@@ -105,7 +109,17 @@ export default {
     },
     confirmType: {
       type: String,
-      default: ''
+      default: 'return',
+      validator (val) {
+        return ConfirmTypes.concat('return').includes(val)
+      }
+    },
+    inputmode: {
+      type: String,
+      default: undefined,
+      validator (value) {
+        return !!~INPUT_MODES.indexOf(value)
+      }
     }
   },
   data () {
@@ -126,7 +140,7 @@ export default {
       return (this.composing ? this.valueComposition : this.valueSync).split('\n')
     },
     isDone () {
-      return ['done', 'go', 'next', 'search', 'send'].includes(this.confirmType)
+      return ConfirmTypes.includes(this.confirmType)
     }
   },
   watch: {
@@ -187,20 +201,26 @@ export default {
     _onKeyUpEnter: function ($event) {
       if (this.isDone) {
         this._confirm($event)
-        this.$refs.textarea.blur()
+        !this.confirmHold && this.$refs.textarea.blur()
       }
     },
-    _onCompositionstart ($event) {
-      this.composing = true
-    },
-    _onCompositionend ($event) {
-      if (this.composing) {
-        this.composing = false
-        // 部分输入法 compositionend 事件可能晚于 input
-        this._onInput($event)
+    _onComposition ($event) {
+      switch ($event.type) {
+        case 'compositionstart':
+          this.composing = true
+          break
+        case 'compositionend':
+          if (this.composing) {
+            this.composing = false
+            // 部分输入法 compositionend 事件可能晚于 input
+            this._onInput($event)
+          }
+          break
       }
+
+      !this.ignoreCompositionEvent &&
+        this.$trigger($event.type, $event, { data: $event.data })
     },
-    // 暂无完成按钮，此功能未实现
     _confirm ($event) {
       this.$trigger('confirm', $event, {
         value: this.valueSync
@@ -218,10 +238,13 @@ export default {
       this.height = height
     },
     _onInput ($event, force) {
-      if (this.composing) {
+      if (this.composing && this.ignoreCompositionEvent) {
         this.valueComposition = $event.target.value
         return
       }
+
+      if (!this.ignoreCompositionEvent) this.valueSync = this.$refs.textarea.value
+
       this.$triggerInput($event, {
         value: this.valueSync,
         cursor: this.$refs.textarea.selectionEnd

@@ -98,11 +98,6 @@ const canIUses = [
 
 // 需要做转换的 API 列表
 const protocols = {
-  chooseImage: {
-    args: {
-      sizeType: false
-    }
-  },
   navigateTo,
   redirectTo,
   previewImage,
@@ -139,12 +134,6 @@ const protocols = {
   showLoading: {
     args: {
       mask: false
-    }
-  },
-  showModal: {
-    args: {
-      cancelColor: false,
-      confirmColor: false
     }
   },
   showActionSheet: {
