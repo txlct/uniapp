@@ -6,7 +6,7 @@ const {
   getMainEntry,
   getH5Options,
   getResolveEntry,
-  getSubPagesWithEntry
+  getSubPagesWithEntry,
   getPlatformStat,
   getPlatformPush,
   getPlatformUniCloud
