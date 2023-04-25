@@ -17,14 +17,48 @@ export function onWebviewPopGesture (webview) {
       setStatusBarStyle(popStartStatusBarStyle)
     } else if (e.type === 'end' && e.result) {
       const pages = getCurrentPages()
+      const len = pages.length
       const page = pages[pages.length - 1]
       page && page.$remove()
-
       setStatusBarStyle()
-
-      UniServiceJSBridge.emit('onAppRoute', {
-        type: 'navigateBack'
-      })
+      // 仅当存在一个页面，且是直达页面时，才 reLaunch 首页
+      if (page && len === 1 && isDirectPage(page)) {
+        reLaunchEntryPage()
+      } else {
+        UniServiceJSBridge.emit('onAppRoute', {
+          type: 'navigateBack'
+        })
+      }
     }
   })
+}
+
+/**
+ * 是否处于直达页面
+ * @param page
+ * @returns
+ */
+function isDirectPage (page) {
+  return (
+    __uniConfig.realEntryPagePath &&
+    page.$page.route === __uniConfig.entryPagePath
+  )
+}
+/**
+ * 重新启动到首页
+ */
+function reLaunchEntryPage () {
+  __uniConfig.entryPagePath = __uniConfig.realEntryPagePath
+  delete __uniConfig.realEntryPagePath
+  uni.reLaunch({
+    url: addLeadingSlash(__uniConfig.entryPagePath)
+  })
+}
+
+function hasLeadingSlash (str) {
+  return str.indexOf('/') === 0
+}
+
+function addLeadingSlash (str) {
+  return hasLeadingSlash(str) ? str : '/' + str
 }

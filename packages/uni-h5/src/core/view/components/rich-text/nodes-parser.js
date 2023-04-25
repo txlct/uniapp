@@ -2,6 +2,7 @@ import {
   hasOwn,
   isPlainObject
 } from 'uni-shared'
+import getRealPath from 'uni-platform/helpers/get-real-path'
 
 const TAGS = {
   a: '',
@@ -96,7 +97,12 @@ function decodeEntities (htmlString) {
   })
 }
 
-export default function parseNodes (nodes, parentNode) {
+function normlizeValue (tagName, name, value) {
+  if (tagName === 'img' && name === 'src') return getRealPath(value)
+  return value
+}
+
+export default function parseNodes (nodes, parentNode, scopeId, triggerItemClick) {
   nodes.forEach(function (node) {
     if (!isPlainObject(node)) {
       return
@@ -114,6 +120,7 @@ export default function parseNodes (nodes, parentNode) {
         return
       }
       const attrs = node.attrs
+      scopeId && elem.setAttribute(scopeId, '')
       if (isPlainObject(attrs)) {
         const tagAttrs = TAGS[tagName] || []
         Object.keys(attrs).forEach(function (name) {
@@ -127,15 +134,17 @@ export default function parseNodes (nodes, parentNode) {
               break
             default:
               if (tagAttrs.indexOf(name) !== -1) {
-                elem.setAttribute(name, value)
+                elem.setAttribute(name, normlizeValue(tagName, name, value))
               }
           }
         })
       }
 
+      processClickEvent(node, elem, triggerItemClick)
+
       const children = node.children
       if (Array.isArray(children) && children.length) {
-        parseNodes(node.children, elem)
+        parseNodes(node.children, elem, scopeId, triggerItemClick)
       }
 
       parentNode.appendChild(elem)
@@ -146,4 +155,14 @@ export default function parseNodes (nodes, parentNode) {
     }
   })
   return parentNode
+}
+
+function processClickEvent (node, elem, triggerItemClick) {
+  if (['a', 'img'].includes(node.name) && triggerItemClick) {
+    elem.setAttribute('onClick', 'return false;')
+    elem.addEventListener('click', (e) => {
+      triggerItemClick(e, { node })
+      e.stopPropagation()
+    }, true)
+  }
 }

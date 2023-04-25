@@ -7,6 +7,7 @@ import {
 import {
   initData,
   initHooks,
+  initUnknownHooks,
   handleEvent,
   initBehaviors,
   initVueComponent,
@@ -16,11 +17,14 @@ import {
 import {
   handleRef,
   handleLink,
+  handleWrap,
   initBehavior,
   triggerEvent,
   initChildVues,
   initSpecialMethods
 } from './util'
+
+import { $emit } from 'uni-core/runtime/event-bus'
 
 const hooks = [
   'onShow',
@@ -82,15 +86,22 @@ export default function parsePage (vuePageOptions) {
       // 支付宝小程序有些页面事件只能放在events下
       onBack () {
         this.$vm.__call_hook('onBackPress')
+      },
+      onKeyboardHeight (res) {
+        $emit('uni:keyboardHeightChange', res)
       }
     },
     __r: handleRef,
     __e: handleEvent,
     __l: handleLink,
+    __w: handleWrap,
     triggerEvent
   }
 
-  initHooks(pageOptions, hooks, vuePageOptions)
+  Object.assign(pageOptions.events, vueOptions.events || {})
+
+  initHooks(pageOptions, hooks, vueOptions)
+  initUnknownHooks(pageOptions, vueOptions, ['onReady'])
 
   if (Array.isArray(vueOptions.wxsCallMethods)) {
     vueOptions.wxsCallMethods.forEach(callMethod => {

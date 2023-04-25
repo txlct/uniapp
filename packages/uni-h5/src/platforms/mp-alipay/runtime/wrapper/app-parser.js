@@ -8,39 +8,19 @@ import {
 } from './util'
 
 export default function parseApp (vm) {
-  Object.defineProperty(Vue.prototype, '$slots', {
-    get () {
-      return this.$scope && this.$scope.props.$slots
-    },
-    set () {
-
-    }
-  })
-  Object.defineProperty(Vue.prototype, '$scopedSlots', {
-    get () {
-      return this.$scope && this.$scope.props.$scopedSlots
-    },
-    set () {
-
-    }
-  })
-
   Vue.prototype.$onAliGetAuthorize = function onAliGetAuthorize (method, $event) {
     my.getPhoneNumber({
       success: (res) => {
         $event.type = 'getphonenumber'
-        const response = JSON.parse(res.response).response
-        if (response.code === '10000') { // success
-          $event.detail.errMsg = 'getPhoneNumber:ok'
-          $event.detail.encryptedData = res.response
-        } else {
-          $event.detail.errMsg = 'getPhoneNumber:fail Error: ' + res.response
-        }
+        const response = JSON.parse(res.response)
+        $event.detail.errMsg = 'getPhoneNumber:ok'
+        $event.detail.encryptedData = response.response
+        $event.detail.sign = response.sign
         this[method]($event)
       },
       fail: (res) => {
         $event.type = 'getphonenumber'
-        $event.detail.errMsg = 'getPhoneNumber:fail'
+        $event.detail.errMsg = 'getPhoneNumber:fail Error: ' + JSON.stringify(res)
         this[method]($event)
       }
     })

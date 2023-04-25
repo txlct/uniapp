@@ -1,4 +1,12 @@
 import {
+  initAppLocale
+} from 'uni-helpers/i18n'
+
+import {
+  ON_THEME_CHANGE
+} from 'uni-helpers/constants'
+
+import {
   callAppHook
 } from 'uni-core/service/plugins/util'
 
@@ -15,7 +23,8 @@ import {
 } from './config'
 
 import {
-  getCurrentPages
+  getCurrentPages,
+  getCurrentPageId
 } from './page'
 
 import {
@@ -40,6 +49,15 @@ import {
 import {
   backbuttonListener
 } from './backbutton'
+
+import {
+  getEnterOptions,
+  initEnterOptions,
+  initLaunchOptions,
+  parseRedirectInfo
+} from './utils'
+
+import { changePagesNavigatorStyle } from './theme'
 
 let appCtx
 
@@ -82,7 +100,11 @@ function initGlobalListeners () {
   })
 
   plus.globalEvent.addEventListener('resume', () => {
-    emit('onAppEnterForeground')
+    const info = parseRedirectInfo()
+    if (info && info.userAction) {
+      initEnterOptions(info)
+    }
+    emit('onAppEnterForeground', getEnterOptions())
   })
 
   plus.globalEvent.addEventListener('netchange', () => {
@@ -109,13 +131,14 @@ function initGlobalListeners () {
       theme: event.uistyle
     }
 
-    callAppHook(appCtx, 'onThemeChange', args)
-    publish('onThemeChange', args)
-
+    callAppHook(appCtx, ON_THEME_CHANGE, args)
+    publish(ON_THEME_CHANGE, args)
+    UniServiceJSBridge.publishHandler(ON_THEME_CHANGE, args, getCurrentPageId())
     // 兼容旧版本 API
     publish('onUIStyleChange', {
       style: event.uistyle
     })
+    changePagesNavigatorStyle()
   })
 
   globalEvent.addEventListener('uniMPNativeEvent', function (event) {
@@ -139,14 +162,20 @@ function onPlusMessage (e) {
 }
 
 function initAppLaunch (appVm) {
-  const args = {
+  const args = initLaunchOptions({
     path: __uniConfig.entryPagePath,
-    query: {},
-    scene: 1001
-  }
+    query: __uniConfig.entryPageQuery,
+    referrerInfo: __uniConfig.referrerInfo
+  })
 
   callAppHook(appVm, 'onLaunch', args)
   callAppHook(appVm, 'onShow', args)
+  // https://tower.im/teams/226535/todos/16905/
+  const getAppState = weex.requireModule('plus').getAppState
+  const appState = getAppState && Number(getAppState())
+  if (appState === 2) {
+    callAppHook(appVm, 'onHide', args)
+  }
 }
 
 function initTabBar () {
@@ -207,12 +236,13 @@ export function clearTempFile () {
   })
 }
 
-export function registerApp (appVm) {
+export function registerApp (appVm, Vue) {
   if (process.env.NODE_ENV !== 'production') {
     console.log('[uni-app] registerApp')
   }
   appCtx = appVm
   appCtx.$vm = appVm
+  initAppLocale(Vue, appVm)
 
   Object.assign(appCtx, defaultApp) // 拷贝默认实现
 

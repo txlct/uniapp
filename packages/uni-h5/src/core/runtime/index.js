@@ -67,9 +67,6 @@ if (typeof Proxy !== 'undefined' && __PLATFORM__ !== 'app-plus') {
       if (eventApi[name]) {
         return eventApi[name]
       }
-      if (!hasOwn(__GLOBAL__, name) && !hasOwn(protocols, name)) {
-        return
-      }
       return promisify(name, wrapper(name, __GLOBAL__[name]))
     },
     set (target, name, value) {

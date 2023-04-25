@@ -2,7 +2,8 @@ const base = [
   'base64ToArrayBuffer',
   'arrayBufferToBase64',
   'addInterceptor',
-  'removeInterceptor'
+  'removeInterceptor',
+  'interceptors'
 ]
 
 const network = [
@@ -16,7 +17,8 @@ const network = [
   'onSocketMessage',
   'closeSocket',
   'onSocketClose',
-  'getUpdateManager'
+  'getUpdateManager',
+  'configMTLS'
 ]
 
 const route = [
@@ -44,13 +46,20 @@ const location = [
   'getLocation',
   'chooseLocation',
   'openLocation',
-  'createMapContext'
+  'createMapContext',
+  'onLocationChange',
+  'onLocationChangeError',
+  'startLocationUpdate',
+  'stopLocationUpdate',
+  'offLocationChange',
+  'offLocationChangeError'
 ]
 
 const media = [
   'chooseImage',
   'chooseFile',
   'previewImage',
+  'closePreviewImage',
   'getImageInfo',
   'getVideoInfo',
   'saveImageToPhotosAlbum',
@@ -71,6 +80,9 @@ const media = [
 const device = [
   'getSystemInfo',
   'getSystemInfoSync',
+  'getWindowInfo',
+  'getDeviceInfo',
+  'getAppBaseInfo',
   'canIUse',
   'onMemoryWarning',
   'getNetworkType',
@@ -127,7 +139,11 @@ const device = [
   'checkIsSoterEnrolledInDevice',
   'startSoterAuthentication',
   'onThemeChange',
-  'onUIStyleChange'
+  'offThemeChange',
+  'onUIStyleChange',
+  'getSystemSetting',
+  'getAppAuthorizeSetting',
+  'openAppAuthorizeSetting'
 ]
 
 const keyboard = [
@@ -181,7 +197,10 @@ const ui = [
   'getRightWindowStyle',
   'setTopWindowStyle',
   'setLeftWindowStyle',
-  'setRightWindowStyle'
+  'setRightWindowStyle',
+  'getLocale',
+  'setLocale',
+  'onLocaleChange'
 ]
 
 const event = [
@@ -217,6 +236,8 @@ const third = [
   'getUserProfile',
   'preLogin',
   'closeAuthView',
+  'getCheckBoxState',
+  'getUniverifyManager',
   'share',
   'shareWithSystem',
   'showShareMenu',
@@ -229,14 +250,27 @@ const third = [
   'requireNativePlugin',
   'upx2px',
   'restoreGlobal',
+  'requireGlobal',
   'getSubNVueById',
   'getCurrentSubNVue',
   'setPageMeta',
+  'onHostEventReceive',
   'onNativeEventReceive',
   'sendNativeEvent',
   'preloadPage',
   'unPreloadPage',
-  'loadSubPackage'
+  'loadSubPackage',
+  'sendHostEvent',
+  'navigateToMiniProgram',
+  'getLaunchOptionsSync',
+  'getEnterOptionsSync',
+  'initUTSProxyClass',
+  'initUTSProxyFunction',
+  'initUTSIndexClassName',
+  'initUTSClassName',
+  'initUTSPackageName',
+  'requireUTSPlugin',
+  'registerUTSPlugin',
 ]
 
 const ad = [
@@ -244,6 +278,14 @@ const ad = [
   'createFullScreenVideoAd',
   'createInterstitialAd',
   'createInteractiveAd'
+]
+
+const plugin = [
+  'invokePushCallback',
+  'getPushClientId',
+  'onPushMessage',
+  'offPushMessage',
+  'createPushMessage'
 ]
 
 const apis = [
@@ -260,7 +302,8 @@ const apis = [
   ...file,
   ...canvas,
   ...third,
-  ...ad
+  ...ad,
+  ...plugin
 ]
 
 module.exports = apis

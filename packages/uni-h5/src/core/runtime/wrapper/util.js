@@ -11,7 +11,7 @@ export const PAGE_EVENT_HOOKS = [
   'onPullDownRefresh',
   'onReachBottom',
   'onAddToFavorites',
-  'onShareTimeline',
+  // 'onShareTimeline',
   'onShareAppMessage',
   'onPageScroll',
   'onResize',
@@ -50,7 +50,7 @@ function hasHook (hook, vueOptions) {
     return false
   }
 
-  if (isFn(vueOptions[hook])) {
+  if (isFn(vueOptions[hook]) || Array.isArray(vueOptions[hook])) {
     return true
   }
   const mixins = vueOptions.mixins
@@ -67,6 +67,29 @@ export function initHooks (mpOptions, hooks, vueOptions) {
       }
     }
   })
+}
+
+export function initUnknownHooks (mpOptions, vueOptions, excludes = []) {
+  findHooks(vueOptions).forEach((hook) => initHook(mpOptions, hook, excludes))
+}
+
+function findHooks (vueOptions, hooks = []) {
+  if (vueOptions) {
+    Object.keys(vueOptions).forEach((name) => {
+      if (name.indexOf('on') === 0 && isFn(vueOptions[name])) {
+        hooks.push(name)
+      }
+    })
+  }
+  return hooks
+}
+
+function initHook (mpOptions, hook, excludes) {
+  if (excludes.indexOf(hook) === -1 && !hasOwn(mpOptions, hook)) {
+    mpOptions[hook] = function (args) {
+      return this.$vm && this.$vm.__call_hook(hook, args)
+    }
+  }
 }
 
 export function initVueComponent (Vue, vueOptions) {
@@ -119,7 +142,7 @@ export function initData (vueOptions, context) {
     try {
       // 对 data 格式化
       data = JSON.parse(JSON.stringify(data))
-    } catch (e) {}
+    } catch (e) { }
   }
 
   if (!isPlainObject(data)) {
@@ -225,17 +248,31 @@ function parsePropType (key, type, defaultValue, file) {
   return type
 }
 
-export function initProperties (props, isBehavior = false, file = '') {
+export function initProperties (props, isBehavior = false, file = '', options) {
   const properties = {}
   if (!isBehavior) {
     properties.vueId = {
       type: String,
       value: ''
     }
-    // 用于字节跳动小程序模拟抽象节点
-    properties.generic = {
-      type: Object,
-      value: null
+    if (__PLATFORM__ === 'mp-toutiao' || __PLATFORM__ === 'mp-lark') {
+      // 用于字节跳动小程序模拟抽象节点
+      properties.generic = {
+        type: Object,
+        value: null
+      }
+    }
+    if (__PLATFORM__ === 'mp-weixin' || __PLATFORM__ === 'mp-alipay') {
+      if (__PLATFORM__ === 'mp-alipay' || options.virtualHost) {
+        properties.virtualHostStyle = {
+          type: null,
+          value: ''
+        }
+        properties.virtualHostClass = {
+          type: null,
+          value: ''
+        }
+      }
     }
     // scopedSlotsCompiler auto
     properties.scopedSlotsCompiler = {
@@ -295,7 +332,7 @@ function wrapper (event) {
   // TODO 又得兼容 mpvue 的 mp 对象
   try {
     event.mp = JSON.parse(JSON.stringify(event))
-  } catch (e) {}
+  } catch (e) { }
 
   event.stopPropagation = noop
   event.preventDefault = noop
@@ -376,7 +413,7 @@ function getExtraValue (vm, dataPathsArray) {
   return context
 }
 
-function processEventExtra (vm, extra, event) {
+function processEventExtra (vm, extra, event, __args__) {
   const extraObj = {}
 
   if (Array.isArray(extra) && extra.length) {
@@ -399,11 +436,7 @@ function processEventExtra (vm, extra, event) {
           if (dataPath === '$event') { // $event
             extraObj['$' + index] = event
           } else if (dataPath === 'arguments') {
-            if (event.detail && event.detail.__args__) {
-              extraObj['$' + index] = event.detail.__args__
-            } else {
-              extraObj['$' + index] = [event]
-            }
+            extraObj['$' + index] = event.detail ? event.detail.__args__ || __args__ : __args__
           } else if (dataPath.indexOf('$event.') === 0) { // $event.target.value
             extraObj['$' + index] = vm.__get_value(dataPath.replace('$event.', ''), event)
           } else {
@@ -430,6 +463,12 @@ function getObjByArray (arr) {
 
 function processEventArgs (vm, event, args = [], extra = [], isCustom, methodName) {
   let isCustomMPEvent = false // wxcomponent 组件，传递原始 event 对象
+
+  // fixed 用户直接触发 mpInstance.triggerEvent
+  const __args__ = isPlainObject(event.detail)
+    ? event.detail.__args__ || [event.detail]
+    : [event.detail]
+
   if (isCustom) { // 自定义事件
     isCustomMPEvent = event.currentTarget &&
       event.currentTarget.dataset &&
@@ -438,11 +477,11 @@ function processEventArgs (vm, event, args = [], extra = [], isCustom, methodNam
       if (isCustomMPEvent) {
         return [event]
       }
-      return event.detail.__args__ || event.detail
+      return __args__
     }
   }
 
-  const extraObj = processEventExtra(vm, extra, event)
+  const extraObj = processEventExtra(vm, extra, event, __args__)
 
   const ret = []
   args.forEach(arg => {
@@ -451,7 +490,7 @@ function processEventArgs (vm, event, args = [], extra = [], isCustom, methodNam
         ret.push(event.target.value)
       } else {
         if (isCustom && !isCustomMPEvent) {
-          ret.push(event.detail.__args__[0])
+          ret.push(__args__[0])
         } else { // wxcomponent 组件或内置组件
           ret.push(event)
         }
@@ -542,7 +581,9 @@ export function handleEvent (event) {
           }
           const handler = handlerCtx[methodName]
           if (!isFn(handler)) {
-            throw new Error(` _vm.${methodName} is not a function`)
+            const type = this.$vm.mpType === 'page' ? 'Page' : 'Component'
+            const path = this.route || this.is
+            throw new Error(`${type} "${path}" does not have a method "${methodName}"`)
           }
           if (isOnce) {
             if (handler.once) {

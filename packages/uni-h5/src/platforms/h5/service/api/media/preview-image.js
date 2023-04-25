@@ -1,25 +1,20 @@
-export function previewImage ({
-  urls,
-  current
-}, callbackId) {
-  const {
-    invokeCallbackHandler: invoke
-  } = UniServiceJSBridge
+const {
+  emit,
+  invokeCallbackHandler: invoke
+} = UniServiceJSBridge
 
-  getApp().$router.push({
-    type: 'navigateTo',
-    path: '/preview-image',
-    params: {
-      urls,
-      current
-    }
-  }, function () {
+export function previewImage (args, callbackId) {
+  emit('onShowPreviewImage', args, function (res) {
     invoke(callbackId, {
       errMsg: 'previewImage:ok'
     })
-  }, function () {
+  })
+}
+
+export function closePreviewImage (_, callbackId) {
+  emit('onClosePreviewImage', function () {
     invoke(callbackId, {
-      errMsg: 'previewImage:fail'
+      errMsg: 'closePreviewImage:ok'
     })
   })
 }

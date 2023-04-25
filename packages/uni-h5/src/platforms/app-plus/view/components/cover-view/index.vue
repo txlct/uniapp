@@ -15,12 +15,17 @@ export default {
   render (createElement) {
     let coverContent = ''
     const $slots = this.$slots.default || []
-    $slots.forEach(node => {
-      if (!node.tag) {
-        coverContent += node.text || ''
-      }
-    })
-    this.coverContent = coverContent
+    const _slots = $slots.filter(node => node.tag)
+    if (!_slots.length) {
+      $slots.forEach(node => {
+        if (!node.tag) {
+          coverContent += node.text || ''
+        }
+      })
+      this.coverContent = coverContent
+    } else {
+      coverContent = _slots
+    }
     return createElement('uni-cover-view', {
       on: {
         on: this.$listeners
@@ -28,7 +33,7 @@ export default {
     }, [createElement('div', {
       ref: 'container',
       staticClass: 'uni-cover-view'
-    }, [coverContent])])
+    }, [].concat(coverContent))])
   }
 }
 </script>
@@ -48,5 +53,19 @@ uni-cover-view[hidden] {
 uni-cover-view .uni-cover-view {
   width: 100%;
   height: 100%;
+  visibility: hidden;
+  text-overflow: inherit;
+  overflow: hidden;
+  white-space: inherit;
+  -webkit-align-items: inherit;
+  align-items: inherit;
+  -webkit-justify-content: inherit;
+  justify-content: inherit;
+  -webkit-flex-direction: inherit;
+  flex-direction: inherit;
+  -webkit-flex-wrap: inherit;
+  flex-wrap: inherit;
+  display: inherit;
+  overflow: inherit;
 }
 </style>

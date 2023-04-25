@@ -60,6 +60,13 @@ const props = [
   },
   {
     name: 'volume'
+  },
+  {
+    name: 'sessionCategory'
+  },
+  {
+    name: 'playbackRate',
+    cache: true
   }
 ]
 
@@ -165,6 +172,7 @@ onMethod('onAudioStateChange', ({
     emit(audio, state, errMsg, errCode)
     if (state === 'play') {
       const oldCurrentTime = audio.currentTime
+      emit(audio, 'timeupdate')
       audio.__timing = setInterval(() => {
         const currentTime = audio.currentTime
         if (currentTime !== oldCurrentTime) {

@@ -9,19 +9,21 @@ function getTemplatePath (template) {
   return path.resolve(process.env.UNI_CLI_CONTEXT, 'public/index.html')
 }
 
-function transform (content) {
+function transform (content, platformOptions) {
   return content
 }
 
-function getIndexCssPath (assetsDir, template) {
-  const VUE_APP_INDEX_CSS_HASH = process.env.VUE_APP_INDEX_CSS_HASH
+
+function getIndexCssPath (assetsDir, template, hashKey) {
+  const CopyWebpackPluginVersion = Number(require('copy-webpack-plugin/package.json').version.split('.')[0])
+  const VUE_APP_INDEX_CSS_HASH = process.env[hashKey]
   if (VUE_APP_INDEX_CSS_HASH) {
     try {
       const templateContent = fs.readFileSync(getTemplatePath(template))
-      if (/\bVUE_APP_INDEX_CSS_HASH\b/.test(templateContent)) {
-        return path.join(assetsDir, `[name].${VUE_APP_INDEX_CSS_HASH}.[ext]`)
+      if (new RegExp('\\b' + hashKey + '\\b').test(templateContent)) {
+        return path.join(assetsDir, `[name].${VUE_APP_INDEX_CSS_HASH}${CopyWebpackPluginVersion > 5 ? '' : '.'}[ext]`)
       }
-    } catch (e) {}
+    } catch (e) { }
   }
   return assetsDir
 }
@@ -35,16 +37,20 @@ module.exports = {
     vue: '@dcloudio/vue-cli-plugin-uni/packages/h5-vue'
   },
   copyWebpackOptions (platformOptions, vueOptions) {
-    const copyOptions = [{
-      from: require.resolve('@dcloudio/uni-h5/dist/index.css'),
-      to: getIndexCssPath(vueOptions.assetsDir, platformOptions.template),
-      transform
-    },
-    'hybrid/html'
+    const copyOptions = [
+      {
+        from: require.resolve('@dcloudio/uni-h5/dist/index.css'),
+        to: getIndexCssPath(vueOptions.assetsDir, platformOptions.template, 'VUE_APP_INDEX_CSS_HASH'),
+        transform (content) {
+          return transform(content, platformOptions)
+        }
+      },
+      'hybrid/html'
     ]
     global.uniModules.forEach(module => {
       copyOptions.push('uni_modules/' + module + '/hybrid/html')
     })
+
     return copyOptions
   }
 }

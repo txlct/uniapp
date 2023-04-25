@@ -6,6 +6,8 @@ import {
   publish
 } from '../../bridge'
 
+const AUDIO_DEFAULT_SESSION_CATEGORY = 'playback'
+
 const audios = {}
 
 const evts = ['play', 'canplay', 'ended', 'stop', 'waiting', 'seeking', 'seeked', 'pause']
@@ -52,6 +54,7 @@ export function createAudioInstance () {
   audio.src = ''
   audio.volume = 1
   audio.startTime = 0
+  audio.setSessionCategory(AUDIO_DEFAULT_SESSION_CATEGORY)
   return {
     errMsg: 'createAudioInstance:ok',
     audioId
@@ -78,7 +81,9 @@ export function setAudioState ({
   autoplay = false,
   loop = false,
   obeyMuteSwitch,
-  volume
+  volume,
+  sessionCategory = AUDIO_DEFAULT_SESSION_CATEGORY,
+  playbackRate
 }) {
   const audio = audios[audioId]
   if (audio) {
@@ -87,7 +92,9 @@ export function setAudioState ({
       autoplay
     }
     if (src) {
-      audio.src = style.src = getRealPath(src)
+      // iOS 设置 src 会重新播放
+      const realSrc = getRealPath(src)
+      if (audio.src !== realSrc) audio.src = style.src = realSrc
     }
     if (startTime) {
       audio.startTime = style.startTime = startTime
@@ -96,6 +103,12 @@ export function setAudioState ({
       audio.volume = style.volume = volume
     }
     audio.setStyles(style)
+    if (sessionCategory) {
+      audio.setSessionCategory(sessionCategory)
+    }
+    if (playbackRate && audio.playbackRate) {
+      audio.playbackRate(playbackRate)
+    }
     initStateChage(audioId)
   }
   return {
