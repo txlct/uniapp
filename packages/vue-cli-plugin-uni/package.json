@@ -18,6 +18,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@dcloudio/uni-stat": "^2.0.2-3070920230324001",
+    "@dcloudio/webpack-uni-pages-loader": "^2.0.2-3070920230324001",
     "buffer-json": "^2.0.0",
     "clone-deep": "^4.0.1",
     "cross-env": "^5.2.0",
