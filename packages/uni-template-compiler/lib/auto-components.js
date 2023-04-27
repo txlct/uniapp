@@ -7,15 +7,15 @@ const {
 
 const {
   removeExt
-} = require('@dcloudio/uni-cli-shared/lib/util')
+} = require('@tencent/uni-cli-shared/lib/util')
 
 const {
   getAutoComponents
-} = require('@dcloudio/uni-cli-shared/lib/pages')
+} = require('@tencent/uni-cli-shared/lib/pages')
 
 const {
   updateUsingAutoImportComponents
-} = require('@dcloudio/uni-cli-shared/lib/cache')
+} = require('@tencent/uni-cli-shared/lib/cache')
 
 function formatSource (source) {
   if (source.indexOf('@/') === 0) { // 根目录

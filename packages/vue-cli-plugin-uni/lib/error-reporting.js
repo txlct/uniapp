@@ -1,8 +1,8 @@
 const {
   pathToRegexp,
   isInHBuilderX
-} = require('@dcloudio/uni-cli-shared/lib/util')
-const plp = require('@dcloudio/webpack-uni-pages-loader/package.json')
+} = require('@tencent/uni-cli-shared/lib/util')
+const plp = require('@tencent/webpack-uni-pages-loader/package.json')
 
 class ErrorReport {
   static get instance () {
@@ -98,9 +98,9 @@ class ErrorReport {
         return false
       }
 
-      // 目前简单的上报逻辑为：错误信息中包含@dcloudio包名
+      // 目前简单的上报逻辑为：错误信息中包含@tencent包名
       if (
-        errMsg.includes('@dcloudio') &&
+        errMsg.includes('@tencent') &&
         !errMsg.includes('Errors compiling template')
       ) {
         return true

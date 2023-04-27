@@ -290,20 +290,20 @@ module.exports = async function checkUpdate () {
   const {
     isInHBuilderX,
     getManifestJson
-  } = require('@dcloudio/uni-cli-shared')
+  } = require('@tencent/uni-cli-shared')
 
   if (isInHBuilderX) { // 仅 cli 提供检测更新
     return
   }
 
-  const plp = require('@dcloudio/webpack-uni-pages-loader/package.json')
+  const plp = require('@tencent/webpack-uni-pages-loader/package.json')
   const ppj = require(path.join(process.env.UNI_CLI_CONTEXT, 'package.json'))
   const manifest = getManifestJson()
 
   try {
     const update = new Upate()
     update.compilerVersion = plp['uni-app'].compilerVersion
-    update.isAlpha = ppj.devDependencies['@dcloudio/vue-cli-plugin-uni'].includes('alpha')
+    update.isAlpha = ppj.devDependencies['@tencent/vue-cli-plugin-uni'].includes('alpha')
     update.uniId = manifest.appid
     const appIdKey = process.env.UNI_PLATFORM.includes('quickapp') ? 'package' : 'appid'
     update.appId = manifest[process.env.UNI_PLATFORM] ? (manifest[process.env.UNI_PLATFORM][appIdKey] || '') : ''

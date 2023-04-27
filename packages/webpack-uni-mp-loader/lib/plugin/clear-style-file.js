@@ -2,7 +2,7 @@ const path = require('path')
 const {
   normalizePath,
   getPlatformExts
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 const { deleteAsset } = require('../shared')
 
 module.exports = function (compilation) {

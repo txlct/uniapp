@@ -1,5 +1,5 @@
 const t = require('@babel/types')
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 const {
   VIRTUAL_HOST_CLASS

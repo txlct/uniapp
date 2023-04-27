@@ -12,7 +12,7 @@ module.exports = {
   plugins: [
     alias({
       entries: [{
-        find: '@dcloudio',
+        find: '@tencent',
         replacement: path.resolve(__dirname, '../packages')
       },
       {

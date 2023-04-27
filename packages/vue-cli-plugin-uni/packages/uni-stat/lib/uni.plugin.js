@@ -5,7 +5,7 @@ const {
   getUniStatistics,
   parseManifestJsonOnce,
   parsePagesJsonOnce,
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 module.exports = [
   defineUniMainJsPlugin((opts) => {
@@ -48,7 +48,7 @@ module.exports = [
       transform(code, id) {
         if (isEnable && opts.filter(id)) {
           return {
-            code: code + `;import '@dcloudio/uni-stat';`,
+            code: code + `;import '@tencent/uni-stat';`,
             map: null,
           }
         }

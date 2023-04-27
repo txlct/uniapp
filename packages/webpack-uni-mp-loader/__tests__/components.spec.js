@@ -3,7 +3,7 @@ const parser = require('@babel/parser')
 const scopedComponentTraverse = require('../lib/babel/scoped-component-traverse')
 const globalComponentTraverse = require('../lib/babel/global-component-traverse')
 
-process.UNI_LIBRARIES = ['@dcloudio/uni-ui']
+process.UNI_LIBRARIES = ['@tencent/uni-ui']
 
 function assertCodegen (content, expectedComponents, isScoped = true) {
   const {
@@ -47,7 +47,7 @@ function assertCodegenOptions (content, expectedOptions, isScoped = true) {
 describe('mp:loader', () => {
   it('parse scoped component', () => {
     assertCodegen(
-      `import { uniBadge,uniCard} from '@dcloudio/uni-ui';
+      `import { uniBadge,uniCard} from '@tencent/uni-ui';
 export default defineComponent({
     components: {
         'uni-badge':uniBadge,
@@ -57,11 +57,11 @@ export default defineComponent({
       [{
         name: 'uni-badge',
         value: 'uniBadge',
-        source: '@dcloudio/uni-ui/lib/uni-badge/uni-badge'
+        source: '@tencent/uni-ui/lib/uni-badge/uni-badge'
       }, {
         name: 'uni-card',
         value: 'uniCard',
-        source: '@dcloudio/uni-ui/lib/uni-card/uni-card'
+        source: '@tencent/uni-ui/lib/uni-card/uni-card'
       }])
 
     assertCodegen(
@@ -87,7 +87,7 @@ export default {
 
     assertCodegen(
       `
-            import { uniBadge,uniCard} from '@dcloudio/uni-ui';
+            import { uniBadge,uniCard} from '@tencent/uni-ui';
             export default {
                 components: {
                     'uni-badge':uniBadge,
@@ -98,11 +98,11 @@ export default {
       [{
         name: 'uni-badge',
         value: 'uniBadge',
-        source: '@dcloudio/uni-ui/lib/uni-badge/uni-badge'
+        source: '@tencent/uni-ui/lib/uni-badge/uni-badge'
       }, {
         name: 'uni-card',
         value: 'uniCard',
-        source: '@dcloudio/uni-ui/lib/uni-card/uni-card'
+        source: '@tencent/uni-ui/lib/uni-card/uni-card'
       }])
 
     assertCodegen(
@@ -305,7 +305,7 @@ global['__wxVueOptions'] = {
   it('parse global component', () => {
     assertCodegen(
       `
-            import { uniBadge,uniCard} from '@dcloudio/uni-ui';
+            import { uniBadge,uniCard} from '@tencent/uni-ui';
             import mediaList from '@/components/tab-nvue/mediaList.vue';
             Vue.component('uni-badge',uniBadge)
             Vue.component('uni-card',uniCard)
@@ -314,11 +314,11 @@ global['__wxVueOptions'] = {
       [{
         name: 'uni-badge',
         value: 'uniBadge',
-        source: '@dcloudio/uni-ui/lib/uni-badge/uni-badge'
+        source: '@tencent/uni-ui/lib/uni-badge/uni-badge'
       }, {
         name: 'uni-card',
         value: 'uniCard',
-        source: '@dcloudio/uni-ui/lib/uni-card/uni-card'
+        source: '@tencent/uni-ui/lib/uni-card/uni-card'
       }, {
         name: 'media-list',
         value: 'mediaList',

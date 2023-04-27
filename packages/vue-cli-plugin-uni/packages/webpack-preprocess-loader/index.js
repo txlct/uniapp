@@ -3,7 +3,7 @@ const utils = require('loader-utils')
 
 const {
   normalizePath
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const preprocessor = require('./preprocess/lib/preprocess')
 

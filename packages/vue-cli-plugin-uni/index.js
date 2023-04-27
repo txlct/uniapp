@@ -34,7 +34,7 @@ module.exports = (api, options) => {
     api.configureWebpack(require('./lib/configure-webpack')(platformOptions, manifestPlatformOptions, options, api))
     api.chainWebpack(require('./lib/chain-webpack')(platformOptions, options, api))
 
-    const vueConfig = require('@dcloudio/uni-quickapp-native/lib/vue.config.js')
+    const vueConfig = require('@tencent/uni-quickapp-native/lib/vue.config.js')
     api.configureWebpack(vueConfig.configureWebpack)
     api.chainWebpack(vueConfig.chainWebpack)
     return

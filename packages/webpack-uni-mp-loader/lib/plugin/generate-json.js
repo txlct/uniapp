@@ -2,14 +2,14 @@ const path = require('path')
 
 const {
   normalizePath
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   getPageSet,
   getJsonFileMap,
   getChangedJsonFileMap,
   supportGlobalUsingComponents
-} = require('@dcloudio/uni-cli-shared/lib/cache')
+} = require('@tencent/uni-cli-shared/lib/cache')
 
 const { createSource } = require('../shared')
 
@@ -28,7 +28,7 @@ const mpBaiduDynamicLibs = [
   'dynamicLib://myDynamicLib/vrvideo'
 ]
 
-const AnalyzeDependency = require('@dcloudio/uni-mp-weixin/lib/independent-plugins/optimize-components-position/index')
+const AnalyzeDependency = require('@tencent/uni-mp-weixin/lib/independent-plugins/optimize-components-position/index')
 
 function analyzeUsingComponents () {
   if (!process.env.UNI_OPT_SUBPACKAGES) {
@@ -232,7 +232,7 @@ module.exports = function generateJson (compilation) {
 
   if (process.env.UNI_USING_CACHE && jsonFileMap.size) {
     setTimeout(() => {
-      require('@dcloudio/uni-cli-shared/lib/cache').store()
+      require('@tencent/uni-cli-shared/lib/cache').store()
     }, 50)
   }
 }

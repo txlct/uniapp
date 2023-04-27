@@ -1,6 +1,6 @@
 const {
   md5
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   getSlotsPath

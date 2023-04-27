@@ -2,7 +2,7 @@ const t = require('@babel/types')
 const babelTraverse = require('@babel/traverse').default
 const babelGenerate = require('@babel/generator').default
 const babelTemplate = require('@babel/template').default
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 const {
   METHOD_RENDER_LIST,
@@ -212,11 +212,11 @@ function hasOwn (obj, key) {
   return Object.prototype.hasOwnProperty.call(obj, key)
 }
 
-const tags = require('@dcloudio/uni-cli-shared/lib/tags')
+const tags = require('@tencent/uni-cli-shared/lib/tags')
 
 const {
   isBuiltInComponent
-} = require('@dcloudio/uni-cli-shared/lib/pages')
+} = require('@tencent/uni-cli-shared/lib/pages')
 
 const {
   getTagName

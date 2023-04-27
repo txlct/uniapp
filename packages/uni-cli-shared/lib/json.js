@@ -1,12 +1,12 @@
 const fs = require('fs')
 const path = require('path')
 const stripJsonComments = require('strip-json-comments')
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 function parseJson (content, preprocess = false) {
   if (typeof content === 'string') {
     if (preprocess) {
-      const preprocessor = require('@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader/preprocess')
+      const preprocessor = require('@tencent/vue-cli-plugin-uni/packages/webpack-preprocess-loader/preprocess')
       const {
         jsPreprocessOptions
       } = require('./platform')

@@ -1,7 +1,7 @@
 const CopyOuterComponentsForIndependent = require('./copy-outer-components-for-independent');
 const CopyWxComponentOnDemand = require('./copy-wx-components-on-demand');
 
-// @dcloudio/webpack-uni-mp-loader/lib/plugin/index-new.js
+// @tencent/webpack-uni-mp-loader/lib/plugin/index-new.js
 // 需要在在上述插件之后执行（获取处理过的json
 class DependencyAnalyze {
     // wxComponentDependencyAnalyzeHandle 分析微信原生组件的依赖情况

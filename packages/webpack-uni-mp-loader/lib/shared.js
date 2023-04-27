@@ -5,11 +5,11 @@ const {
   getPlatformTarget,
   createSource,
   deleteAsset
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   normalizeNodeModules
-} = require('@dcloudio/uni-cli-shared/lib/platform')
+} = require('@tencent/uni-cli-shared/lib/platform')
 
 const templates = {}
 const compilerOptions = {}

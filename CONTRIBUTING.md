@@ -2,7 +2,7 @@
 
 ## 记录在uni-app 仓库底层源码实现的一些代码改动及功能调整
 
-- 去除 `@dcloudio/uni-cli-i18n` 多语言包，方便业务能平滑升级uni-app master 最新代码。
+- 去除 `@tencent/uni-cli-i18n` 多语言包，方便业务能平滑升级uni-app master 最新代码。
 - 支持MPA(多页应用)模式
 
 ## Merge Requests

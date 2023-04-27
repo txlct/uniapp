@@ -13,11 +13,11 @@ module.exports = function chainWebpack (platformOptions, vueOptions, api) {
   const {
     runByHBuilderX, // 使用 HBuilderX 运行
     cssPreprocessOptions
-  } = require('@dcloudio/uni-cli-shared')
+  } = require('@tencent/uni-cli-shared')
 
   return function (webpackConfig) {
     // 处理静态资源 limit
-    const urlLoader = require('@dcloudio/uni-cli-shared/lib/url-loader')
+    const urlLoader = require('@tencent/uni-cli-shared/lib/url-loader')
     const staticTypes = ['images', 'media', 'fonts']
     staticTypes.forEach(staticType => {
       const newOptions = urlLoader.options()

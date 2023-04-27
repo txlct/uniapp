@@ -7,7 +7,7 @@ const {
   normalizePath,
   getPlatformExts,
   getShadowTemplate
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   getJsonFile,
@@ -17,15 +17,15 @@ const {
   updateGenericComponents, // resolve
   updateComponentGenerics, // define
   updateUsingGlobalComponents
-} = require('@dcloudio/uni-cli-shared/lib/cache')
+} = require('@tencent/uni-cli-shared/lib/cache')
 
 const {
   isBuiltInComponentPath
-} = require('@dcloudio/uni-cli-shared/lib/pages')
+} = require('@tencent/uni-cli-shared/lib/pages')
 
 const {
   getPlatformFilterTag
-} = require('@dcloudio/uni-cli-shared/lib/platform')
+} = require('@tencent/uni-cli-shared/lib/platform')
 
 const {
   normalizeNodeModules

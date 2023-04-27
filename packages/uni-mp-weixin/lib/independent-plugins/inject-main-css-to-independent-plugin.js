@@ -4,7 +4,7 @@ const { generateAsset } = require('./utils');
 const {
     getIndependentPkgRoots,
     getIndependentEntryPages
-} = require('@dcloudio/uni-mp-weixin/lib/independent-plugins/optimize-components-position/util');
+} = require('@tencent/uni-mp-weixin/lib/independent-plugins/optimize-components-position/util');
 const { wxComponentsStr } = require('./optimize-components-position/constant');
 const weuiMiniprogramDir = 'weui-mp';
 
@@ -56,7 +56,7 @@ class InjectMainCssToIndependentCssPlugin {
 
                     const indendentRoots = getIndependentPkgRoots();
                     indendentRoots.forEach(indendentRoot => {
-                        
+
                         let pkgMainCssPath = `${indendentRoot}/common/main.wxss`;
                         let pkgLibraryCssPath = `${indendentRoot}/common/library.wxss`;
 

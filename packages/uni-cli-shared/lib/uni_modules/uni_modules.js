@@ -83,11 +83,11 @@ function parseInject(vite = true, source, globalObject, define) {
     if (define === false) {
     }
     else if (typeof define === 'string') {
-        // {'uni.getBatteryInfo' : '@dcloudio/uni-getbatteryinfo'}
+        // {'uni.getBatteryInfo' : '@tencent/uni-getbatteryinfo'}
         injects[globalObject + '.' + define] = vite ? source : [source, 'default'];
     }
     else if (Array.isArray(define)) {
-        // {'uni.getBatteryInfo' : ['@dcloudio/uni-getbatteryinfo','getBatteryInfo]}
+        // {'uni.getBatteryInfo' : ['@tencent/uni-getbatteryinfo','getBatteryInfo]}
         define.forEach((d) => {
             injects[globalObject + '.' + d] = [source, d];
         });

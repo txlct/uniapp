@@ -1,10 +1,10 @@
 const {
   initAutoImportScanComponents
-} = require('@dcloudio/uni-cli-shared/lib/pages')
+} = require('@tencent/uni-cli-shared/lib/pages')
 const {
   initUniModules
-} = require('@dcloudio/uni-cli-shared/lib/uni_modules')
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+} = require('@tencent/uni-cli-shared/lib/uni_modules')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 let compiling = false
 

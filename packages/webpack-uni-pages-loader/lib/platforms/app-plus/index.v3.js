@@ -2,12 +2,12 @@ const path = require('path')
 
 const {
   normalizePath
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   parsePages,
   addPageUsingComponents
-} = require('@dcloudio/uni-cli-shared/lib/pages')
+} = require('@tencent/uni-cli-shared/lib/pages')
 
 const {
   parseStyle

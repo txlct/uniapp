@@ -6,7 +6,7 @@ const {
   normalizePath,
   getFlexDirection,
   parseManifestJson
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   normalizeNodeModules

@@ -8,22 +8,22 @@ const {
   normalizePath,
   getComponentName,
   jsPreprocessOptions
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   getBabelParserOptions
-} = require('@dcloudio/uni-cli-shared/lib/platform')
+} = require('@tencent/uni-cli-shared/lib/platform')
 
 const {
   isBuiltInComponentPath
-} = require('@dcloudio/uni-cli-shared/lib/pages')
+} = require('@tencent/uni-cli-shared/lib/pages')
 
 const {
   updateUsingComponents,
   updateComponentGenerics
-} = require('@dcloudio/uni-cli-shared/lib/cache')
+} = require('@tencent/uni-cli-shared/lib/cache')
 
-const preprocessor = require('@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader/preprocess')
+const preprocessor = require('@tencent/vue-cli-plugin-uni/packages/webpack-preprocess-loader/preprocess')
 
 const traverse = require('./babel/scoped-component-traverse')
 
@@ -39,7 +39,7 @@ const {
 } = require('./babel/util')
 
 const isObject = val => Object.prototype.toString.call(val) === '[object Object]'
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 module.exports = function (content, map) {
   this.cacheable && this.cacheable()

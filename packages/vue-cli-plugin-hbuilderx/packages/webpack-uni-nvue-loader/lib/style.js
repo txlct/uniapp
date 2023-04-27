@@ -2,12 +2,12 @@ var path = require('path')
 var styler = require('weex-styler')
 var {
   normalizePath
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 module.exports = function (content, map) {
   this.cacheable && this.cacheable()
   this.callback(null, 'module.exports = ' + genStyleString(content, this), map)
 }
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 // @todo:
 // font-relative lengths: em, ex, ch, ic

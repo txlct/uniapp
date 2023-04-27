@@ -8,7 +8,7 @@ const {
   compileToFunctions,
   ssrCompile,
   ssrCompileToFunctions
-} = require('@dcloudio/vue-cli-plugin-uni/packages/vue-template-compiler')
+} = require('@tencent/vue-cli-plugin-uni/packages/vue-template-compiler')
 
 const traverseScript = require('./script/traverse')
 const generateScript = require('./script/generate')
@@ -45,7 +45,7 @@ module.exports = {
 
     if ( // 启用摇树优化后,需要过滤内置组件
       !options.autoComponentResourcePath ||
-      options.autoComponentResourcePath.indexOf('@dcloudio/uni-h5/src') === -1
+      options.autoComponentResourcePath.indexOf('@tencent/uni-h5/src') === -1
     ) {
       (options.modules || (options.modules = [])).push(autoComponentsModule)
     }
@@ -89,7 +89,7 @@ module.exports = {
       }
     } else if (options['quickapp-native']) {
       // 后续改版，应统一由具体包实现
-      options.modules.push(require('@dcloudio/uni-quickapp-native/lib/compiler-module'))
+      options.modules.push(require('@tencent/uni-quickapp-native/lib/compiler-module'))
     }
 
     if (!options.mp) { // h5,quickapp-native

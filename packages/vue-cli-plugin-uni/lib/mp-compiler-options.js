@@ -1,7 +1,7 @@
 const {
   camelize,
   convertStaticStyle
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 module.exports = {
   modules: [require('./format-text'), {

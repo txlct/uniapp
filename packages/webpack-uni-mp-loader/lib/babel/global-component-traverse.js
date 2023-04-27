@@ -5,7 +5,7 @@ const {
   parseComponents
 } = require('./util')
 
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 module.exports = function (ast, state = {}) {
   const imports = []
@@ -55,7 +55,7 @@ module.exports = function (ast, state = {}) {
     }
   } catch (e) {
     if (state.filename) {
-      console.error('at ' + require('@dcloudio/uni-cli-shared').normalizePath(path.relative(process.env.UNI_INPUT_DIR, state.filename)) + ':1')
+      console.error('at ' + require('@tencent/uni-cli-shared').normalizePath(path.relative(process.env.UNI_INPUT_DIR, state.filename)) + ':1')
     }
     throw e
   }

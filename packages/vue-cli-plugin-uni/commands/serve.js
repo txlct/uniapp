@@ -252,7 +252,7 @@ module.exports = (api, options) => {
     return new Promise((resolve, reject) => {
       const {
         runByHBuilderX
-      } = require('@dcloudio/uni-cli-shared')
+      } = require('@tencent/uni-cli-shared')
       // log instructions & open browser on first compilation complete
       let isFirstCompile = true
       compiler.hooks.done.tap('vue-cli-service uni-serve', stats => {

@@ -8,7 +8,7 @@ const traverse = require('@babel/traverse').default
 
 const {
   normalizeNodeModules
-} = require('@dcloudio/uni-cli-shared/lib/platform')
+} = require('@tencent/uni-cli-shared/lib/platform')
 
 module.exports = function (source, map) {
   const params = loaderUtils.parseQuery(this.resourceQuery)

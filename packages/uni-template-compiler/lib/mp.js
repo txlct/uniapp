@@ -1,4 +1,4 @@
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 const EVENTS = {
   click: 'tap'
@@ -192,7 +192,7 @@ ${content}
 }
 
 module.exports = function getCompilerOptions (platform) {
-  let id = '@dcloudio/uni-' + platform
+  let id = '@tencent/uni-' + platform
   if (global.uniPlugin) {
     id = global.uniPlugin.id
   }

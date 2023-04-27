@@ -1,4 +1,4 @@
-const vueLoader = require('@dcloudio/uni-cli-shared/lib/vue-loader')
+const vueLoader = require('@tencent/uni-cli-shared/lib/vue-loader')
 
 const {
   getPartialIdentifier
@@ -35,12 +35,12 @@ module.exports = function modifyVueLoader (webpackConfig, loaderOptions, compile
     webpackConfig.module
       .rule('vue')
       .use('uniapp-h5-style-scoped')
-      .loader(require.resolve('@dcloudio/vue-cli-plugin-uni/packages/webpack-scoped-loader'))
+      .loader(require.resolve('@tencent/vue-cli-plugin-uni/packages/webpack-scoped-loader'))
   } else {
     webpackConfig.module
       .rule('vue')
       .use('uniapp-nvue-style-loader')
-      .loader(require.resolve('@dcloudio/webpack-uni-mp-loader/lib/style.js'))
+      .loader(require.resolve('@tencent/webpack-uni-mp-loader/lib/style.js'))
   }
   // 是否启用 cache
   if (process.env.UNI_USING_CACHE) {

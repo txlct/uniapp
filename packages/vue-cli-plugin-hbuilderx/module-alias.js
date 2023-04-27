@@ -4,7 +4,7 @@ const moduleAlias = require('module-alias')
 
 const {
   hasModule
-} = require('@dcloudio/uni-cli-shared/lib/util')
+} = require('@tencent/uni-cli-shared/lib/util')
 
 const isInHBuilderX = fs.existsSync(path.resolve(process.env.UNI_CLI_CONTEXT, 'bin/uniapp-cli.js'))
 
@@ -12,9 +12,9 @@ const isInHBuilderX = fs.existsSync(path.resolve(process.env.UNI_CLI_CONTEXT, 'b
 moduleAlias.addAlias('weex-styler', path.resolve(__dirname, 'packages/weex-styler'))
 moduleAlias.addAlias('weex-template-compiler', path.resolve(__dirname, 'packages/weex-template-compiler'))
 moduleAlias.addAlias('@vue/component-compiler-utils', require.resolve(
-  '@dcloudio/vue-cli-plugin-uni/packages/@vue/component-compiler-utils'))
+  '@tencent/vue-cli-plugin-uni/packages/@vue/component-compiler-utils'))
 moduleAlias.addAlias('@vue/component-compiler-utils/package.json', require.resolve(
-  '@dcloudio/vue-cli-plugin-uni/packages/@vue/component-compiler-utils/package.json'))
+  '@tencent/vue-cli-plugin-uni/packages/@vue/component-compiler-utils/package.json'))
 
 if (isInHBuilderX) {
   moduleAlias.addAlias('typescript', path.resolve(process.env.UNI_HBUILDERX_PLUGINS,

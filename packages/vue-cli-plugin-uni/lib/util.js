@@ -1,7 +1,7 @@
 const path = require('path')
 const {
   pathToGlob
-} = require('@dcloudio/uni-cli-shared/lib/util')
+} = require('@tencent/uni-cli-shared/lib/util')
 
 let partialIdentifier = false
 module.exports = {
@@ -19,7 +19,7 @@ module.exports = {
     return partialIdentifier
   },
   getAutomatorCode () {
-    const automator = `@dcloudio/uni-${process.env.UNI_SUB_PLATFORM || process.env.UNI_PLATFORM}/dist/automator`
+    const automator = `@tencent/uni-${process.env.UNI_SUB_PLATFORM || process.env.UNI_PLATFORM}/dist/automator`
     return process.env.UNI_AUTOMATOR_WS_ENDPOINT ? `import '${automator}';` : ''
   },
   getWatchOptions () {

@@ -8,8 +8,8 @@ const Module = module.constructor.length > 1
 
 const oldResolveFilename = Module._resolveFilename
 Module._resolveFilename = function (request, parentModule, isMain, options) {
-  if (request.indexOf('@dcloudio') === 0) {
-    request = request.replace('@dcloudio', scopedPath)
+  if (request.indexOf('@tencent') === 0) {
+    request = request.replace('@tencent', scopedPath)
   }
   return oldResolveFilename.call(this, request, parentModule, isMain, options)
 }

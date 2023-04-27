@@ -1,4 +1,4 @@
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 function addImportsMap (metadata, name, source) {
   if (!metadata.modules) {

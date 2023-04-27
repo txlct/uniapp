@@ -1,7 +1,7 @@
 const fs = require('fs')
 const {
   parseTheme
-} = require('@dcloudio/uni-cli-shared/lib/theme')
+} = require('@tencent/uni-cli-shared/lib/theme')
 
 function generatePageCode (pages, pageOptions) {
   return pages.map(pagePath => {
@@ -22,7 +22,7 @@ function generateUniConfig (appJson, isAppView) {
 }
 
 function generatePolyfill () {
-  return fs.readFileSync(require.resolve('@dcloudio/uni-cli-shared/lib/uni-polyfill.js'), { encoding: 'utf8' })
+  return fs.readFileSync(require.resolve('@tencent/uni-cli-shared/lib/uni-polyfill.js'), { encoding: 'utf8' })
 }
 
 module.exports = function definePages (appJson, isAppView) {

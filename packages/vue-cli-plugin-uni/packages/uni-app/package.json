@@ -1,7 +1,7 @@
 {
-  "name": "@dcloudio/uni-app",
+  "name": "@tencent/uni-app",
   "version": "3.0.0-alpha-3000020210813002",
-  "description": "@dcloudio/uni-app",
+  "description": "@tencent/uni-app",
   "main": "./dist/uni-app.cjs.js",
   "module": "./dist/uni-app.es.js",
   "types": "./dist/uni-app.d.ts",

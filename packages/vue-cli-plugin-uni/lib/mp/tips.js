@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const {
   isInHBuilderX
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 class UniTips {
   apply (compiler) {

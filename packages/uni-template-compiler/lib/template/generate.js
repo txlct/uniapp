@@ -8,7 +8,7 @@ const {
   VIRTUAL_HOST_STYLE,
   VIRTUAL_HOST_CLASS
 } = require('../constants')
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 function processElement (ast, state, isRoot) {
   const platform = state.options.platform

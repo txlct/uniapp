@@ -85,7 +85,7 @@ function handlePlaceholderExpression (objExpr, state) {
       const key = name || value
 
       if (key) {
-        acc[key] = valName 
+        acc[key] = valName
       }
 
       return acc
@@ -217,7 +217,7 @@ module.exports = function (ast, state = {
     })
   } catch (e) {
     if (state.filename) {
-      console.error('at ' + require('@dcloudio/uni-cli-shared').normalizePath(path.relative(process.env.UNI_INPUT_DIR, state.filename)) + ':1')
+      console.error('at ' + require('@tencent/uni-cli-shared').normalizePath(path.relative(process.env.UNI_INPUT_DIR, state.filename)) + ':1')
     }
     throw e
   }

@@ -7,7 +7,7 @@ if (process.env.UNI_USING_V3) {
 
   const {
     getPlatformCssVars
-  } = require('@dcloudio/uni-cli-shared')
+  } = require('@tencent/uni-cli-shared')
 
   const CSS_TAGS = require('./tags')
   const {
@@ -163,7 +163,7 @@ if (process.env.UNI_USING_V3) {
     }
     return function (root, result) {
       if (!rewriteUrl) {
-        rewriteUrl = require('@dcloudio/uni-cli-shared/lib/url-loader').rewriteUrl
+        rewriteUrl = require('@tencent/uni-cli-shared/lib/url-loader').rewriteUrl
       }
       rewriteUrl(root)
 

@@ -1,6 +1,6 @@
 const {
   initI18nOptions
-} = require('@dcloudio/uni-cli-shared/lib/i18n')
+} = require('@tencent/uni-cli-shared/lib/i18n')
 
 function parseRoutes (config) {
   const __uniRoutes = []

@@ -1,4 +1,4 @@
-/// <reference types="@dcloudio/types" />
+/// <reference types="@tencent/types" />
 import { createLifeCycle as createLifeCycleBase, ComponentInternalInstance } from '@vue/composition-api'
 import * as app from './app'
 import * as mp from './mp'

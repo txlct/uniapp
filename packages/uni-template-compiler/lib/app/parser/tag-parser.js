@@ -3,7 +3,7 @@ const {
   elements
 } = require('../util')
 
-const tags = require('@dcloudio/uni-cli-shared/lib/tags')
+const tags = require('@tencent/uni-cli-shared/lib/tags')
 
 // 仅限 view 层
 module.exports = function parseTag (el) {

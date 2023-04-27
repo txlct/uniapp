@@ -26,11 +26,11 @@ module.exports = function configureWebpack (platformOptions, manifestPlatformOpt
     jsPreprocessOptions,
     htmlPreprocessOptions,
     uts
-  } = require('@dcloudio/uni-cli-shared')
+  } = require('@tencent/uni-cli-shared')
 
   const {
     getPlatformVue
-  } = require('@dcloudio/uni-cli-shared/lib/platform')
+  } = require('@tencent/uni-cli-shared/lib/platform')
 
   const {
     getCopyWebpackPluginOptions
@@ -110,7 +110,7 @@ module.exports = function configureWebpack (platformOptions, manifestPlatformOpt
     compilerOptions: {
       baseUrl: context,
       typeRoots: [
-        resolveModule('@dcloudio/types'),
+        resolveModule('@tencent/types'),
         resolveModule('@types'),
         path.resolve(process.env.UNI_CLI_CONTEXT, 'types')
       ],
@@ -139,13 +139,13 @@ module.exports = function configureWebpack (platformOptions, manifestPlatformOpt
           resolveModule('tslib')
         ],
         'mpvue-page-factory': [
-          resolveModule('@dcloudio/vue-cli-plugin-uni/packages/mpvue-page-factory')
+          resolveModule('@tencent/vue-cli-plugin-uni/packages/mpvue-page-factory')
         ],
         '@vue/composition-api': [
-          resolveModule('@dcloudio/vue-cli-plugin-uni/packages/@vue/composition-api')
+          resolveModule('@tencent/vue-cli-plugin-uni/packages/@vue/composition-api')
         ],
-        '@dcloudio/uni-app': [
-          resolveModule('@dcloudio/uni-app')
+        '@tencent/uni-app': [
+          resolveModule('@tencent/uni-app')
         ]
       }
     },
@@ -240,7 +240,7 @@ module.exports = function configureWebpack (platformOptions, manifestPlatformOpt
       platformWebpackConfig = platformWebpackConfig(webpackConfig, vueOptions, api)
     }
     // 移除 node_modules 目录，避免受路径上的 node_modules 影响
-    if (require('@dcloudio/uni-cli-shared/lib/util').isInHBuilderX) {
+    if (require('@tencent/uni-cli-shared/lib/util').isInHBuilderX) {
       webpackConfig.resolve.modules = webpackConfig.resolve.modules.filter(module => module !== 'node_modules')
     }
 
@@ -257,7 +257,7 @@ module.exports = function configureWebpack (platformOptions, manifestPlatformOpt
         patterns
       } : patterns))
 
-      const uniExtApis = require('@dcloudio/uni-cli-shared/lib/uni_modules/uni_modules')
+      const uniExtApis = require('@tencent/uni-cli-shared/lib/uni_modules/uni_modules')
         .parseUniExtApis(false)
       const keys = Object.keys(uniExtApis)
       if (keys.length) {
@@ -266,7 +266,7 @@ module.exports = function configureWebpack (platformOptions, manifestPlatformOpt
     }
     if (!process.env.UNI_SUBPACKGE || !process.env.UNI_MP_PLUGIN) {
       try {
-        const automatorJson = require.resolve('@dcloudio/uni-automator/dist/automator.json')
+        const automatorJson = require.resolve('@tencent/uni-automator/dist/automator.json')
         const patterns = [{
           from: automatorJson,
           to: '../.automator/' + (process.env.UNI_SUB_PLATFORM || process.env.UNI_PLATFORM) +
@@ -274,7 +274,7 @@ module.exports = function configureWebpack (platformOptions, manifestPlatformOpt
           transform (content) {
             if (process.env.UNI_AUTOMATOR_WS_ENDPOINT) {
               return JSON.stringify({
-                version: require('@dcloudio/uni-automator/package.json').version,
+                version: require('@tencent/uni-automator/package.json').version,
                 wsEndpoint: process.env.UNI_AUTOMATOR_WS_ENDPOINT
               })
             }
@@ -311,7 +311,7 @@ module.exports = function configureWebpack (platformOptions, manifestPlatformOpt
       use: [{
         loader: 'babel-loader'
       }, {
-        loader: '@dcloudio/webpack-uni-pages-loader'
+        loader: '@tencent/webpack-uni-pages-loader'
       }],
       type: 'javascript/auto'
     },
@@ -336,7 +336,7 @@ module.exports = function configureWebpack (platformOptions, manifestPlatformOpt
 
     if (process.env.NODE_ENV === 'development' || (process.env.NODE_ENV === 'production' && process.env
       .SOURCEMAP === 'true')) {
-      const sourceMap = require('@dcloudio/uni-cli-shared/lib/source-map')
+      const sourceMap = require('@tencent/uni-cli-shared/lib/source-map')
       let isAppService = false
       if (
         process.env.UNI_PLATFORM === 'app-plus' &&
@@ -409,14 +409,14 @@ module.exports = function configureWebpack (platformOptions, manifestPlatformOpt
         JSON.stringify({
           type: 'stat'
         }),
-      vuex: require.resolve('@dcloudio/vue-cli-plugin-uni/packages/vuex3'),
-      '@vue/composition-api': require.resolve('@dcloudio/vue-cli-plugin-uni/packages/@vue/composition-api')
+      vuex: require.resolve('@tencent/vue-cli-plugin-uni/packages/vuex3'),
+      '@vue/composition-api': require.resolve('@tencent/vue-cli-plugin-uni/packages/@vue/composition-api')
     }
 
     if (process.env.UNI_PLATFORM.startsWith('mp')) {
       const BabelRuntimeVersions = require('@babel/runtime/package.json').version.split('.')
       if (BabelRuntimeVersions[0] === '7' && Number(BabelRuntimeVersions[1]) >= 18) {
-        alias['@babel/runtime/regenerator'] = require.resolve('@dcloudio/vue-cli-plugin-uni/packages/@babel/runtime/regenerator')
+        alias['@babel/runtime/regenerator'] = require.resolve('@tencent/vue-cli-plugin-uni/packages/@babel/runtime/regenerator')
       }
     }
 

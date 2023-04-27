@@ -1,6 +1,6 @@
 const path = require('path')
 const t = require('@babel/types')
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 function generateJsCode (properties = '{}') {
   return `
@@ -124,7 +124,7 @@ module.exports = {
       // TODO 使用 getPlatformExts 在单元测试报错，改从 state.options.platform 判断
       const {
         getPlatformExts
-      } = require('@dcloudio/uni-cli-shared')
+      } = require('@tencent/uni-cli-shared')
       const styleExtname = getPlatformExts().style
       const styleFile = resourcePath.replace(ownerName + extname, componentName + styleExtname)
       const styleContent = generateCssCode(ownerName + styleExtname)

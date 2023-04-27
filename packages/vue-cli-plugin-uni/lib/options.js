@@ -3,13 +3,13 @@ const path = require('path')
 const webpack = require('webpack')
 const {
   pathToRegexp
-} = require('@dcloudio/uni-cli-shared/lib/util')
+} = require('@tencent/uni-cli-shared/lib/util')
 
 module.exports = function initOptions (options) {
   const {
     getPlatformScss,
     getPlatformSass
-  } = require('@dcloudio/uni-cli-shared')
+  } = require('@tencent/uni-cli-shared')
 
   if (!options.transpileDependencies) {
     options.transpileDependencies = []
@@ -17,17 +17,17 @@ module.exports = function initOptions (options) {
 
   // 增加 src/node_modules 解析
   options.transpileDependencies.push(pathToRegexp(path.resolve(process.env.UNI_INPUT_DIR, 'node_modules'), { start: true }))
-  options.transpileDependencies.push('@dcloudio/uni-' + process.env.UNI_PLATFORM)
-  options.transpileDependencies.push('@dcloudio/uni-i18n')
-  options.transpileDependencies.push('@dcloudio/uni-stat')
-  options.transpileDependencies.push('@dcloudio/uni-push')
-  options.transpileDependencies.push('@dcloudio/vue-cli-plugin-uni/packages/uni-app')
-  options.transpileDependencies.push('@dcloudio/vue-cli-plugin-uni/packages/uni-cloud')
-  options.transpileDependencies.push('@dcloudio/vue-cli-plugin-uni/packages/uni-stat')
-  options.transpileDependencies.push('@dcloudio/vue-cli-plugin-uni/packages/uni-push')
+  options.transpileDependencies.push('@tencent/uni-' + process.env.UNI_PLATFORM)
+  options.transpileDependencies.push('@tencent/uni-i18n')
+  options.transpileDependencies.push('@tencent/uni-stat')
+  options.transpileDependencies.push('@tencent/uni-push')
+  options.transpileDependencies.push('@tencent/vue-cli-plugin-uni/packages/uni-app')
+  options.transpileDependencies.push('@tencent/vue-cli-plugin-uni/packages/uni-cloud')
+  options.transpileDependencies.push('@tencent/vue-cli-plugin-uni/packages/uni-stat')
+  options.transpileDependencies.push('@tencent/vue-cli-plugin-uni/packages/uni-push')
 
   if (process.env.UNI_PLATFORM !== 'mp-weixin') { // mp runtime
-    options.transpileDependencies.push('@dcloudio/uni-mp-weixin')
+    options.transpileDependencies.push('@tencent/uni-mp-weixin')
   }
 
   if (process.env.UNI_PLATFORM === 'h5') { // h5 dev 用到了这两个，需要 babel

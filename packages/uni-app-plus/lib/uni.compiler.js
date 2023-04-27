@@ -1,1 +1,1 @@
-module.exports = require('@dcloudio/uni-mp-weixin/lib/uni.compiler.js')
+module.exports = require('@tencent/uni-mp-weixin/lib/uni.compiler.js')

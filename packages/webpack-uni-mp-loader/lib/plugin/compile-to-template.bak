@@ -1,7 +1,7 @@
 const {
   hyphenate,
   getPlatformCompiler
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const SRC_REGEX = /src="([^"]+)"/g
 module.exports = function compile (source, options) {

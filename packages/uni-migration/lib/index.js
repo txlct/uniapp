@@ -1,6 +1,6 @@
 const path = require('path')
 const fs = require('fs-extra')
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 const validate = require('./validate')
 
 const patchVant = require('./vant')

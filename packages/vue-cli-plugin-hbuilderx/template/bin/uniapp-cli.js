@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 // TODO 暂时处理安装目录包含特殊符号，导致 H5 预览资源加载失败的问题。
 const matchSymbol = __dirname.match(/[()]/)

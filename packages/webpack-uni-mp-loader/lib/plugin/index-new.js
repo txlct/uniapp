@@ -4,11 +4,11 @@ const webpack = require('webpack')
 const {
   parseEntry,
   normalizePath
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   pagesJsonJsFileName
-} = require('@dcloudio/uni-cli-shared/lib/pages')
+} = require('@tencent/uni-cli-shared/lib/pages')
 
 const { createSource, getModuleId } = require('../shared')
 

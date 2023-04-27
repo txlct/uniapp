@@ -1,4 +1,4 @@
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 function isPlainObject (a) {
   if (a === null) {

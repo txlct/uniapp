@@ -7,16 +7,16 @@ const {
   normalizePath,
   getPlatformProject,
   isSupportSubPackages
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   updateAppJsonUsingComponents
-} = require('@dcloudio/uni-cli-shared/lib/cache')
+} = require('@tencent/uni-cli-shared/lib/cache')
 
 const {
   darkmode,
   hasTheme
-} = require('@dcloudio/uni-cli-shared/lib/theme')
+} = require('@tencent/uni-cli-shared/lib/theme')
 
 const {
   hasOwn,
@@ -25,7 +25,7 @@ const {
   NON_APP_JSON_KEYS
 } = require('../util')
 
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 function defaultCopy (name, value, json) {
   json[name] = value

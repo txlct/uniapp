@@ -84,7 +84,7 @@ function resolveUTSCompiler() {
     }
     if (!compilerPath) {
         try {
-            compilerPath = require.resolve('@dcloudio/uni-uts-v1', {
+            compilerPath = require.resolve('@tencent/uni-uts-v1', {
                 paths: [process.env.UNI_CLI_CONTEXT],
             });
         }
@@ -93,7 +93,7 @@ function resolveUTSCompiler() {
             if (utils_1.version.startsWith('2.0.')) {
                 utsCompilerVersion = '^3.0.0-alpha-3060920221117001';
             }
-            console.error((0, utils_1.installDepTips)('devDependencies', '@dcloudio/uni-uts-v1', utsCompilerVersion));
+            console.error((0, utils_1.installDepTips)('devDependencies', '@tencent/uni-uts-v1', utsCompilerVersion));
             process.exit(0);
         }
     }

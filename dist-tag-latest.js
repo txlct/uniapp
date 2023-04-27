@@ -11,7 +11,7 @@ if (!version) {
 
 (async function() {
   for (let i = 0; i < pkgs.length; i++) {
-    console.log(`npm dist-tag add @dcloudio/${pkgs[i]}@${version} latest`);
-    await shellExec(`npm dist-tag add @dcloudio/${pkgs[i]}@${version} latest`)
+    console.log(`npm dist-tag add @tencent/${pkgs[i]}@${version} latest`);
+    await shellExec(`npm dist-tag add @tencent/${pkgs[i]}@${version} latest`)
   }
 })();

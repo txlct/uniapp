@@ -4,8 +4,8 @@ const Service = require('@vue/cli-service')
 
 const {
   initCustomScript
-} = require('@dcloudio/uni-cli-shared/lib/package')
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+} = require('@tencent/uni-cli-shared/lib/package')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 module.exports = function custom (argv) {
   const script = argv._[1]

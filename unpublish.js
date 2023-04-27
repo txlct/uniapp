@@ -11,7 +11,7 @@ if (!version) {
 
 (async function() {
   for (let i = 0; i < pkgs.length; i++) {
-    console.log(`npm unpublish @dcloudio/${pkgs[i]}@${version}`);
-    await shellExec(`npm unpublish @dcloudio/${pkgs[i]}@${version}`)
+    console.log(`npm unpublish @tencent/${pkgs[i]}@${version}`);
+    await shellExec(`npm unpublish @tencent/${pkgs[i]}@${version}`)
   }
 })();

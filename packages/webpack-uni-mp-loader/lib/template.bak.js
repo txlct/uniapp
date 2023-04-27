@@ -6,7 +6,7 @@ const {
   md5,
   removeExt,
   getPlatformExts
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   cacheTemplate,

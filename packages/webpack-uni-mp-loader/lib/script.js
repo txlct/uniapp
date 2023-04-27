@@ -5,7 +5,7 @@ const {
   hashify,
   removeExt,
   hasModule
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   resolve,

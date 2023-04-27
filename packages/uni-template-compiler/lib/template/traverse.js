@@ -4,7 +4,7 @@ const t = require('@babel/types')
 const babelTraverse = require('@babel/traverse').default
 
 const generate = require('./generate')
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 const {
   genCode,

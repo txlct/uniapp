@@ -3,7 +3,7 @@ const path = require('path')
 
 const request = require('request')
 
-const registry = 'https://registry.npmjs.org/@dcloudio/'
+const registry = 'https://registry.npmjs.org/@tencent/'
 
 const pkgs = fs.readdirSync(path.resolve(__dirname, 'packages')).filter(pkg => pkg.indexOf('.') !== 0)
 

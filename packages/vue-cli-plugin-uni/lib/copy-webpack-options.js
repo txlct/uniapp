@@ -2,10 +2,10 @@ const fs = require('fs')
 const path = require('path')
 const {
   compileI18nJsonStr
-} = require('@dcloudio/uni-i18n')
+} = require('@tencent/uni-i18n')
 const {
   initI18nOptions
-} = require('@dcloudio/uni-cli-shared/lib/i18n')
+} = require('@tencent/uni-cli-shared/lib/i18n')
 const assetsDir = 'static'
 const CopyWebpackPluginVersion = Number(require('copy-webpack-plugin/package.json').version.split('.')[0])
 

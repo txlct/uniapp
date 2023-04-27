@@ -1,5 +1,5 @@
 {
-	"name": "@dcloudio/babel-plugin-console",
+	"name": "@tencent/babel-plugin-console",
 	"version": "0.0.1",
 	"description": "uni-app babel-plugin-console",
 	"main": "dist/index.js",

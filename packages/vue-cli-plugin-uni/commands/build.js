@@ -7,9 +7,9 @@ const {
   parseJson,
   parsePagesJson,
   parseManifestJson
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 const defaults = {
   clean: true,
@@ -178,7 +178,7 @@ async function build (args, api, options) {
     process.env.UNI_USING_V3_NATIVE ||
     (process.UNI_NVUE_ENTRY && Object.keys(process.UNI_NVUE_ENTRY).length)
   ) {
-    webpackConfigs.push(require('@dcloudio/vue-cli-plugin-hbuilderx/build/webpack.nvue.conf.js')(process
+    webpackConfigs.push(require('@tencent/vue-cli-plugin-hbuilderx/build/webpack.nvue.conf.js')(process
       .UNI_NVUE_ENTRY))
   }
 
@@ -276,7 +276,7 @@ function buildManifestJson () {
   const pagesJson = parsePagesJson(fs.readFileSync(pagesJsonPath, 'utf8'))
   const manifestJson = parseManifestJson(fs.readFileSync(manifestJsonPath, 'utf8'))
 
-  const res = require('@dcloudio/webpack-uni-pages-loader/lib/platforms/app-plus/index.js')(pagesJson,
+  const res = require('@tencent/webpack-uni-pages-loader/lib/platforms/app-plus/index.js')(pagesJson,
     manifestJson,
     false)
   if (res && res[0]) {

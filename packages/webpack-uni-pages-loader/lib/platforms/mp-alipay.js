@@ -4,11 +4,11 @@ const path = require('path')
 const {
   parsePages,
   getPlatformProject
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   updateAppJsonUsingComponents
-} = require('@dcloudio/uni-cli-shared/lib/cache')
+} = require('@tencent/uni-cli-shared/lib/cache')
 
 const {
   hasOwn,

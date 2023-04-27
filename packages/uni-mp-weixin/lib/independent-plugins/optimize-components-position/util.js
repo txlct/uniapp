@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs-extra');
-const { getGlobalUsingComponents } = require('@dcloudio/uni-cli-shared/lib/cache');
+const { getGlobalUsingComponents } = require('@tencent/uni-cli-shared/lib/cache');
 const { wxComponentsStr, outerComponents } = require('./constant');
 const { generateAsset } = require('../utils');
 

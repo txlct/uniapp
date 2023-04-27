@@ -2,7 +2,7 @@ const selectorParser = require('postcss-selector-parser')
 
 const {
   tags
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const TAGS = Object.keys(tags)
 
@@ -19,7 +19,7 @@ let rewriteUrl
 
 function once (root) {
   if (!rewriteUrl) {
-    rewriteUrl = require('@dcloudio/uni-cli-shared/lib/url-loader').rewriteUrl
+    rewriteUrl = require('@tencent/uni-cli-shared/lib/url-loader').rewriteUrl
   }
   rewriteUrl(root)
 

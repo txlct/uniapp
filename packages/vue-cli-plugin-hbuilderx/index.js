@@ -1,8 +1,8 @@
 const fs = require('fs')
 const path = require('path')
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
-process.env.UNI_CLI_CONTEXT = require('@dcloudio/uni-cli-shared/lib/util').getCLIContext()
+process.env.UNI_CLI_CONTEXT = require('@tencent/uni-cli-shared/lib/util').getCLIContext()
 
 process.env.UNI_HBUILDERX_PLUGINS = process.env.UNI_HBUILDERX_PLUGINS || path.resolve(__dirname, '../../../../')
 

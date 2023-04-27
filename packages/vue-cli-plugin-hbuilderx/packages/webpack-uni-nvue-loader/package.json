@@ -1,5 +1,5 @@
 {
-	"name": "@dcloudio/webpack-uni-nvue-loader",
+	"name": "@tencent/webpack-uni-nvue-loader",
 	"version": "0.0.1",
 	"description": "webpack-uni-nvue-loader",
 	"scripts": {

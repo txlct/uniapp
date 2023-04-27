@@ -6,7 +6,7 @@ const {
   normalizePath,
   pathToRegexp,
   isInHBuilderX
-} = require('@dcloudio/uni-cli-shared/lib/util')
+} = require('@tencent/uni-cli-shared/lib/util')
 
 let sourceRoot = false
 

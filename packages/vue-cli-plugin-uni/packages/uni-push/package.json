@@ -1,7 +1,7 @@
 {
-  "name": "@dcloudio/uni-push",
+  "name": "@tencent/uni-push",
   "version": "3.0.0-alpha-3040620220415003",
-  "description": "@dcloudio/uni-push",
+  "description": "@tencent/uni-push",
   "main": "lib/uni-push.js",
   "module": "lib/uni-push.js",
   "files": [
@@ -20,7 +20,7 @@
   },
   "gitHead": "33e807d66e1fe47e2ee08ad9c59247e37b8884da",
   "dependencies": {
-    "@dcloudio/uni-cli-shared": "3.0.0-alpha-3040620220415003",
+    "@tencent/uni-cli-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?pnpm",
     "debug": "^4.3.3"
   },
   "devDependencies": {

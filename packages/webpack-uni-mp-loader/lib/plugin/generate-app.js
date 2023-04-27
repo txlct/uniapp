@@ -6,11 +6,11 @@ const {
 const {
   getShadowCss,
   getPlatformGlobal
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   getSpecialMethods
-} = require('@dcloudio/uni-cli-shared/lib/cache')
+} = require('@tencent/uni-cli-shared/lib/cache')
 
 module.exports = function generateApp (compilation) {
   const ext = getPlatformExts().style

@@ -1,5 +1,5 @@
 {
-	"name": "@dcloudio/uni-app-plus-nvue-v8",
+	"name": "@tencent/uni-app-plus-nvue-v8",
 	"version": "0.0.1",
 	"description": "uni-app app-plus-nvue-v8",
 	"main": "dist/index.js",

@@ -3,10 +3,10 @@ const path = require('path')
 const {
   removeExt,
   normalizePath
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 const {
   getUsingComponentsCode
-} = require('@dcloudio/uni-cli-shared/lib/pages')
+} = require('@tencent/uni-cli-shared/lib/pages')
 
 module.exports = function (content, map) {
   this.cacheable && this.cacheable()

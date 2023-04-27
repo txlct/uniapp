@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 const {
   removeExt,
@@ -485,7 +485,7 @@ function initAutoImportScanComponents () {
   if (process.env.UNI_PLATFORM === 'quickapp-native') {
     if (!uniQuickAppAutoImportScanComponents) {
       uniQuickAppAutoImportScanComponents = getAutoComponentsByDir(
-        path.resolve(require.resolve('@dcloudio/uni-quickapp-native'), '../../components'),
+        path.resolve(require.resolve('@tencent/uni-quickapp-native'), '../../components'),
         true
       )
     }
@@ -508,7 +508,7 @@ function initBuiltInEasycom (components, usingAutoImportComponents) {
     const easycomName = `^${name}$`
     if (!usingAutoImportComponents[easycomName]) {
       usingAutoImportComponents[easycomName] =
-        '@dcloudio/uni-cli-shared/components/' + name + '.vue'
+        '@tencent/uni-cli-shared/components/' + name + '.vue'
     }
   })
 }

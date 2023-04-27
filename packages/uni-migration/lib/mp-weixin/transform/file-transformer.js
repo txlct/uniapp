@@ -49,7 +49,7 @@ module.exports = function transformFile(input, options) {
   const scriptCode = transformScriptFile(filepath + '.js', jsCode, options, deps)
 
   const commentsCode = options.silent ? '' :
-    `<!-- @dcloudio/uni-migration@${pkg.version} -->
+    `<!-- @tencent/uni-migration@${pkg.version} -->
 <!-- ${new Date().toLocaleString()} -->
 `
   return [

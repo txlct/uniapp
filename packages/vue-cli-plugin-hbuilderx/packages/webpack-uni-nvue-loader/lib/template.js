@@ -4,11 +4,11 @@ const {
   removeExt,
   normalizePath,
   getPagesJson
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   normalizeNodeModules
-} = require('@dcloudio/webpack-uni-mp-loader/lib/shared')
+} = require('@tencent/webpack-uni-mp-loader/lib/shared')
 
 const SCROLLER_COMPONENTS = [
   'list',

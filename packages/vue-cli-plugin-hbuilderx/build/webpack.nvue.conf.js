@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
 const webpack = require('webpack')
-const VueLoaderPlugin = require('@dcloudio/vue-cli-plugin-uni/packages/vue-loader/lib/plugin')
+const VueLoaderPlugin = require('@tencent/vue-cli-plugin-uni/packages/vue-loader/lib/plugin')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const CopyWebpackPluginVersion = Number(require('copy-webpack-plugin/package.json').version.split('.')[0])
 const TerserPlugin = require('terser-webpack-plugin')
@@ -12,34 +12,34 @@ const {
   nvueHtmlPreprocessOptions,
   getTemplatePath,
   uts
-} = require('@dcloudio/uni-cli-shared')
-const fileLoader = require('@dcloudio/uni-cli-shared/lib/file-loader')
+} = require('@tencent/uni-cli-shared')
+const fileLoader = require('@tencent/uni-cli-shared/lib/file-loader')
 const {
   compileI18nJsonStr
-} = require('@dcloudio/uni-i18n')
+} = require('@tencent/uni-i18n')
 const {
   initI18nOptions
-} = require('@dcloudio/uni-cli-shared/lib/i18n')
+} = require('@tencent/uni-cli-shared/lib/i18n')
 const WebpackAppPlusNVuePlugin = process.env.UNI_USING_V3
   ? require('../packages/webpack-app-plus-plugin')
   : require('../packages/webpack-app-plus-nvue-plugin')
 
-const WebpackErrorsPlugin = require('@dcloudio/vue-cli-plugin-uni/packages/webpack-errors-plugin')
-const WebpackUniMPPlugin = require('@dcloudio/webpack-uni-mp-loader/lib/plugin/index-new')
+const WebpackErrorsPlugin = require('@tencent/vue-cli-plugin-uni/packages/webpack-errors-plugin')
+const WebpackUniMPPlugin = require('@tencent/webpack-uni-mp-loader/lib/plugin/index-new')
 
-const onErrors = require('@dcloudio/vue-cli-plugin-uni/util/on-errors')
-const onWarnings = require('@dcloudio/vue-cli-plugin-uni/util/on-warnings')
+const onErrors = require('@tencent/vue-cli-plugin-uni/util/on-errors')
+const onWarnings = require('@tencent/vue-cli-plugin-uni/util/on-warnings')
 
 const cssLoaders = require('./css-loader.conf')
 const vueLoaderOptions = require('./vue-loader.conf')
 
 const jsPreprocessorLoader = {
-  loader: '@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader',
+  loader: '@tencent/vue-cli-plugin-uni/packages/webpack-preprocess-loader',
   options: nvueJsPreprocessOptions
 }
 
 const htmlPreprocessorLoader = {
-  loader: '@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader',
+  loader: '@tencent/vue-cli-plugin-uni/packages/webpack-preprocess-loader',
   options: nvueHtmlPreprocessOptions
 }
 
@@ -47,7 +47,7 @@ const uniPath = process.env.UNI_USING_V8
   ? '../packages/uni-app-plus-nvue-v8/dist/index.js'
   : '../packages/uni-app-plus-nvue/dist/index.js'
 
-const uniCloudPath = require.resolve('@dcloudio/vue-cli-plugin-uni/packages/uni-cloud/dist/index.js')
+const uniCloudPath = require.resolve('@tencent/vue-cli-plugin-uni/packages/uni-cloud/dist/index.js')
 
 const provide = {
   uniCloud: [uniCloudPath, 'default']
@@ -78,8 +78,8 @@ if (
   process.env.UNI_PLATFORM === 'app-plus' &&
   process.env.UNI_USING_V8
 ) {
-  provide.__f__ = [require.resolve('@dcloudio/vue-cli-plugin-uni/lib/format-log.js'), 'default']
-  provide.crypto = [require.resolve('@dcloudio/vue-cli-plugin-uni/lib/crypto.js'), 'default']
+  provide.__f__ = [require.resolve('@tencent/vue-cli-plugin-uni/lib/format-log.js'), 'default']
+  provide.crypto = [require.resolve('@tencent/vue-cli-plugin-uni/lib/crypto.js'), 'default']
 }
 
 const plugins = [
@@ -117,7 +117,7 @@ const plugins = [
 ]
 
 if (process.env.NODE_ENV === 'development') {
-  plugins.push(require('@dcloudio/uni-cli-shared/lib/source-map').createEvalSourceMapDevToolPlugin())
+  plugins.push(require('@tencent/uni-cli-shared/lib/source-map').createEvalSourceMapDevToolPlugin())
 }
 
 // const excludeModuleReg = /node_modules(?!(\/|\\).*(weex).*)/
@@ -131,13 +131,13 @@ const rules = [webpack.version[0] > 4 ? {
 }, {
   test: path.resolve(process.env.UNI_INPUT_DIR, 'pages.json'),
   use: [{
-    loader: '@dcloudio/webpack-uni-pages-loader'
+    loader: '@tencent/webpack-uni-pages-loader'
   }],
   type: 'javascript/auto'
 }, {
   test: path.resolve(process.env.UNI_INPUT_DIR, getNVueMainEntry()),
   use: [{
-    loader: '@dcloudio/vue-cli-plugin-hbuilderx/packages/webpack-uni-nvue-loader/lib/main'
+    loader: '@tencent/vue-cli-plugin-hbuilderx/packages/webpack-uni-nvue-loader/lib/main'
   }]
 }, {
   test: /\.js$/,
@@ -150,13 +150,13 @@ const rules = [webpack.version[0] > 4 ? {
   jsPreprocessorLoader
   ]
   // exclude (modulePath) { // nvue js均提供babel，否则还得提供transpileDependencies配置
-  //   return excludeModuleReg.test(modulePath) && modulePath.indexOf('@dcloudio') === -1
+  //   return excludeModuleReg.test(modulePath) && modulePath.indexOf('@tencent') === -1
   // }
 },
 {
   test: [/\.nvue(\?[^?]+)?$/, /\.vue(\?[^?]+)?$/],
   use: [{
-    loader: require.resolve('@dcloudio/vue-cli-plugin-uni/packages/vue-loader'),
+    loader: require.resolve('@tencent/vue-cli-plugin-uni/packages/vue-loader'),
     options: vueLoaderOptions
   }]
 },
@@ -185,7 +185,7 @@ const rules = [webpack.version[0] > 4 ? {
   type: 'javascript/auto',
   resourceQuery: /uts-proxy/,
   use: [{
-    loader: require.resolve('@dcloudio/uni-cli-shared/lib/uts/uts-loader.js')
+    loader: require.resolve('@tencent/uni-cli-shared/lib/uts/uts-loader.js')
   }]
 }
 ].concat(cssLoaders)
@@ -196,9 +196,9 @@ if (process.env.UNI_USING_NVUE_COMPILER || process.env.UNI_USING_V3_NATIVE) {
       return query.indexOf('vue&type=template') !== -1 && query.indexOf('mpType=page') !== -1
     },
     use: [{
-      loader: '@dcloudio/vue-cli-plugin-hbuilderx/packages/webpack-uni-nvue-loader/lib/template'
+      loader: '@tencent/vue-cli-plugin-hbuilderx/packages/webpack-uni-nvue-loader/lib/template'
     }, {
-      loader: '@dcloudio/vue-cli-plugin-uni/packages/webpack-uni-app-loader/page-meta'
+      loader: '@tencent/vue-cli-plugin-uni/packages/webpack-uni-app-loader/page-meta'
     }]
   })
 }
@@ -207,13 +207,13 @@ rules.unshift({
     return query.indexOf('vue&type=template') !== -1 && query.indexOf('mpType=page') === -1
   },
   use: [{
-    loader: '@dcloudio/vue-cli-plugin-hbuilderx/packages/webpack-uni-nvue-loader/lib/template.recycle'
+    loader: '@tencent/vue-cli-plugin-hbuilderx/packages/webpack-uni-nvue-loader/lib/template.recycle'
   }]
 })
 
 if (process.env.UNI_USING_V3_NATIVE) {
   try {
-    const automatorJson = require.resolve('@dcloudio/uni-automator/dist/automator.json')
+    const automatorJson = require.resolve('@tencent/uni-automator/dist/automator.json')
     const patterns = [{
       from: automatorJson,
       to: '../.automator/' + (process.env.UNI_SUB_PLATFORM || process.env.UNI_PLATFORM) +
@@ -221,7 +221,7 @@ if (process.env.UNI_USING_V3_NATIVE) {
       transform (content) {
         if (process.env.UNI_AUTOMATOR_WS_ENDPOINT) {
           return JSON.stringify({
-            version: require('@dcloudio/uni-automator/package.json').version,
+            version: require('@tencent/uni-automator/package.json').version,
             wsEndpoint: process.env.UNI_AUTOMATOR_WS_ENDPOINT
           })
         }
@@ -387,7 +387,7 @@ module.exports = function () {
           type: 'origin-pages-json'
         }),
         '@': process.env.UNI_INPUT_DIR,
-        'uni-polyfill': require.resolve('@dcloudio/uni-cli-shared/lib/uni-polyfill.js'),
+        'uni-polyfill': require.resolve('@tencent/uni-cli-shared/lib/uni-polyfill.js'),
         'uni-pages': path.resolve(process.env.UNI_INPUT_DIR, 'pages.json'),
         'uni-app-style': path.resolve(process.env.UNI_INPUT_DIR, getNVueMainEntry()) + '?' + JSON.stringify({
           type: 'appStyle'
@@ -397,7 +397,7 @@ module.exports = function () {
           JSON.stringify({
             type: 'stat'
           }),
-        '@vue/composition-api': require.resolve('@dcloudio/vue-cli-plugin-uni/packages/@vue/composition-api')
+        '@vue/composition-api': require.resolve('@tencent/vue-cli-plugin-uni/packages/@vue/composition-api')
       },
       modules: [
         'node_modules',

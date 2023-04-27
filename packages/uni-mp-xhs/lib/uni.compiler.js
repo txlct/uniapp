@@ -1,4 +1,4 @@
-const compiler = require('@dcloudio/uni-mp-weixin/lib/uni.compiler.js')
+const compiler = require('@tencent/uni-mp-weixin/lib/uni.compiler.js')
 module.exports = Object.assign({}, compiler, {
   directive: 'xhs:'
 })

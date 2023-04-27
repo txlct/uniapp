@@ -69,7 +69,7 @@ module.exports = {
   plugins: [
     alias({
       entries: [{
-        find: '@dcloudio',
+        find: '@tencent',
         replacement: path.resolve(__dirname, '../packages')
       }, {
         find: 'uni-core',
@@ -102,5 +102,5 @@ module.exports = {
       __PLATFORM__: JSON.stringify(process.env.UNI_PLATFORM)
     })
   ],
-  external: ['vue', '@dcloudio/uni-i18n']
+  external: ['vue', '@tencent/uni-i18n']
 }

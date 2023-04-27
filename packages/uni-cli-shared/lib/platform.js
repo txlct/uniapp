@@ -114,21 +114,21 @@ module.exports = {
   getMPRuntimePath () {
     if (process.env.UNI_USING_VUE3) {
       try {
-        return require.resolve('@dcloudio/uni-' + process.env.UNI_PLATFORM + '/dist/uni.mp.esm.js')
+        return require.resolve('@tencent/uni-' + process.env.UNI_PLATFORM + '/dist/uni.mp.esm.js')
       } catch (error) {
         throw new Error('Vue3 项目暂不支持当前小程序')
       }
     }
-    return require.resolve('@dcloudio/uni-' + process.env.UNI_PLATFORM)
+    return require.resolve('@tencent/uni-' + process.env.UNI_PLATFORM)
   },
   getPlatformVue (vueOptions) {
     if (uniPluginOptions.vue) {
       return uniPluginOptions.vue
     }
     if (process.env.UNI_USING_VUE3) {
-      return '@dcloudio/uni-mp-vue'
+      return '@tencent/uni-mp-vue'
     }
-    return '@dcloudio/vue-cli-plugin-uni/packages/mp-vue'
+    return '@tencent/vue-cli-plugin-uni/packages/mp-vue'
   },
   getPlatformCssVars () {
     return uniPluginOptions.cssVars || {}
@@ -165,20 +165,20 @@ module.exports = {
     if (!process.env.UNI_USING_STAT) {
       return ''
     }
-    return process.env.UNI_USING_STAT === '2' ? 'import \'@dcloudio/uni-stat/dist/uni-cloud-stat.es.js\';'
-      : 'import \'@dcloudio/uni-stat/dist/uni-stat.es.js\';'
+    return process.env.UNI_USING_STAT === '2' ? 'import \'@tencent/uni-stat/dist/uni-cloud-stat.es.js\';'
+      : 'import \'@tencent/uni-stat/dist/uni-stat.es.js\';'
   },
   getPlatformPush () {
     if (process.env.UNI_PUSH_V2_OFFLINE || process.env.UNI_PUSH_V1) {
-      return ';import \'@dcloudio/vue-cli-plugin-uni/packages/uni-push/dist/uni-push.plus.es.js\';'
+      return ';import \'@tencent/vue-cli-plugin-uni/packages/uni-push/dist/uni-push.plus.es.js\';'
     } else if (process.env.UNI_PUSH_V2) {
-      return ';import \'@dcloudio/vue-cli-plugin-uni/packages/uni-push/dist/uni-push.es.js\';'
+      return ';import \'@tencent/vue-cli-plugin-uni/packages/uni-push/dist/uni-push.es.js\';'
     }
     return ''
   },
   getPlatformUniCloud () {
     if (JSON.parse(process.env.UNI_CLOUD_PROVIDER || '[]').length) {
-      const uniCloudLibPath = '@dcloudio/vue-cli-plugin-uni/packages/uni-cloud/dist/index.js'
+      const uniCloudLibPath = '@tencent/vue-cli-plugin-uni/packages/uni-cloud/dist/index.js'
       return `import '${uniCloudLibPath}';`
     }
     return ''

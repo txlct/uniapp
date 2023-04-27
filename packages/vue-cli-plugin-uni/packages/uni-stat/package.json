@@ -1,7 +1,7 @@
 {
-  "name": "@dcloudio/uni-stat",
+  "name": "@tencent/uni-stat",
   "version": "3.0.0-alpha-3000020210813002",
-  "description": "@dcloudio/uni-stat",
+  "description": "@tencent/uni-stat",
   "main": "dist/uni-stat.es.js",
   "module": "dist/uni-stat.es.js",
   "files": [

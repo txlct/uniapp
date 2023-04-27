@@ -12,7 +12,7 @@ const {
   getPlatformUniCloud,
   createSource,
   deleteAsset
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const WebpackUniAppPlugin = require('../../packages/webpack-uni-app-loader/plugin/index')
 
@@ -23,16 +23,16 @@ const {
 } = require('../cache-loader')
 
 function createUniMPPlugin () {
-  const WebpackUniMPPlugin = require('@dcloudio/webpack-uni-mp-loader/lib/plugin/index-new')
+  const WebpackUniMPPlugin = require('@tencent/webpack-uni-mp-loader/lib/plugin/index-new')
   return new WebpackUniMPPlugin()
 }
 
-const createWxMpIndependentPlugins = require('@dcloudio/uni-mp-weixin/lib/createIndependentPlugin')
+const createWxMpIndependentPlugins = require('@tencent/uni-mp-weixin/lib/createIndependentPlugin')
 
 const UniTips = require('./tips')
 
 function getProvides () {
-  const uniPath = require('@dcloudio/uni-cli-shared/lib/platform').getMPRuntimePath()
+  const uniPath = require('@tencent/uni-cli-shared/lib/platform').getMPRuntimePath()
   const uniCloudPath = path.resolve(__dirname, '../../packages/uni-cloud/dist/index.js')
   const provides = {
     uni: [uniPath, 'default'],
@@ -40,7 +40,7 @@ function getProvides () {
   }
 
   if (process.env.UNI_USING_VUE3) {
-    provides.uni = ['@dcloudio/uni-' + process.env.UNI_PLATFORM + '/dist/uni.api.esm.js', 'default']
+    provides.uni = ['@tencent/uni-' + process.env.UNI_PLATFORM + '/dist/uni.api.esm.js', 'default']
     provides.createMiniProgramApp = [uniPath, 'createApp']
   }
 
@@ -213,15 +213,15 @@ ${globalEnv}.__webpack_require_UNI_MP_PLUGIN__ = __webpack_require__;`
 
     const alias = { // 仅 mp-weixin
       'mpvue-page-factory': require.resolve(
-        '@dcloudio/vue-cli-plugin-uni/packages/mpvue-page-factory')
+        '@tencent/vue-cli-plugin-uni/packages/mpvue-page-factory')
     }
 
     if (process.env.UNI_USING_VUE3) {
-      alias.vuex = require.resolve('@dcloudio/vue-cli-plugin-uni/packages/vuex')
-      alias['@vue/devtools-api'] = require.resolve('@dcloudio/vue-cli-plugin-uni/packages/@vue/devtools-api')
+      alias.vuex = require.resolve('@tencent/vue-cli-plugin-uni/packages/vuex')
+      alias['@vue/devtools-api'] = require.resolve('@tencent/vue-cli-plugin-uni/packages/@vue/devtools-api')
 
-      alias['vue-i18n'] = require.resolve('@dcloudio/vue-cli-plugin-uni/packages/vue3/node_modules/vue-i18n')
-      alias['@dcloudio/uni-app'] = require.resolve('@dcloudio/vue-cli-plugin-uni/packages/uni-app')
+      alias['vue-i18n'] = require.resolve('@tencent/vue-cli-plugin-uni/packages/vue3/node_modules/vue-i18n')
+      alias['@tencent/uni-app'] = require.resolve('@tencent/vue-cli-plugin-uni/packages/uni-app')
     }
 
     // 使用外层依赖的版本
@@ -265,19 +265,19 @@ ${globalEnv}.__webpack_require_UNI_MP_PLUGIN__ = __webpack_require__;`
               ]
             }
           }, {
-            loader: '@dcloudio/webpack-uni-mp-loader/lib/main'
+            loader: '@tencent/webpack-uni-mp-loader/lib/main'
           }]
         }, {
           resourceQuery: /vue&type=script/,
           use: [{
-            loader: '@dcloudio/webpack-uni-mp-loader/lib/script'
+            loader: '@tencent/webpack-uni-mp-loader/lib/script'
           }]
         }, {
           resourceQuery: /vue&type=template/,
           use: [{
-            loader: '@dcloudio/webpack-uni-mp-loader/lib/template'
+            loader: '@tencent/webpack-uni-mp-loader/lib/template'
           }, {
-            loader: '@dcloudio/vue-cli-plugin-uni/packages/webpack-uni-app-loader/page-meta'
+            loader: '@tencent/vue-cli-plugin-uni/packages/webpack-uni-app-loader/page-meta'
           }]
         }, createTemplateCacheLoader(api), {
           resourceQuery: [
@@ -290,7 +290,7 @@ ${globalEnv}.__webpack_require_UNI_MP_PLUGIN__ = __webpack_require__;`
           ],
           use: [{
             loader: require.resolve(
-              '@dcloudio/vue-cli-plugin-uni/packages/webpack-uni-filter-loader')
+              '@tencent/vue-cli-plugin-uni/packages/webpack-uni-filter-loader')
           }]
         }]
       },

@@ -38,7 +38,7 @@ function genPriorities (entryPagePath) {
   return o
 }
 
-const uniCloudPath = require.resolve('@dcloudio/vue-cli-plugin-uni/packages/uni-cloud/dist/index.js')
+const uniCloudPath = require.resolve('@tencent/vue-cli-plugin-uni/packages/uni-cloud/dist/index.js')
 
 const patterns = [{
   from: path.resolve(__dirname, '../dist/' + dslFilename),

@@ -10,11 +10,11 @@ const {
   getPlatformStat,
   getPlatformPush,
   getPlatformUniCloud
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   getGlobalUsingComponentsCode
-} = require('@dcloudio/uni-cli-shared/lib/pages')
+} = require('@tencent/uni-cli-shared/lib/pages')
 
 const modifyVueLoader = require('../vue-loader')
 
@@ -33,8 +33,8 @@ const {
   devServer
 } = getH5Options()
 
-const runtimePath = '@dcloudio/uni-mp-weixin/dist/mp.js'
-const wxsPath = '@dcloudio/uni-mp-weixin/dist/wxs.js'
+const runtimePath = '@tencent/uni-mp-weixin/dist/mp.js'
+const wxsPath = '@tencent/uni-mp-weixin/dist/wxs.js'
 const uniCloudPath = path.resolve(__dirname, '../../packages/uni-cloud/dist/index.js')
 
 function getProvides () {
@@ -159,7 +159,7 @@ module.exports = {
         extensions: ['.uts', '.nvue'],
         alias: {
           'vue-router': resolve('packages/h5-vue-router'),
-          'uni-h5': require.resolve('@dcloudio/uni-h5')
+          'uni-h5': require.resolve('@tencent/uni-h5')
         }
       },
       module: {
@@ -193,7 +193,7 @@ module.exports = {
           use: [{
             loader: resolve('packages/webpack-uni-app-loader/filter-modules-template.js')
           }, {
-            loader: '@dcloudio/vue-cli-plugin-uni/packages/webpack-uni-app-loader/page-meta'
+            loader: '@tencent/vue-cli-plugin-uni/packages/webpack-uni-app-loader/page-meta'
           }]
         }, {
           resourceQuery: [/lang=wxs/, /blockType=wxs/],

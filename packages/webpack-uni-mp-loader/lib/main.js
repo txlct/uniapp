@@ -9,7 +9,7 @@ const {
   hasModule,
   removeExt,
   normalizePath
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   resolve,

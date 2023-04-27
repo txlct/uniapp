@@ -1,4 +1,4 @@
-const { copyMiniProgramThemeJson } = require('@dcloudio/uni-cli-shared/lib/theme')
+const { copyMiniProgramThemeJson } = require('@tencent/uni-cli-shared/lib/theme')
 
 module.exports = {
   options: {

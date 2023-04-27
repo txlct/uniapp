@@ -1,6 +1,6 @@
 const GraphHelpers = require('webpack/lib/GraphHelpers');
-const { normalizePath } = require('@dcloudio/uni-cli-shared');
-const getSplitChunks = require('@dcloudio/vue-cli-plugin-uni/lib/split-chunks');
+const { normalizePath } = require('@tencent/uni-cli-shared');
+const getSplitChunks = require('@tencent/vue-cli-plugin-uni/lib/split-chunks');
 const path = require('path');
 
 const mainPath = normalizePath(path.resolve(process.env.UNI_INPUT_DIR, 'main.'));

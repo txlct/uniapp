@@ -4,14 +4,14 @@ const webpack = require('webpack')
 const {
   removeExt,
   normalizePath
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 const {
   getComponentSet
-} = require('@dcloudio/uni-cli-shared/lib/cache')
+} = require('@tencent/uni-cli-shared/lib/cache')
 
 const {
   isBuiltInComponentPath
-} = require('@dcloudio/uni-cli-shared/lib/pages')
+} = require('@tencent/uni-cli-shared/lib/pages')
 
 const {
   restoreNodeModules,
@@ -21,7 +21,7 @@ const {
 
 const EMPTY_COMPONENT_LEN = 'Component({})'.length
 
-const uniPath = normalizePath(require('@dcloudio/uni-cli-shared/lib/platform').getMPRuntimePath())
+const uniPath = normalizePath(require('@tencent/uni-cli-shared/lib/platform').getMPRuntimePath())
 
 function findModule (modules, resource, altResource) {
   return modules.find(
@@ -98,7 +98,7 @@ module.exports = function generateComponent (compilation, jsonpFunction = 'webpa
           let resource = normalizePath(path.resolve(process.env.UNI_INPUT_DIR, '..', modulePath))
           const altResource = normalizePath(path.resolve(process.env.UNI_INPUT_DIR, modulePath))
 
-          if (modulePath.includes('@dcloudio') && isBuiltInComponentPath(modulePath)) {
+          if (modulePath.includes('@tencent') && isBuiltInComponentPath(modulePath)) {
             resource = normalizePath(path.resolve(process.env.UNI_CLI_CONTEXT, modulePath))
           }
 

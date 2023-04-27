@@ -11,17 +11,17 @@ const {
   normalizePath,
   getComponentName,
   jsPreprocessOptions
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   getBabelParserOptions
-} = require('@dcloudio/uni-cli-shared/lib/platform')
+} = require('@tencent/uni-cli-shared/lib/platform')
 
 const {
   updateUsingComponents
-} = require('@dcloudio/uni-cli-shared/lib/cache')
+} = require('@tencent/uni-cli-shared/lib/cache')
 
-const preprocessor = require('@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader/preprocess')
+const preprocessor = require('@tencent/vue-cli-plugin-uni/packages/webpack-preprocess-loader/preprocess')
 
 const {
   resolve,
@@ -37,7 +37,7 @@ const traverse = require('./babel/global-component-traverse')
 
 const babelPluginCreateApp = require.resolve('./babel/plugin-create-app')
 
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 function addCreateApp (babelLoader) {
   babelLoader.options = babelLoader.options || {}

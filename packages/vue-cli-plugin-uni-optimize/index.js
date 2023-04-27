@@ -7,7 +7,7 @@ const WebpackOptimizePlugin = require('./packages/webpack-optimize-plugin')
 const {
   src,
   lib
-} = require('@dcloudio/uni-h5/path')
+} = require('@tencent/uni-h5/path')
 
 const resolve = dir => path.resolve(__dirname, './', dir)
 
@@ -63,7 +63,7 @@ module.exports = (api, options) => {
       plugins: [
         new WebpackOptimizePlugin(),
         new webpack.DefinePlugin({
-          __VERSION__: JSON.stringify(require('@dcloudio/uni-' + process.env.UNI_PLATFORM + '/package.json').version),
+          __VERSION__: JSON.stringify(require('@tencent/uni-' + process.env.UNI_PLATFORM + '/package.json').version),
           __PLATFORM__: JSON.stringify(process.env.UNI_PLATFORM)
         }),
         new webpack.ProvidePlugin({

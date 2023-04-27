@@ -1,10 +1,10 @@
 const {
   jsPreprocessOptions
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
-const preprocessor = require('@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader/preprocess')
+const preprocessor = require('@tencent/vue-cli-plugin-uni/packages/webpack-preprocess-loader/preprocess')
 
-const traverse = require('@dcloudio/webpack-uni-mp-loader/lib/babel/scoped-component-traverse')
+const traverse = require('@tencent/webpack-uni-mp-loader/lib/babel/scoped-component-traverse')
 
 const {
   parseComponents

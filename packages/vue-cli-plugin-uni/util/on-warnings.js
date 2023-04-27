@@ -2,7 +2,7 @@ const stringify = require('./stringify')
 module.exports = function (errors) {
   const {
     runByHBuilderX
-  } = require('@dcloudio/uni-cli-shared')
+  } = require('@tencent/uni-cli-shared')
   if (runByHBuilderX) {
     console.log('WARNING: ' + stringify(errors))
   } else {

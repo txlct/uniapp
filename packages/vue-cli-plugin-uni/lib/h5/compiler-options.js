@@ -1,6 +1,6 @@
 const {
   tags
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 const parser = require('@babel/parser')
 const t = require('@babel/types')
 

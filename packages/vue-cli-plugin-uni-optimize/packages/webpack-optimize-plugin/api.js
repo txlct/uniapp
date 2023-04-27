@@ -204,7 +204,7 @@ module.exports = function updateApis (apis = new Set(), userApis = new Set()) {
     fs.mkdirSync(tmpDir)
   }
 
-  const manifest = require('@dcloudio/uni-' + process.env.UNI_PLATFORM + '/manifest.json')
+  const manifest = require('@tencent/uni-' + process.env.UNI_PLATFORM + '/manifest.json')
   // autoload
   Object.keys(manifest).forEach(name => {
     if (manifest[name][2]) {

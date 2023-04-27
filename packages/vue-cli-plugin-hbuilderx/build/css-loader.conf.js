@@ -6,14 +6,14 @@ const {
   getPlatformScss,
   getPlatformSass,
   nvueCssPreprocessOptions
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const nvueStyleLoader = {
-  loader: '@dcloudio/vue-cli-plugin-hbuilderx/packages/webpack-uni-nvue-loader/lib/style'
+  loader: '@tencent/vue-cli-plugin-hbuilderx/packages/webpack-uni-nvue-loader/lib/style'
 }
 
 const preprocessLoader = {
-  loader: '@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader',
+  loader: '@tencent/vue-cli-plugin-uni/packages/webpack-preprocess-loader',
   options: nvueCssPreprocessOptions
 }
 
@@ -33,7 +33,7 @@ const plugins = [
       return id
     }
   }),
-  require('@dcloudio/vue-cli-plugin-uni/packages/postcss')
+  require('@tencent/vue-cli-plugin-uni/packages/postcss')
 ]
 if (webpack.version[0] > 4) {
   options.postcssOptions = { plugins }
@@ -59,7 +59,7 @@ if (isSass) {
 }
 
 const scssLoader = {
-  loader: '@dcloudio/vue-cli-plugin-uni/packages/sass-loader',
+  loader: '@tencent/vue-cli-plugin-uni/packages/sass-loader',
   options: {
     nvue: true,
     sourceMap: false
@@ -67,7 +67,7 @@ const scssLoader = {
 }
 
 const sassLoader = {
-  loader: '@dcloudio/vue-cli-plugin-uni/packages/sass-loader',
+  loader: '@tencent/vue-cli-plugin-uni/packages/sass-loader',
   options: {
     nvue: true,
     sourceMap: false

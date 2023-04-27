@@ -1,5 +1,5 @@
 {
-	"name": "@dcloudio/uni-app-plus",
+	"name": "@tencent/uni-app-plus",
 	"version": "0.0.1",
 	"description": "uni-app app-plus",
 	"main": "dist/index.js",

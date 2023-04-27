@@ -88,7 +88,7 @@ module.exports = function (source) {
     if (!modules && options.compilerOptions && options.compilerOptions.modules) {
       modules = options.compilerOptions.modules
     }
-    const sourcePath = normalizePath(require('@dcloudio/uni-h5/path').src)
+    const sourcePath = normalizePath(require('@tencent/uni-h5/path').src)
     if (normalizePath(this.resourcePath).indexOf(sourcePath) === 0) {
       descriptor.styles.length = 0
       options.compilerOptions && (delete options.compilerOptions.modules)

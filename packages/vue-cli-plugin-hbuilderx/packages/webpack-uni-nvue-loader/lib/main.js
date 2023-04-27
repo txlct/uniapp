@@ -14,7 +14,7 @@ const {
 const {
   normalizePath,
   getPlatformStat
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const appVuePath = path.resolve(process.env.UNI_INPUT_DIR, 'App.vue')
 
@@ -72,7 +72,7 @@ module.exports = function (content, map) {
       }
     }
   }
-  const automatorCode = process.env.UNI_AUTOMATOR_WS_ENDPOINT ? 'import \'@dcloudio/uni-app-plus/dist/automator\';'
+  const automatorCode = process.env.UNI_AUTOMATOR_WS_ENDPOINT ? 'import \'@tencent/uni-app-plus/dist/automator\';'
     : ''
   return automatorCode + statCode + content
 }

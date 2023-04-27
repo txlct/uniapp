@@ -10,7 +10,7 @@ const {
 const {
   getPlatformFilterTag,
   normalizeNodeModules
-} = require('@dcloudio/uni-cli-shared/lib/platform')
+} = require('@tencent/uni-cli-shared/lib/platform')
 
 const FILTER_TAG = getPlatformFilterTag()
 

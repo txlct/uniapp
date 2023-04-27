@@ -19,10 +19,10 @@ function makeRandom(len) {
     return 'E';
 //   var text = "";
 //   var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-// 
+//
 //   for (var i = 0; i < len; i++)
 //     text += possible.charAt(Math.floor(Math.random() * possible.length));
-// 
+//
 //   return text;
 }
 
@@ -1978,7 +1978,7 @@ function parse(template$$1, options) {
         if (platformIsPreTag(element.tag)) {
             inPre = false
         }
-        
+
         // apply post-transforms
         for (var i$2 = 0; i$2 < postTransforms.length; i$2++) {
             postTransforms[i$2](element, options)
@@ -4062,8 +4062,8 @@ function createCompileToFunctionFn(compile) {
 function createCompilerCreator(baseCompile) {
     return function createCompiler(baseOptions) {
         //fixed by xxxxxx 共享 compiled。
-        const {hashify} = require('@dcloudio/uni-cli-shared')
-        const {cacheCompilerOptions} = require('@dcloudio/webpack-uni-mp-loader/lib/shared')
+        const {hashify} = require('@tencent/uni-cli-shared')
+        const {cacheCompilerOptions} = require('@tencent/webpack-uni-mp-loader/lib/shared')
         function compile(template$$1, options) {
             var finalOptions = Object.create(baseOptions)
             var errors = []
@@ -4098,10 +4098,10 @@ function createCompilerCreator(baseCompile) {
             }
             compiled.errors = errors
             compiled.tips = tips
-            
+
             //fixed by xxxxxx
             cacheCompilerOptions(finalOptions.realResourcePath,{compiled:{ast:compiled.ast}})
-            
+
             return compiled
         }
 

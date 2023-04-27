@@ -2,7 +2,7 @@ const path = require('path')
 
 const {
   normalizePath
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const subPkgsInfo = Object.values(process.UNI_SUBPACKAGES)
 const normalFilter = ({ independent }) => !independent
@@ -52,7 +52,7 @@ function createCacheGroups () {
 module.exports = function getSplitChunks () {
   const {
     normalizePath
-  } = require('@dcloudio/uni-cli-shared')
+  } = require('@tencent/uni-cli-shared')
 
   if (process.env.UNI_USING_V3) {
     return {

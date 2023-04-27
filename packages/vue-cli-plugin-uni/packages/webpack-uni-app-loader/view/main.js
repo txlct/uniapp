@@ -11,15 +11,15 @@ const {
 
 const {
   getGlobalUsingComponentsCode
-} = require('@dcloudio/uni-cli-shared/lib/pages')
+} = require('@tencent/uni-cli-shared/lib/pages')
 
 const {
   jsPreprocessOptions
-} = require('@dcloudio/uni-cli-shared/lib/platform')
+} = require('@tencent/uni-cli-shared/lib/platform')
 
-const preprocessor = require('@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader/preprocess')
+const preprocessor = require('@tencent/vue-cli-plugin-uni/packages/webpack-preprocess-loader/preprocess')
 
-const traverse = require('@dcloudio/webpack-uni-mp-loader/lib/babel/global-component-traverse')
+const traverse = require('@tencent/webpack-uni-mp-loader/lib/babel/global-component-traverse')
 
 const genStylesCode = require('../../vue-loader/lib/codegen/styleInjection')
 
@@ -109,7 +109,7 @@ module.exports = function (source, map) {
   // 追加小程序全局自定义组件(仅v3)
   source = getGlobalUsingComponentsCode() + source
   const automatorCode = process.env.UNI_AUTOMATOR_WS_ENDPOINT
-    ? 'import \'@dcloudio/uni-app-plus/dist/automator.view\''
+    ? 'import \'@tencent/uni-app-plus/dist/automator.view\''
     : ''
   this.callback(null,
     `

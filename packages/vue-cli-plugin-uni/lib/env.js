@@ -2,7 +2,7 @@ const fs = require('fs')
 const path = require('path')
 const mkdirp = require('mkdirp')
 const loaderUtils = require('loader-utils')
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 const moduleAlias = require('module-alias')
 
 require('./error-reporting')
@@ -26,7 +26,7 @@ const {
   isEnableUniPushV2,
   isUniPushOffline,
   isEnableSecureNetwork
-} = require('@dcloudio/uni-cli-shared/lib/manifest')
+} = require('@tencent/uni-cli-shared/lib/manifest')
 
 const manifestJsonObj = getManifestJson()
 
@@ -55,7 +55,7 @@ if (isEnableUniPushV2(manifestJsonObj, process.env.UNI_PLATFORM)) {
 }
 
 // 初始化全局插件对象
-global.uniPlugin = require('@dcloudio/uni-cli-shared/lib/plugin').init()
+global.uniPlugin = require('@tencent/uni-cli-shared/lib/plugin').init()
 
 const platformOptions = manifestJsonObj[process.env.UNI_SUB_PLATFORM || process.env.UNI_PLATFORM] || {}
 // 插件校验环境
@@ -135,7 +135,7 @@ if (!process.env.UNI_CLOUD_PROVIDER && process.env.UNI_CLOUD_SPACES) {
 process.env.UNI_SECURE_NETWORK_ENABLE = isEnableSecureNetwork(manifestJsonObj, process.env.UNI_PLATFORM)
 
 // 初始化环境变量
-process.env.UNI_CLI_CONTEXT = require('@dcloudio/uni-cli-shared/lib/util').getCLIContext()
+process.env.UNI_CLI_CONTEXT = require('@tencent/uni-cli-shared/lib/util').getCLIContext()
 
 const defaultOutputDir = './dist/' +
   (process.env.NODE_ENV === 'production' ? 'build' : 'dev') + '/' +
@@ -171,7 +171,7 @@ if (process.env.UNI_PLATFORM === 'app-plus') {
   process.env.UNI_OUTPUT_TMP_DIR = path.resolve(process.env.UNI_OUTPUT_DIR, '../.tmp/app-plus')
 }
 
-process.UNI_LIBRARIES = process.UNI_LIBRARIES || ['@dcloudio/uni-ui']
+process.UNI_LIBRARIES = process.UNI_LIBRARIES || ['@tencent/uni-ui']
 
 if (process.env.NODE_ENV === 'production') { // 发行模式,不启用 cache
   delete process.env.UNI_USING_CACHE
@@ -188,13 +188,13 @@ const {
   isSupportSubPackages,
   runByHBuilderX,
   getPagesJson
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 process.env.RUN_BY_HBUILDERX = JSON.stringify(runByHBuilderX)
 
 const {
   initUniModules
-} = require('@dcloudio/uni-cli-shared/lib/uni_modules')
+} = require('@tencent/uni-cli-shared/lib/uni_modules')
 
 initUniModules()
 
@@ -252,9 +252,9 @@ if (process.env.UNI_PLATFORM === 'h5') {
       if (Array.isArray(treeShaking.modules) && treeShaking.modules.length) {
         const {
           parseUserApis
-        } = require('@dcloudio/uni-cli-shared/lib/api')
+        } = require('@tencent/uni-cli-shared/lib/api')
         try {
-          const modules = require('@dcloudio/uni-h5/lib/modules.json')
+          const modules = require('@tencent/uni-h5/lib/modules.json')
           process.UNI_USER_APIS = parseUserApis(treeShaking.modules || [], modules)
         } catch (e) {}
       }
@@ -266,11 +266,11 @@ if (process.env.UNI_PLATFORM === 'h5') {
       process.env.UNI_OPT_PRELOAD = true
     }
   }
-  const indexCssBuffer = fs.readFileSync(require.resolve('@dcloudio/uni-h5/dist/index.css'))
+  const indexCssBuffer = fs.readFileSync(require.resolve('@tencent/uni-h5/dist/index.css'))
   process.env.VUE_APP_INDEX_CSS_HASH = loaderUtils.getHashDigest(indexCssBuffer, 'md5', 'hex', 8)
   let indexDarkCssBuffer = ''
   try {
-    indexDarkCssBuffer = fs.readFileSync(require.resolve('@dcloudio/uni-h5/dist/index.dark.css'))
+    indexDarkCssBuffer = fs.readFileSync(require.resolve('@tencent/uni-h5/dist/index.dark.css'))
     process.env.VUE_APP_INDEX_DARK_CSS_HASH = loaderUtils.getHashDigest(indexDarkCssBuffer, 'md5', 'hex', 8)
   } catch (error) {
     process.env.VUE_APP_INDEX_DARK_CSS_HASH = ''
@@ -435,7 +435,7 @@ const warningMsg =
 const needWarning = !platformOptions.usingComponents || usingComponentsAbsent
 let hasNVue = false
 // 输出编译器版本等信息
-const pagesPkg = require('@dcloudio/webpack-uni-pages-loader/package.json')
+const pagesPkg = require('@tencent/webpack-uni-pages-loader/package.json')
 process.env.UNI_COMPILER_VERSION = ''
 if (pagesPkg) {
   process.env.UNI_COMPILER_VERSION = pagesPkg['uni-app'].compilerVersion
@@ -492,29 +492,29 @@ if (process.env.NODE_ENV !== 'production') { // 运行模式性能提示
 }
 
 // 将 template-compiler 指向修订后的版本
-moduleAlias.addAlias('vue-template-compiler', '@dcloudio/vue-cli-plugin-uni/packages/vue-template-compiler')
-moduleAlias.addAlias('@megalo/template-compiler', '@dcloudio/vue-cli-plugin-uni/packages/@megalo/template-compiler')
-moduleAlias.addAlias('mpvue-template-compiler', '@dcloudio/vue-cli-plugin-uni/packages/mpvue-template-compiler')
+moduleAlias.addAlias('vue-template-compiler', '@tencent/vue-cli-plugin-uni/packages/vue-template-compiler')
+moduleAlias.addAlias('@megalo/template-compiler', '@tencent/vue-cli-plugin-uni/packages/@megalo/template-compiler')
+moduleAlias.addAlias('mpvue-template-compiler', '@tencent/vue-cli-plugin-uni/packages/mpvue-template-compiler')
 // vue-loader
-moduleAlias.addAlias('vue-loader', '@dcloudio/vue-cli-plugin-uni/packages/vue-loader')
+moduleAlias.addAlias('vue-loader', '@tencent/vue-cli-plugin-uni/packages/vue-loader')
 // sass-loader
-moduleAlias.addAlias('sass-loader', '@dcloudio/vue-cli-plugin-uni/packages/sass-loader')
+moduleAlias.addAlias('sass-loader', '@tencent/vue-cli-plugin-uni/packages/sass-loader')
 
 if (process.env.UNI_USING_V3 && process.env.UNI_PLATFORM === 'app-plus') {
-  moduleAlias.addAlias('./runtime/getUrl.js', '@dcloudio/vue-cli-plugin-uni/lib/app-plus/getUrl.js')
-  moduleAlias.addAlias('../runtime/getUrl.js', '@dcloudio/vue-cli-plugin-uni/lib/app-plus/getUrl.js')
-  moduleAlias.addAlias('vue-style-loader', '@dcloudio/vue-cli-plugin-uni/packages/app-vue-style-loader')
+  moduleAlias.addAlias('./runtime/getUrl.js', '@tencent/vue-cli-plugin-uni/lib/app-plus/getUrl.js')
+  moduleAlias.addAlias('../runtime/getUrl.js', '@tencent/vue-cli-plugin-uni/lib/app-plus/getUrl.js')
+  moduleAlias.addAlias('vue-style-loader', '@tencent/vue-cli-plugin-uni/packages/app-vue-style-loader')
 }
 
 if (process.env.UNI_PLATFORM === 'h5') {
-  moduleAlias.addAlias('vue-style-loader', '@dcloudio/vue-cli-plugin-uni/packages/h5-vue-style-loader')
+  moduleAlias.addAlias('vue-style-loader', '@tencent/vue-cli-plugin-uni/packages/h5-vue-style-loader')
 }
 
 if (process.env.UNI_PLATFORM === 'mp-toutiao' || process.env.UNI_PLATFORM === 'mp-lark') {
   // !important 始终带有一个空格
   moduleAlias.addAlias(
     'postcss-normalize-whitespace',
-    '@dcloudio/vue-cli-plugin-uni/packages/postcss-normalize-whitespace'
+    '@tencent/vue-cli-plugin-uni/packages/postcss-normalize-whitespace'
   )
 }
 
@@ -548,14 +548,14 @@ if (
   if (!fs.existsSync(cacheJsonDir)) { //  创建 cache 目录
     mkdirp(cacheJsonDir)
   } else {
-    require('@dcloudio/uni-cli-shared/lib/cache').restore()
+    require('@tencent/uni-cli-shared/lib/cache').restore()
   }
 }
 
 const {
   initAutoImportComponents,
   initAutoImportScanComponents
-} = require('@dcloudio/uni-cli-shared/lib/pages')
+} = require('@tencent/uni-cli-shared/lib/pages')
 
 process.UNI_AUTO_SCAN_COMPONENTS = !(pagesJsonObj.easycom && pagesJsonObj.easycom.autoscan === false)
 initAutoImportComponents(pagesJsonObj.easycom)
@@ -574,7 +574,7 @@ if (
     process.env.UNI_USING_V3
   )
 ) {
-  const migrate = require('@dcloudio/uni-migration')
+  const migrate = require('@tencent/uni-migration')
   const wxcomponentDirs = [path.resolve(process.env.UNI_INPUT_DIR, 'wxcomponents')]
   global.uniModules.forEach(module => {
     wxcomponentDirs.push(path.resolve(process.env.UNI_INPUT_DIR, 'uni_modules', module, 'wxcomponents'))

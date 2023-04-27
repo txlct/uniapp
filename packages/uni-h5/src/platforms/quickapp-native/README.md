@@ -57,7 +57,7 @@ npm run serve:quickapp-vue
 npm run build:quickapp-vue
 ```
 
-手动替换 `uni-app` 编译输出目录 `packages/uni-quickapp-vue` 到 `hello quickapp` 工程 `node_modules/@dcloudio/uni-quickapp-vue`, 可以考虑 `npm link`
+手动替换 `uni-app` 编译输出目录 `packages/uni-quickapp-vue` 到 `hello quickapp` 工程 `node_modules/@tencent/uni-quickapp-vue`, 可以考虑 `npm link`
 
 
 #### `uni-app` 目录说明

@@ -6,18 +6,18 @@ const merge = require('merge')
 const {
   normalizePath,
   getFlexDirection
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 const {
   getTheme,
   hasTheme,
   parseTheme
-} = require('@dcloudio/uni-cli-shared/lib/theme')
+} = require('@tencent/uni-cli-shared/lib/theme')
 const {
   compileI18nJsonStr
-} = require('@dcloudio/uni-i18n')
+} = require('@tencent/uni-i18n')
 const {
   initI18nOptions
-} = require('@dcloudio/uni-cli-shared/lib/i18n')
+} = require('@tencent/uni-cli-shared/lib/i18n')
 const {
   hasOwn,
   parseStyle

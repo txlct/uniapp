@@ -1,4 +1,4 @@
-const compiler = require('@dcloudio/uni-template-compiler')
+const compiler = require('@tencent/uni-template-compiler')
 
 const defaultOptions = {
   compiler,
@@ -14,7 +14,7 @@ const defaultCompilerOptions = {
 
 module.exports = {
   test: [/\.vue$/, /\.nvue$/],
-  loader: require.resolve('@dcloudio/vue-cli-plugin-uni/packages/vue-loader'),
+  loader: require.resolve('@tencent/vue-cli-plugin-uni/packages/vue-loader'),
   options (options = {}, compilerOptions = {}) {
     return Object.assign({},
       defaultOptions,

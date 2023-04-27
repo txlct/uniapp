@@ -1,6 +1,6 @@
 const {
   getPlatformCssnano
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 const webpack = require('webpack')
 
 module.exports = function initCssnanoOptions (webpackConfig) {

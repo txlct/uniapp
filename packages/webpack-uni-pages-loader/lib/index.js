@@ -7,15 +7,15 @@ const {
   normalizePath,
   parsePagesJson,
   parseManifestJson
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   getPagesJson
-} = require('@dcloudio/uni-cli-shared/lib/cache')
+} = require('@tencent/uni-cli-shared/lib/cache')
 
 const {
   pagesJsonJsFileName
-} = require('@dcloudio/uni-cli-shared/lib/pages')
+} = require('@tencent/uni-cli-shared/lib/pages')
 
 const parseStyle = require('./util').parseStyle
 
@@ -30,7 +30,7 @@ function checkEmitFile (filePath, jsonObj, changedEmitFiles) {
 }
 
 module.exports = function (content, map) {
-  // content = JSON.stringify(require('@dcloudio/uni-cli-shared/lib/uni_modules').getPagesJson(content))
+  // content = JSON.stringify(require('@tencent/uni-cli-shared/lib/uni_modules').getPagesJson(content))
   let queryParam
   if (this.resourceQuery) {
     queryParam = loaderUtils.parseQuery(this.resourceQuery)

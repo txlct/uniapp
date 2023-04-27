@@ -8,17 +8,17 @@ const {
   getFlexDirection,
   getNetworkTimeout,
   normalizePath
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   addPageUsingComponents
-} = require('@dcloudio/uni-cli-shared/lib/pages')
+} = require('@tencent/uni-cli-shared/lib/pages')
 
 const {
   getTheme
-} = require('@dcloudio/uni-cli-shared/lib/theme')
+} = require('@tencent/uni-cli-shared/lib/theme')
 
-const compilerVersion = require('@dcloudio/webpack-uni-pages-loader/package.json')['uni-app'].compilerVersion
+const compilerVersion = require('@tencent/webpack-uni-pages-loader/package.json')['uni-app'].compilerVersion
 
 const PLATFORMS = getPlatforms()
 

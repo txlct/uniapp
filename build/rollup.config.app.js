@@ -65,7 +65,7 @@ module.exports = {
   plugins: [
     alias({
       entries: [{
-        find: '@dcloudio',
+        find: '@tencent',
         replacement: resolve('packages')
       }, {
         find: 'uni-core',

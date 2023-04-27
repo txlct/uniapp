@@ -1,7 +1,7 @@
 import {
   initVueI18n,
   isI18nStr
-} from '@dcloudio/uni-i18n'
+} from '@tencent/uni-i18n'
 import {
   isStr
 } from 'uni-shared'

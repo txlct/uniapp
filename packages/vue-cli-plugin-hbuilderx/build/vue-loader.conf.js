@@ -1,11 +1,11 @@
 const {
   module: autoComponentsModule,
   compileTemplate
-} = require('@dcloudio/uni-template-compiler/lib/auto-components')
+} = require('@tencent/uni-template-compiler/lib/auto-components')
 
 const {
   isUnaryTag
-} = require('@dcloudio/uni-template-compiler/lib/util')
+} = require('@tencent/uni-template-compiler/lib/util')
 
 const TAGS = [
   'text',
@@ -130,8 +130,8 @@ const oldCompile = compiler.compile
 compiler.compile = function (source, options = {}) {
   (options.modules || (options.modules = [])).push(autoComponentsModule)
 
-  options.modules.push(require('@dcloudio/uni-template-compiler/lib/asset-url'))
-  options.modules.push(require('@dcloudio/uni-template-compiler/lib/bool-attr'))
+  options.modules.push(require('@tencent/uni-template-compiler/lib/asset-url'))
+  options.modules.push(require('@tencent/uni-template-compiler/lib/bool-attr'))
 
   options.isUnaryTag = isUnaryTag
   // 将 autoComponents 挂在 isUnaryTag 上边

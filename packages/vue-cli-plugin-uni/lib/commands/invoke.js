@@ -1,6 +1,6 @@
 const fs = require('fs')
 const path = require('path')
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 module.exports = async function add (argv) {
   const pluginName = argv._[1]

@@ -1,4 +1,4 @@
-const vueLoader = require('@dcloudio/uni-cli-shared/lib/vue-loader')
+const vueLoader = require('@tencent/uni-cli-shared/lib/vue-loader')
 
 module.exports = config => {
   config.module

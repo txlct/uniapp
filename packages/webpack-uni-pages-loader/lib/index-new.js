@@ -8,35 +8,35 @@ const {
   normalizePath,
   parsePagesJson,
   parseManifestJson
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
 const {
   updateAppJson,
   updatePageJson,
   updateProjectJson
-} = require('@dcloudio/uni-cli-shared/lib/cache')
+} = require('@tencent/uni-cli-shared/lib/cache')
 
 const {
   initTheme,
   parseTheme,
   darkmode
-} = require('@dcloudio/uni-cli-shared/lib/theme')
+} = require('@tencent/uni-cli-shared/lib/theme')
 
 const {
   // pagesJsonJsFileName,
   initAutoImportComponents
-} = require('@dcloudio/uni-cli-shared/lib/pages')
+} = require('@tencent/uni-cli-shared/lib/pages')
 
-const uniI18n = require('@dcloudio/uni-cli-i18n')
+const uniI18n = require('@tencent/uni-cli-i18n')
 
 const parseStyle = require('./util').parseStyle
 
 const {
   initI18nOptions
-} = require('@dcloudio/uni-cli-shared/lib/i18n')
+} = require('@tencent/uni-cli-shared/lib/i18n')
 const {
   parseI18nJson
-} = require('@dcloudio/uni-i18n')
+} = require('@tencent/uni-i18n')
 
 // 将开发者手动设置的 usingComponents 调整名称，方便与自动解析到的 usingComponents 做最后合并
 function renameUsingComponents (jsonObj) {

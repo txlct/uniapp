@@ -6,13 +6,13 @@ const {
   getPlatformStat,
   getPlatformPush,
   getPlatformUniCloud
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 
-const vueLoader = require('@dcloudio/uni-cli-shared/lib/vue-loader')
+const vueLoader = require('@tencent/uni-cli-shared/lib/vue-loader')
 
 const {
   getGlobalUsingComponentsCode
-} = require('@dcloudio/uni-cli-shared/lib/pages')
+} = require('@tencent/uni-cli-shared/lib/pages')
 
 const WebpackUniAppPlugin = require('../../packages/webpack-uni-app-loader/plugin/index')
 
@@ -24,8 +24,8 @@ const {
 //   createTemplateCacheLoader
 // } = require('../cache-loader')
 
-const runtimePath = '@dcloudio/uni-mp-weixin/dist/mp.js'
-const wxsPath = '@dcloudio/uni-mp-weixin/dist/wxs.js'
+const runtimePath = '@tencent/uni-mp-weixin/dist/mp.js'
+const wxsPath = '@tencent/uni-mp-weixin/dist/wxs.js'
 const uniCloudPath = path.resolve(__dirname, '../../packages/uni-cloud/dist/index.js')
 const cryptoPath = path.resolve(__dirname, '../crypto.js')
 
@@ -182,7 +182,7 @@ const v3 = {
           type: 'javascript/auto',
           resourceQuery: /uts-proxy/,
           use: [{
-            loader: require.resolve('@dcloudio/uni-cli-shared/lib/uts/uts-loader.js')
+            loader: require.resolve('@tencent/uni-cli-shared/lib/uts/uts-loader.js')
           }]
         },
         ...rules

@@ -1,7 +1,7 @@
 const fs = require('fs')
 const path = require('path')
-const { parseJson } = require('@dcloudio/uni-cli-shared/lib/json')
-const { copyMiniProgramThemeJson } = require('@dcloudio/uni-cli-shared/lib/theme')
+const { parseJson } = require('@tencent/uni-cli-shared/lib/json')
+const { copyMiniProgramThemeJson } = require('@tencent/uni-cli-shared/lib/theme')
 
 const COMPONENTS_DIR_NAME = 'wxcomponents'
 
