@@ -35,7 +35,8 @@
     "update-check": "^1.5.3",
     "webpack-merge": "^4.1.4",
     "wrap-loader": "^0.2.0",
-    "xregexp": "4.0.0"
+    "xregexp": "4.0.0",
+    "postcss": "7.0.39"
   },
   "peerDependencies": {
     "copy-webpack-plugin": ">=5",
