@@ -2,9 +2,9 @@ const {
   getPlatformFilterTag,
   normalizeNodeModules,
   jsPreprocessOptions
-} = require('@dcloudio/uni-cli-shared/lib/platform')
+} = require('@tencent/uni-cli-shared/lib/platform')
 
-const preprocessor = require('@dcloudio/vue-cli-plugin-uni/packages/webpack-preprocess-loader/preprocess')
+const preprocessor = require('@tencent/vue-cli-plugin-uni/packages/webpack-preprocess-loader/preprocess')
 
 const FILTER_TAG = getPlatformFilterTag()
 

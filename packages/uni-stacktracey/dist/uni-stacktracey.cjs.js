@@ -109,7 +109,7 @@ class StackTracey {
         // externalDomain ||
         relativePath[0] === '~' || // webpack-specific heuristic
             relativePath[0] === '/' || // external source
-            relativePath.indexOf('@dcloudio') !== -1 ||
+            relativePath.indexOf('@tencent') !== -1 ||
             relativePath.indexOf('weex-main-jsfm') !== -1 ||
             relativePath.indexOf('webpack/bootstrap') === 0);
     }
@@ -3508,7 +3508,7 @@ function stacktracey(stacktrace, opts) {
     return _promise;
 }
 function isThirdParty(relativePath) {
-    return relativePath.indexOf('@dcloudio') !== -1;
+    return relativePath.indexOf('@tencent') !== -1;
 }
 function getConsumer(content) {
     return new Promise((resolve, reject) => {

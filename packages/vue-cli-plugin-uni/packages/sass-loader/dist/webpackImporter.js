@@ -43,7 +43,7 @@ const preprocessor = require('../../webpack-preprocess-loader/preprocess/lib/pre
 const {
   cssPreprocessOptions,
   nvueCssPreprocessOptions
-} = require('@dcloudio/uni-cli-shared')
+} = require('@tencent/uni-cli-shared')
 // fixed by xxxxxx
 function webpackImporter(resourcePath, resolve, addNormalizedDependency, isNVue) {
   function dirContextFrom(fileContext) {
