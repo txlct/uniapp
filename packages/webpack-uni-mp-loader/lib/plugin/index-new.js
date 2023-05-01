@@ -79,8 +79,12 @@ function addMPPluginRequire (compilation) {
 
         const newlineIndex = compilation.assets[name].source().lastIndexOf('\n')
 
+        const id = typeof uniModuleId === 'number'
+          ? uniModuleId
+          : `'${uniModuleId}'`;
+
         const source = compilation.assets[name].source().substring(0, newlineIndex) +
-        `\nmodule.exports = wx.__webpack_require_${process.env.UNI_MP_PLUGIN.replace('-', '_')}__(${uniModuleId});\n` +
+        `\nmodule.exports = wx.__webpack_require_${process.env.UNI_MP_PLUGIN.replace('-', '_')}__(${id});\n` +
         compilation.assets[name].source().substring(newlineIndex + 1)
 
         compilation.assets[name] = {
