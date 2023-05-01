@@ -12,6 +12,7 @@ import {
   AppJson,
   resolveVueI18nRuntime,
 } from '@dcloudio/uni-cli-shared'
+import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni'
 
 import type { CompilerOptions } from '@dcloudio/uni-mp-compiler'
 
@@ -95,13 +96,16 @@ export interface UniMiniProgramPluginOptions {
 }
 
 export function uniMiniProgramPlugin(
-  options: UniMiniProgramPluginOptions
+  options: UniMiniProgramPluginOptions,
+  opt: VitePluginUniOptions
 ): UniVitePlugin {
   const {
     vite: { alias, copyOptions },
     template,
     style,
   } = options
+  const { mp: { vendorConfig = {} } = {} } =
+    opt as Required<VitePluginUniOptions>
 
   let nvueCssEmitted = false
 
@@ -152,7 +156,7 @@ export function uniMiniProgramPlugin(
         optimizeDeps: {
           disabled: true,
         },
-        build: buildOptions(),
+        build: buildOptions(vendorConfig),
       }
     },
     configResolved(config) {

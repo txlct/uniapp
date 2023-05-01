@@ -14,3 +14,4 @@ function createResolveId(options) {
     };
 }
 exports.createResolveId = createResolveId;
+//# sourceMappingURL=index.js.map

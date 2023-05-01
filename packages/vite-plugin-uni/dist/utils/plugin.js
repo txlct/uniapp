@@ -116,3 +116,4 @@ function resolvePlugins(cliRoot, platform) {
     })
         .filter(Boolean);
 }
+//# sourceMappingURL=plugin.js.map

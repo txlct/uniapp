@@ -1,7 +1,8 @@
 import type { SFCScriptCompileOptions } from '@vue/compiler-sfc';
+import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni';
 import { UniMiniProgramPluginOptions } from './plugin';
 export { UniMiniProgramPluginOptions } from './plugin';
-declare const _default: (options: UniMiniProgramPluginOptions) => (import("vite").Plugin | ((options: {
+declare const _default: (options: UniMiniProgramPluginOptions, opt: VitePluginUniOptions) => (import("vite").Plugin | ((options: {
     vueOptions?: {
         script?: Partial<SFCScriptCompileOptions>;
     };

@@ -46,3 +46,4 @@ function createResolve(options, _config) {
     };
 }
 exports.createResolve = createResolve;
+//# sourceMappingURL=resolve.js.map

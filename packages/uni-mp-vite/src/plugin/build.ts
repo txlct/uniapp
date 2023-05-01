@@ -25,10 +25,13 @@ import {
   parseVirtualComponentPath,
   parseVirtualPagePath,
 } from '../plugins/entry'
+import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni'
 
 const debugChunk = debug('uni:chunk')
 
-export function buildOptions(): UserConfig['build'] {
+export function buildOptions(
+  vendorConfig: Required<VitePluginUniOptions>['mp']['vendorConfig']
+): UserConfig['build'] {
   const platform = process.env.UNI_PLATFORM
   const inputDir = process.env.UNI_INPUT_DIR
   const outputDir = process.env.UNI_OUTPUT_DIR
@@ -36,12 +39,13 @@ export function buildOptions(): UserConfig['build'] {
   if (fs.existsSync(outputDir)) {
     emptyDir(outputDir, ['project.config.json', 'project.private.config.json'])
   }
-  return createBuildOptions(inputDir, platform)
+  return createBuildOptions(inputDir, platform, vendorConfig)
 }
 
 export function createBuildOptions(
   inputDir: string,
-  platform: UniApp.PLATFORM
+  platform: UniApp.PLATFORM,
+  vendorConfig: Required<VitePluginUniOptions>['mp']['vendorConfig']
 ): BuildOptions {
   const { renderDynamicImport } = dynamicImportPolyfill()
   return {
@@ -64,7 +68,7 @@ export function createBuildOptions(
           return chunk.name + '.js'
         },
         format: 'cjs',
-        manualChunks: createMoveToVendorChunkFn(),
+        manualChunks: createMoveToVendorChunkFn(vendorConfig),
         chunkFileNames: createChunkFileNames(inputDir),
         plugins: [
           {
@@ -115,7 +119,9 @@ function isVueJs(id: string) {
 
 const chunkFileNameBlackList = ['main', 'pages.json', 'manifest.json']
 
-function createMoveToVendorChunkFn(): GetManualChunk {
+function createMoveToVendorChunkFn(
+  vendorConfig: Required<VitePluginUniOptions>['mp']['vendorConfig']
+): GetManualChunk {
   const cache = new Map<string, boolean>()
   const inputDir = normalizePath(process.env.UNI_INPUT_DIR)
   return (id, { getModuleInfo }) => {
@@ -125,6 +131,14 @@ function createMoveToVendorChunkFn(): GetManualChunk {
     if (DEFAULT_ASSETS_RE.test(filename)) {
       debugChunk('common/assets', normalizedId)
       return 'common/assets'
+    }
+
+    for (const key in vendorConfig) {
+      const element = vendorConfig[key]
+      if (element.test(filename)) {
+        debugChunk(key, normalizedId)
+        return key
+      }
     }
     // 处理项目内的js,ts文件
     if (EXTNAME_JS_RE.test(filename)) {

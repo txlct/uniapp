@@ -53,6 +53,9 @@ export interface VitePluginUniOptions {
   vueOptions?: VueOptions
   vueJsxOptions?: (VueJSXPluginOptions & { babelPlugins?: any[] }) | boolean
   viteLegacyOptions?: ViteLegacyOptions | false
+  mp?: {
+    vendorConfig: Record<string, RegExp>
+  }
 }
 export interface VitePluginUniResolvedOptions extends VitePluginUniOptions {
   base: string

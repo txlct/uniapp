@@ -247,3 +247,4 @@ function initCustomScripts(options) {
     process.env.UNI_CUSTOM_DEFINE = JSON.stringify(custom.define);
     process.env.UNI_CUSTOM_CONTEXT = JSON.stringify(custom.context);
 }
+//# sourceMappingURL=utils.js.map

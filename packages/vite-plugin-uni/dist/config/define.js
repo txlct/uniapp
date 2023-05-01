@@ -12,3 +12,4 @@ function createDefine(_) {
     }, (0, uni_cli_shared_1.initDefine)());
 }
 exports.createDefine = createDefine;
+//# sourceMappingURL=define.js.map

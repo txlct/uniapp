@@ -6,7 +6,7 @@ const semver = require('semver')
 const currentVersion = require('../package.json').version
 const { prompt } = require('enquirer')
 const execa = require('execa')
-const { targets: packageTargets } = require('./utils')
+const { targets: packageTargets, fuzzyMatchTarget } = require('./utils')
 
 const remoteRepoUrlPrefix = 'https://gitpkg.now.sh/txlct/uniapp/packages/'
 // 参数
@@ -16,6 +16,7 @@ const isDryRun = args.dry
 const skipTests = args.skipTests
 const skipBuild = args.skipBuild
 const onlyDist = args.onlyDist
+const isLocal = args.local;
 const packages = fs
   .readdirSync(path.resolve(__dirname, '../packages'))
   .filter(
@@ -33,18 +34,28 @@ const runIfNotDry = isDryRun ? dryRun : run
 const getPkgRoot = (pkg) => path.resolve(__dirname, '../packages/' + pkg)
 const step = (msg) => console.log(colors.cyan(msg))
 
+const getCurrentBranch = async () => {
+  const { stdout: branch } = await run('git', ['rev-parse', '--abbrev-ref', 'HEAD'], { stdio: 'pipe' })
+
+  return branch?.trim() || '';
+}
+
 const targetMap = new Map();
 
 const getPackageName = (name) => name.replace(/@dcloudio\//, '');
 
 const setTargetMap = ({ tag, repo }) => {
-  if (!tag || !repo) return;
+  if (!tag && !repo) return;
 
   targets.forEach(target => {
     const name = getPackageName(target);
     const slash = repo.endsWith('/') ? '' : '/';
 
-    targetMap.set(target, `${repo}${slash}${name}?${tag}`)
+    const value = repo
+      ? `${repo}${slash}${name}${tag ? `?${tag}` : ''}`
+      : tag;
+
+    targetMap.set(target, value)
   });
 };  
 
@@ -53,7 +64,7 @@ async function main() {
     await prompt({
       type: 'input',
       name: 'version',
-      message: 'Input custom version',
+      message: 'Input custom package version',
       initial: currentVersion,
     })
   ).version
@@ -62,35 +73,45 @@ async function main() {
     throw new Error(`invalid target version: ${targetVersion}`)
   }
 
-  const { yes: isRemoteRepo } = (
-    await prompt({
-      type: 'confirm',
-      name: 'yes',
-      message: `是否远端分支?`
-    })
-  )
+  let isRemoteRepo = false;
 
-  const { repo } = (
-    await prompt({
-      type: 'input',
-      name: 'repo',
-      message: 'Input target repository',
-      initial: isRemoteRepo ? remoteRepoUrlPrefix : '',
-    })
-  );
+  if (!isLocal) {
+    ({ yes: isRemoteRepo } = (
+      await prompt({
+        type: 'confirm',
+        name: 'yes',
+        message: `是否远端分支?`
+      })
+    ))
+  }
+
+  let repo = '';
+
+  if (isRemoteRepo) {
+    ({ repo = '' } = (
+      await prompt({
+        type: 'input',
+        name: 'repo',
+        message: 'Input target repository',
+        initial: remoteRepoUrlPrefix,
+      })
+    ));
+  } 
 
   const { tag } = (
     await prompt({
       type: 'input',
       name: 'tag',
-      message: 'input target tag',
-      initial: ''
+      message: isRemoteRepo
+        ? '请输入远程分支名或tag名'
+        : '请输入dependencies tag',
+      initial: isRemoteRepo
+        ? await getCurrentBranch()
+        : isLocal ? 'workspace:*' : currentVersion
     })
   );
 
-  if (repo && tag) {
-    setTargetMap({ tag, repo });
-  }
+  setTargetMap({ tag, repo });
 
   const { yes } = await prompt({
     type: 'confirm',
@@ -125,7 +146,7 @@ async function main() {
       args = [
         ...args,
         '--',
-        ...targets,
+        ...fuzzyMatchTarget(targets),
       ];
     }
 

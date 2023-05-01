@@ -10,7 +10,7 @@ const debug_1 = __importDefault(require("debug"));
 const uni_cli_shared_1 = require("@dcloudio/uni-cli-shared");
 const entry_1 = require("../plugins/entry");
 const debugChunk = (0, debug_1.default)('uni:chunk');
-function buildOptions() {
+function buildOptions(vendorConfig) {
     const platform = process.env.UNI_PLATFORM;
     const inputDir = process.env.UNI_INPUT_DIR;
     const outputDir = process.env.UNI_OUTPUT_DIR;
@@ -18,10 +18,10 @@ function buildOptions() {
     if (fs_1.default.existsSync(outputDir)) {
         (0, uni_cli_shared_1.emptyDir)(outputDir, ['project.config.json', 'project.private.config.json']);
     }
-    return createBuildOptions(inputDir, platform);
+    return createBuildOptions(inputDir, platform, vendorConfig);
 }
 exports.buildOptions = buildOptions;
-function createBuildOptions(inputDir, platform) {
+function createBuildOptions(inputDir, platform, vendorConfig) {
     const { renderDynamicImport } = (0, uni_cli_shared_1.dynamicImportPolyfill)();
     return {
         // sourcemap: 'inline', // TODO
@@ -43,7 +43,7 @@ function createBuildOptions(inputDir, platform) {
                     return chunk.name + '.js';
                 },
                 format: 'cjs',
-                manualChunks: createMoveToVendorChunkFn(),
+                manualChunks: createMoveToVendorChunkFn(vendorConfig),
                 chunkFileNames: createChunkFileNames(inputDir),
                 plugins: [
                     {
@@ -91,7 +91,7 @@ function isVueJs(id) {
     return id.includes('\0plugin-vue:export-helper');
 }
 const chunkFileNameBlackList = ['main', 'pages.json', 'manifest.json'];
-function createMoveToVendorChunkFn() {
+function createMoveToVendorChunkFn(vendorConfig) {
     const cache = new Map();
     const inputDir = (0, uni_cli_shared_1.normalizePath)(process.env.UNI_INPUT_DIR);
     return (id, { getModuleInfo }) => {
@@ -101,6 +101,13 @@ function createMoveToVendorChunkFn() {
         if (uni_cli_shared_1.DEFAULT_ASSETS_RE.test(filename)) {
             debugChunk('common/assets', normalizedId);
             return 'common/assets';
+        }
+        for (const key in vendorConfig) {
+            const element = vendorConfig[key];
+            if (element.test(filename)) {
+                debugChunk(key, normalizedId);
+                return key;
+            }
         }
         // 处理项目内的js,ts文件
         if (uni_cli_shared_1.EXTNAME_JS_RE.test(filename)) {

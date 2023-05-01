@@ -17,3 +17,4 @@ function initOptions(options, config) {
     options.assetsDir = config.build.assetsDir;
 }
 exports.initOptions = initOptions;
+//# sourceMappingURL=options.js.map

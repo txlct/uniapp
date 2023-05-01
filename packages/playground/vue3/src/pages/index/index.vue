@@ -11,6 +11,8 @@
 <script setup lang="ts">
 import { ref } from 'vue';
 import comp from '@/components/comp/comp.vue';
+import { m } from '../../module'
+console.log(m)
 
 const title = ref('Hello');
 </script>

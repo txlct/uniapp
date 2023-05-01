@@ -52,3 +52,4 @@ function uniPrePlugin(config, options) {
     };
 }
 exports.uniPrePlugin = uniPrePlugin;
+//# sourceMappingURL=pre.js.map

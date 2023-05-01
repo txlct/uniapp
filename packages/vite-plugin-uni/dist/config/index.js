@@ -39,3 +39,4 @@ function createConfig(options, _uniPlugins) {
     };
 }
 exports.createConfig = createConfig;
+//# sourceMappingURL=index.js.map

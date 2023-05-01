@@ -1,6 +1,8 @@
 import type { Plugin } from 'vite'
 import initMiniProgramPlugin from '@dcloudio/uni-mp-vite'
 import { options } from './options'
+import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni'
+
 const uniMiniProgramBaiduPlugin: Plugin = {
   name: 'uni:mp-baidu',
   config() {
@@ -11,4 +13,7 @@ const uniMiniProgramBaiduPlugin: Plugin = {
     }
   },
 }
-export default [uniMiniProgramBaiduPlugin, ...initMiniProgramPlugin(options)]
+export default (opt: VitePluginUniOptions) => [
+  uniMiniProgramBaiduPlugin,
+  ...initMiniProgramPlugin(options, opt),
+]

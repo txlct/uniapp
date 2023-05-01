@@ -12,6 +12,7 @@ const args = require('minimist')(process.argv.slice(2))
 const targets = args._
 // const formats = args.formats || args.f
 const devOnly = args.devOnly || args.d
+const isDev = !!devOnly;
 const isRelease = args.release
 const multiProcess = args.m
 // const buildTypes = args.t || args.types || isRelease
@@ -65,6 +66,12 @@ function getTargetGroup(targets) {
 async function buildAll(targets) {
   if (!multiProcess) {
     for (const target of targets) {
+      if (isDev) {
+        build(target);
+
+        continue;
+      }
+
       await build(target)
     }
     return
@@ -114,13 +121,12 @@ async function build(target) {
   const types = target.endsWith('-shared') || pkg.types
   // if building a specific format, do not remove dist.
   // if (!formats && bundler !== 'vite') {
-  if (!['uni-cloud', 'uni-automator'].includes(target)) {
+  if (!['uni-cloud', 'uni-automator'].includes(target) && !isDev) {
     await fs.remove(`${pkgDir}/dist`)
   }
   // }
 
   const env = devOnly ? 'development' : 'production'
-  const isDev = !!devOnly;
 
   if (hasViteBundler) {
     const env = {}

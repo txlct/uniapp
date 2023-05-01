@@ -52,3 +52,4 @@ function addPlugin(plugins, plugin, index, type = 'post') {
     }
     return plugins.splice(index + (type === 'pre' ? 0 : 1), 0, plugin);
 }
+//# sourceMappingURL=index.js.map

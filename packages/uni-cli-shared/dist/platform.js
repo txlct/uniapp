@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isMiniProgramPlatform = exports.getPlatformDir = exports.getPlatforms = exports.registerPlatform = void 0;
+exports.getPlatformType = exports.isMiniProgramPlatform = exports.getPlatformDir = exports.getPlatforms = exports.registerPlatform = void 0;
 const BUILT_IN_PLATFORMS = [
     'app',
     'app-plus',
@@ -37,4 +37,17 @@ function isMiniProgramPlatform() {
     return !['app', 'app-plus', 'h5', 'web'].includes(process.env.UNI_PLATFORM);
 }
 exports.isMiniProgramPlatform = isMiniProgramPlatform;
+const getPlatformType = () => {
+    const PLATFORM_TYPE = process.env.PLATFORM_TYPE || '';
+    const PREFIX = process.env.PREFIX || '';
+    const name = `${PREFIX}${PLATFORM_TYPE}`;
+    return {
+        name,
+        entryName: name || 'index',
+        assetsName: name ? `${name}/` : '',
+        PLATFORM_TYPE,
+        PREFIX
+    };
+};
+exports.getPlatformType = getPlatformType;
 //# sourceMappingURL=platform.js.map

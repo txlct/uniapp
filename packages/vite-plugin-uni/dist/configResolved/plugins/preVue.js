@@ -31,3 +31,4 @@ function uniPreVuePlugin() {
     };
 }
 exports.uniPreVuePlugin = uniPreVuePlugin;
+//# sourceMappingURL=preVue.js.map

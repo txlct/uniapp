@@ -34,3 +34,17 @@ export function getPlatformDir() {
 export function isMiniProgramPlatform() {
   return !['app', 'app-plus', 'h5', 'web'].includes(process.env.UNI_PLATFORM)
 }
+
+export const getPlatformType = () => {
+  const PLATFORM_TYPE = process.env.PLATFORM_TYPE || '';
+  const PREFIX = process.env.PREFIX || '';
+  const name = `${PREFIX}${PLATFORM_TYPE}`;
+
+  return {
+    name,
+    entryName: name || 'index',
+    assetsName: name ? `${name}/` : '',
+    PLATFORM_TYPE,
+    PREFIX
+  };
+};

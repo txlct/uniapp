@@ -5,15 +5,15 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "debug vue3 playground",
+      "name": "debug h5",
       "request": "launch",
       "runtimeArgs": [
-        "build:mp",
+        "dev",
         "devOnly",
         "debug"
       ],
       "runtimeExecutable": "pnpm",
-      "runtimeVersion": "16.19.0",
+      "runtimeVersion": "16",
       "skipFiles": [
         "<node_internals>/**"
       ],
@@ -26,13 +26,38 @@
       "runtimeArgs": [
         "dev:mp",
         "devOnly",
+        "debug"
       ],
       "runtimeExecutable": "pnpm",
-      "runtimeVersion": "16.19.0",
+      "runtimeVersion": "16",
       "skipFiles": [
         "<node_internals>/**"
       ],
-      "cwd": "${workspaceFolder}",
+      "cwd": "${workspaceFolder}/packages/playground/vue3",
+      "type": "node"
+    },
+    {
+      // 多项目h5打包测试
+      "name": "debug h5 multi-platform",
+      "request": "launch",
+      "runtimeArgs": [
+        "build:h5",
+        "debug"
+      ],
+      "env": {
+        "PLATFORM": "h5",
+        "UNI_PLATFORM": "h5",
+        "PLATFORM_TYPE": "action",
+        "PREFIX": "pages/",
+        "WORKING_DIR": "../compiler/h5-action",
+        "NODE_OPTIONS": "--trace-warnings"
+      },
+      "runtimeExecutable": "pnpm",
+      "runtimeVersion": "16",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "cwd": "${workspaceFolder}/packages/playground/vue3",
       "type": "node"
     }
   ]

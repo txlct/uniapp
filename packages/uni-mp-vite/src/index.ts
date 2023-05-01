@@ -1,6 +1,7 @@
 import { extend } from '@vue/shared'
 import type { SFCScriptCompileOptions } from '@vue/compiler-sfc'
 import { uniViteInjectPlugin } from '@dcloudio/uni-cli-shared'
+import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni'
 
 import { uniMiniProgramPlugin, UniMiniProgramPluginOptions } from './plugin'
 import { uniUsingComponentsPlugin } from './plugins/usingComponents'
@@ -15,7 +16,11 @@ import { uniSubpackagePlugin } from './plugins/subpackage'
 import { uniMiniProgramPluginPlugin } from './plugins/plugin'
 
 export { UniMiniProgramPluginOptions } from './plugin'
-export default (options: UniMiniProgramPluginOptions) => {
+
+export default (
+  options: UniMiniProgramPluginOptions,
+  opt: VitePluginUniOptions
+) => {
   if (!options.app.subpackages) {
     delete process.env.UNI_SUBPACKAGE
   }
@@ -41,7 +46,7 @@ export default (options: UniMiniProgramPluginOptions) => {
     ),
     uniRenderjsPlugin({ lang: options.template.filter?.lang }),
     uniRuntimeHooksPlugin(),
-    uniMiniProgramPlugin(options),
+    uniMiniProgramPlugin(options, opt),
     (options: {
       vueOptions?: { script?: Partial<SFCScriptCompileOptions> }
     }) => {

@@ -54,3 +54,4 @@ function uniCopyPlugin({ outputDir, copyOptions, }) {
     });
 }
 exports.uniCopyPlugin = uniCopyPlugin;
+//# sourceMappingURL=copy.js.map

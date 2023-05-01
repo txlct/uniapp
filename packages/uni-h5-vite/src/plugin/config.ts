@@ -11,11 +11,18 @@ import {
   initPostcssPlugin,
   parseRpx2UnitOnce,
   isSsr,
+  getPlatformType,
 } from '@dcloudio/uni-cli-shared'
 import { createDefine } from '../utils'
 import { esbuildPrePlugin } from './esbuild/esbuildPrePlugin'
 import { external } from './configureServer/ssr'
 import { extend, hasOwn } from '@vue/shared'
+import { PreRenderedChunk } from 'rollup';
+
+const getFilePath = (filePath: string) => path.resolve(process.env.UNI_INPUT_DIR, '../', filePath);
+
+const checkIsFileExist = (filePath: string) => fs.existsSync(filePath);
+
 export function createConfig(options: {
   resolvedConfig: ResolvedConfig | null
 }): Plugin['config'] {
@@ -67,6 +74,27 @@ export function createConfig(options: {
       }
     }
 
+    const { name, entryName, assetsName } = getPlatformType();
+
+    const getChunkName = (chunkInfo: PreRenderedChunk, isEntry = false, filename = '[name].[hash].js',) => {
+      const { assetsDir } = options.resolvedConfig!.build;
+      if (chunkInfo.facadeModuleId && !isEntry) {
+        const dirname = path.relative(
+          inputDir,
+          path.dirname(chunkInfo.facadeModuleId)
+        );
+        if (dirname) {
+          return path.posix.join(
+            assetsDir,
+            name,
+            normalizePath(dirname).replace(/\//g, '-') +
+            `-${filename}`
+          );
+        }
+      }
+      return path.posix.join(assetsDir, isEntry ? '' : name, filename);
+    };
+
     return {
       css: {
         postcss: {
@@ -89,25 +117,20 @@ export function createConfig(options: {
       },
       build: {
         rollupOptions: {
+          input: {
+            [entryName]: checkIsFileExist(getFilePath(`${entryName}.html`))
+              ? getFilePath(`${entryName}.html`)
+              : getFilePath('index.html')
+          },
           // resolveSSRExternal 会判定package.json，hbx 工程可能没有，通过 rollup 来配置
           external: isSsr(env.command, config) ? external : [],
           output: {
+            assetFileNames: `assets/${assetsName}[name]-[hash][extname]`,
+            entryFileNames(chunkInfo) {
+              return getChunkName(chunkInfo,  true, `${entryName}.[hash].js`);
+            },
             chunkFileNames(chunkInfo) {
-              const { assetsDir } = options.resolvedConfig!.build
-              if (chunkInfo.facadeModuleId) {
-                const dirname = path.relative(
-                  inputDir,
-                  path.dirname(chunkInfo.facadeModuleId)
-                )
-                if (dirname) {
-                  return path.posix.join(
-                    assetsDir,
-                    normalizePath(dirname).replace(/\//g, '-') +
-                      '-[name].[hash].js'
-                  )
-                }
-              }
-              return path.posix.join(assetsDir, '[name].[hash].js')
+              return getChunkName(chunkInfo);
             },
           },
         },

@@ -55,3 +55,4 @@ cli
 cli.help();
 cli.version(require('../../package.json').version);
 cli.parse();
+//# sourceMappingURL=index.js.map

@@ -42,3 +42,4 @@ exports.uniStaticPlugin = uniStaticPlugin;
 function fileToUrl(id, config) {
     return config.base + id.slice(1);
 }
+//# sourceMappingURL=static.js.map

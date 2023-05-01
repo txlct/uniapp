@@ -8,8 +8,9 @@ const configResolved_1 = require("./configResolved");
 const template_1 = require("./template");
 const pagesJson_1 = require("../plugins/pagesJson");
 const polyfill_1 = require("./polyfill");
-function uniMiniProgramPlugin(options) {
+function uniMiniProgramPlugin(options, opt) {
     const { vite: { alias, copyOptions }, template, style, } = options;
+    const { mp: { vendorConfig = {} } = {} } = opt;
     let nvueCssEmitted = false;
     let resolvedConfig;
     (0, polyfill_1.rewriteCompileScriptOnce)();
@@ -53,7 +54,7 @@ function uniMiniProgramPlugin(options) {
                 optimizeDeps: {
                     disabled: true,
                 },
-                build: (0, build_1.buildOptions)(),
+                build: (0, build_1.buildOptions)(vendorConfig),
             };
         },
         configResolved(config) {

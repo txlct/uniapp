@@ -58,3 +58,4 @@ function initLogger({ logger, nvue }) {
         }
     };
 }
+//# sourceMappingURL=index.js.map

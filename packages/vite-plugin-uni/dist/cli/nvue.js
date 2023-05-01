@@ -22,3 +22,4 @@ function initNVueEnv() {
     }
 }
 exports.initNVueEnv = initNVueEnv;
+//# sourceMappingURL=nvue.js.map

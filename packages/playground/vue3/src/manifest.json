@@ -13,5 +13,12 @@
         },
         "usingComponents": true
     },
+    "h5": {
+        "optimization": {
+            "treeShaking": {
+                "enable": true
+            }
+        }
+    },
     "vueVersion": "3"
 }

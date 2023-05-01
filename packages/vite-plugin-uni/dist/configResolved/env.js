@@ -29,3 +29,4 @@ function initEnv(config) {
     ].find((file) => fs_1.default.existsSync(file));
 }
 exports.initEnv = initEnv;
+//# sourceMappingURL=env.js.map
