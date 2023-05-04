@@ -5,6 +5,9 @@
       <text class="title">{{ title }}</text>
     </view>
     <comp></comp>
+    <navigator url="plugin://plugin/pages/plugin/index">
+      插件页
+    </navigator>
   </view>
 </template>
 

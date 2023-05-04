@@ -1,0 +1,6 @@
+{
+  "pages": {
+    "pages/plugin/index": "pages/plugin/index"
+  },
+  "main": "plugin.js"
+}

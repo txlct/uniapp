@@ -13,6 +13,9 @@
 					"comp": "view"
 				}
 			}
+		},
+		{
+			"path": "pages/plugin/index"
 		}
 	],
 	"globalStyle": {

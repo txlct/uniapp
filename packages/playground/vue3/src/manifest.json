@@ -11,7 +11,13 @@
         "setting": {
             "urlCheck": false
         },
-        "usingComponents": true
+        "usingComponents": true,
+        "plugins": {
+            "plugin": {
+                "version": "dev",
+                "provider": ""
+            }
+        }
     },
     "h5": {
         "optimization": {
