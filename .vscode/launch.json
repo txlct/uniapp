@@ -37,6 +37,20 @@
       "type": "node"
     },
     {
+      "name": "debug uniapp mp-weixin plugin",
+      "request": "launch",
+      "runtimeArgs": [
+        "dev:plugin"
+      ],
+      "runtimeExecutable": "pnpm",
+      "runtimeVersion": "16",
+      "skipFiles": [
+        "<node_internals>/**"
+      ],
+      "cwd": "${workspaceFolder}/packages/playground/vue3",
+      "type": "node"
+    },
+    {
       // 多项目h5打包测试
       "name": "debug h5 multi-platform",
       "request": "launch",

@@ -739,14 +739,18 @@ function initCreatePage(parseOptions) {
     };
 }
 
+// 全局插件应用实例
+let pluginInstance = null;
 function initCreatePluginApp(parseAppOptions) {
     return function createApp(vm) {
+        pluginInstance = vm;
         initAppLifecycle(parseApp(vm, parseAppOptions), vm);
         if (process.env.UNI_MP_PLUGIN) {
             wx.$vm = vm;
         }
     };
 }
+const getPluginInstance = () => pluginInstance;
 
 const MPPage = Page;
 const MPComponent = Component;
@@ -883,4 +887,4 @@ const createSubpackageApp = initCreateSubpackageApp();
         createSubpackageApp;
 }
 
-export { createApp, createComponent, createPage, createPluginApp, createSubpackageApp };
+export { createApp, createComponent, createPage, createPluginApp, createSubpackageApp, getPluginInstance };

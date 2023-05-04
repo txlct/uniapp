@@ -24,3 +24,5 @@ if (__PLATFORM__ === 'mp-weixin') {
   ;(wx as any).createSubpackageApp = (global as any).createSubpackageApp =
     createSubpackageApp
 }
+
+export { getPluginInstance } from '@dcloudio/uni-mp-core';

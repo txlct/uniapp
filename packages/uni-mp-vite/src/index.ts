@@ -1,6 +1,6 @@
 import { extend } from '@vue/shared'
 import type { SFCScriptCompileOptions } from '@vue/compiler-sfc'
-import { uniViteInjectPlugin } from '@dcloudio/uni-cli-shared'
+import { resolveBuiltIn, uniViteInjectPlugin } from '@dcloudio/uni-cli-shared'
 import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni'
 
 import { uniMiniProgramPlugin, UniMiniProgramPluginOptions } from './plugin'
@@ -22,27 +22,32 @@ export default (
   opt: VitePluginUniOptions
 ) => {
   if (!options.app.subpackages) {
-    delete process.env.UNI_SUBPACKAGE
+    delete process.env.UNI_SUBPACKAGE;
   }
   if (!options.app.plugins) {
-    delete process.env.UNI_MP_PLUGIN
+    delete process.env.UNI_MP_PLUGIN;
   }
-  const normalizeComponentName = options.template.component?.normalizeName
+  const normalizeComponentName = options.template.component?.normalizeName;
   return [
     (options: {
-      vueOptions?: { script?: Partial<SFCScriptCompileOptions> }
+      vueOptions?: { script?: Partial<SFCScriptCompileOptions>; };
     }) => {
       return uniMainJsPlugin({
         normalizeComponentName,
         babelParserPlugins: options.vueOptions?.script?.babelParserPlugins,
-      })
+      });
     },
     uniManifestJsonPlugin(options),
     uniPagesJsonPlugin(options),
     uniEntryPlugin(options),
     uniViteInjectPlugin(
       'uni:mp-inject',
-      extend({ exclude: [/uni.api.esm/, /uni.mp.esm/] }, options.vite.inject)
+      extend(
+        { exclude: [/uni.api.esm/, /uni.mp.esm/] },
+        options.vite.inject,
+        // 小程序插件兼容getApp兜底函数
+        (process.env.UNI_MP_PLUGIN && { getApp: [resolveBuiltIn('@dcloudio/uni-mp-weixin/dist/uni.mp.esm.js'), 'getPluginInstance'] })
+      )
     ),
     uniRenderjsPlugin({ lang: options.template.filter?.lang }),
     uniRuntimeHooksPlugin(),
