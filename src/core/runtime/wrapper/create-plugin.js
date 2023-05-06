@@ -6,8 +6,19 @@ import {
 
 import parseApp from 'uni-platform/runtime/wrapper/app-parser'
 
-export default function createPlugin (vm) {
+// 插件应用实例
+let pluginVm = null;
+
+export function createPlugin (vm) {
   const appOptions = parseApp(vm)
+
+  pluginVm = vm;
+
+  // 若当前vm无globalData，使用options中的globalData兼容
+  if (!vm.globalData && appOptions.globalData) {
+    vm.globalData = appOptions.globalData;
+  }
+  
   if (isFn(appOptions.onShow) && __GLOBAL__.onAppShow) {
     __GLOBAL__.onAppShow((...args) => {
       appOptions.onShow.apply(vm, args)
@@ -24,3 +35,6 @@ export default function createPlugin (vm) {
   }
   return vm
 }
+
+// 小程序插件getApp获取当前vm实例
+export const getPluginInstance = () => pluginVm;

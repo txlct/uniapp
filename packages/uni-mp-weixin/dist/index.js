@@ -1817,8 +1817,19 @@ function createSubpackageApp (vm) {
   return vm
 }
 
+// 插件应用实例
+let pluginVm = null;
+
 function createPlugin (vm) {
   const appOptions = parseApp(vm);
+
+  pluginVm = vm;
+
+  // 若当前vm无globalData，使用options中的globalData兼容
+  if (!vm.globalData && appOptions.globalData) {
+    vm.globalData = appOptions.globalData;
+  }
+  
   if (isFn(appOptions.onShow) && wx.onAppShow) {
     wx.onAppShow((...args) => {
       appOptions.onShow.apply(vm, args);
@@ -1835,6 +1846,9 @@ function createPlugin (vm) {
   }
   return vm
 }
+
+// 小程序插件getApp获取当前vm实例
+const getPluginInstance = () => pluginVm;
 
 todos.forEach(todoApi => {
   protocols[todoApi] = false;
@@ -1921,4 +1935,4 @@ wx.createPlugin = createPlugin;
 var uni$1 = uni;
 
 export default uni$1;
-export { createApp, createComponent, createPage, createPlugin, createSubpackageApp };
+export { createApp, createComponent, createPage, createPlugin, createSubpackageApp, getPluginInstance };

@@ -28,7 +28,7 @@ import createApp from './wrapper/create-app'
 import createPage from './wrapper/create-page'
 import createComponent from './wrapper/create-component'
 import createSubpackageApp from './wrapper/create-subpackage-app'
-import createPlugin from './wrapper/create-plugin'
+import { createPlugin, getPluginInstance } from './wrapper/create-plugin';
 
 todos.forEach(todoApi => {
   protocols[todoApi] = false
@@ -124,7 +124,8 @@ export {
   createPage,
   createComponent,
   createSubpackageApp,
-  createPlugin
+  createPlugin,
+  getPluginInstance
 }
 
 export default uni
