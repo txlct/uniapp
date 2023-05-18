@@ -63,7 +63,7 @@ export function createConfigResolved({
         platform: process.env.UNI_PLATFORM,
         chunkCssFilename(id: string) {
           if (id === mainPath) {
-            return 'app' + cssExtname
+            return (process.env.UNI_MP_PLUGIN ? 'main' : 'app') + cssExtname;
           } else if (isUniPageUrl(id)) {
             return normalizeCssChunkFilename(
               parseVirtualPagePath(id),
@@ -78,7 +78,7 @@ export function createConfigResolved({
         },
         chunkCssCode(filename, cssCode) {
           cssCode = transformScopedCss(cssCode)
-          if (filename === 'app' + cssExtname) {
+          if (['app' + cssExtname, 'main' + cssExtname].includes(filename)) {
             const componentCustomHiddenCss =
               (component &&
                 component.vShow &&

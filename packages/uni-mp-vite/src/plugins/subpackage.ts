@@ -21,7 +21,7 @@ export function createNonAppGenerateBundle(
       delete bundle[name]
     })
     const appJsFile = 'app.js'
-    const appCssFile = 'app' + extname
+    const appCssFile = (process.env.UNI_MP_PLUGIN ? 'main' : 'app') + extname
     Object.keys(bundle).forEach((name) => {
       if (!isMiniProgramPageFile(name)) {
         return

@@ -31,7 +31,7 @@ function createConfigResolved({ cdn, style: { extname }, template: { component }
             platform: process.env.UNI_PLATFORM,
             chunkCssFilename(id) {
                 if (id === mainPath) {
-                    return 'app' + cssExtname;
+                    return (process.env.UNI_MP_PLUGIN ? 'main' : 'app') + cssExtname;
                 }
                 else if ((0, entry_1.isUniPageUrl)(id)) {
                     return normalizeCssChunkFilename((0, entry_1.parseVirtualPagePath)(id), cssExtname);
@@ -42,7 +42,7 @@ function createConfigResolved({ cdn, style: { extname }, template: { component }
             },
             chunkCssCode(filename, cssCode) {
                 cssCode = (0, uni_cli_shared_1.transformScopedCss)(cssCode);
-                if (filename === 'app' + cssExtname) {
+                if (['app' + cssExtname, 'main' + cssExtname].includes(filename)) {
                     const componentCustomHiddenCss = (component &&
                         component.vShow &&
                         genComponentCustomHiddenCss(component.vShow)) ||
