@@ -4,8 +4,8 @@
   "scripts": {
     "dev": "uni",
     "dev:mp": "uni -p mp-weixin",
-    "dev:plugin": "cross-env UNI_OUTPUT_DIR=dist/dev/mp-weixin/plugin pnpm dev:mp --plugin plugin",
-    "dev:mp-plugin": "cross-env NODE_ENV=development UNI_PLATFORM=mp-weixin UNI_OUTPUT_DIR=dist/dev/mp-weixin/mp pnpm dev:mp",
+    "dev:plugin": "cross-env UNI_OUTPUT_DIR=dist/dev/mp-weixin/plugin pnpm dev:mp --plugin",
+    "dev:mp-plugin": "cross-env NODE_ENV=development UNI_PLATFORM=mp-weixin UNI_OUTPUT_DIR=dist/dev/mp-weixin/mp pnpm dev:mp --minify",
     "build:h5": "uni build",
     "build:mp": "uni build -p mp-weixin",
     "build:plugin": "cross-env UNI_OUTPUT_DIR=dist/build/mp-weixin/plugin pnpm run build:mp --plugin plugin",
