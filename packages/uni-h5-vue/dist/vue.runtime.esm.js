@@ -9472,7 +9472,7 @@ function patchStyle(el, prev, next) {
         const currentDisplay = style.display;
         if (isCssString) {
             if (prev !== next) {
-                style.cssText = next;
+                style.cssText = normalizeRpx(next);
             }
         }
         else if (prev) {
