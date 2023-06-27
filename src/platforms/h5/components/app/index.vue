@@ -67,7 +67,7 @@ function onThemeChange () {
     mediaQueryList = window.matchMedia('(prefers-color-scheme: dark)')
   } catch (error) { }
 
-  if (mediaQueryList) {
+  if (mediaQueryList && mediaQueryList.addEventListener) {
     mediaQueryList.addEventListener('change', (e) => {
       UniServiceJSBridge.emit('api.' + ON_THEME_CHANGE, {
         theme: e.matches ? 'dark' : 'light'
