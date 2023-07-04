@@ -11044,7 +11044,7 @@ const getSystemInfoSync = /* @__PURE__ */ defineSyncApi(
     }
   }
 );
-function updateDocumentTitle(title) {
+function updateDocumentTitle(title = "") {
   {
     const ssrContext = getApp$1().$.appContext.provides[vue.ssrContextKey];
     if (ssrContext) {

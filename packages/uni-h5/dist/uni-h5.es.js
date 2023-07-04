@@ -21604,7 +21604,7 @@ const loadFontFace = /* @__PURE__ */ defineAsyncApi(
   },
   LoadFontFaceProtocol
 );
-function updateDocumentTitle(title) {
+function updateDocumentTitle(title = "") {
   {
     document.title = title;
   }
