@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.uniPagesJsonPlugin = void 0;
 const uni_cli_shared_1 = require("@dcloudio/uni-cli-shared");
 const utils_1 = require("../utils");
-function uniPagesJsonPlugin() {
+function uniPagesJsonPlugin(uniOptions) {
     return (0, uni_cli_shared_1.defineUniPagesJsonPlugin)((opts) => {
         return {
             name: 'uni:h5-pages-json',
@@ -13,12 +13,24 @@ function uniPagesJsonPlugin() {
                     const { resolvedConfig } = opts;
                     const ssr = (0, utils_1.isSSR)(opt);
                     return {
-                        code: registerGlobalCode(resolvedConfig, ssr) +
-                            generatePagesJsonCode(ssr, code, resolvedConfig),
+                        code: generatePagesJsonCode(ssr, code, resolvedConfig),
                         map: { mappings: '' },
                     };
                 }
             },
+            // writeBundle(options, bundle){
+            //   if(!uniOptions.h5?.split){
+            //     return
+            //   }
+            //   const pageJsonJs = Object.keys(bundle).find((key=>{
+            //     return key.includes(PAGES_JSON_JS) && /\.js$/.test(key)
+            //   }))
+            //   if(!pageJsonJs){
+            //     return
+            //   }
+            //   const outputPath = path.resolve(options.dir!, 'test.shtml');
+            //   fs.writeFileSync(outputPath, `<script type="module" src="./${pageJsonJs}"></script>`)
+            // }
         };
     });
 }
@@ -29,16 +41,15 @@ function generatePagesJsonCode(ssr, jsonStr, config) {
     const { importLayoutComponentsCode, defineLayoutComponentsCode } = generateLayoutComponentsCode(globalName, pagesJson);
     const definePagesCode = generatePagesDefineCode(pagesJson, config);
     const uniRoutesCode = generateRoutes(globalName, pagesJson, config);
-    const uniConfigCode = generateConfig(globalName, pagesJson, config);
-    const cssCode = generateCssCode(config);
+    const uniConfigCode = generateConfig(globalName, pagesJson);
     return `
 import { defineAsyncComponent, resolveComponent, createVNode, withCtx, openBlock, createBlock } from 'vue'
-import { PageComponent, useI18n, setupWindow, setupPage } from '@dcloudio/uni-h5'
-import { appId, appName, appVersion, appVersionCode, debug, networkTimeout, router, async, sdkConfigs, qqMapKey, googleMapKey, aMapKey, aMapSecurityJsCode, aMapServiceHost, nvue, locale, fallbackLocale, darkmode, themeConfig } from './${uni_cli_shared_1.MANIFEST_JSON_JS}'
-const locales = import.meta.globEager('./locale/*.json')
+import { PageComponent, useI18n, setupWindow, setupPage, getApp } from '@dcloudio/uni-h5'
+const async = ${globalName}.__uniConfig && ${globalName}.__uniConfig.async || {}
+const app =  ${globalName}.__app 
+
 ${importLayoutComponentsCode}
 const extend = Object.assign
-${cssCode}
 ${uniConfigCode}
 ${defineLayoutComponentsCode}
 ${definePagesCode}
@@ -54,64 +65,6 @@ const hmrCode = `if(import.meta.hot){
 }`;
 function getGlobal(ssr) {
     return ssr ? 'global' : 'window';
-}
-// 兼容 wx 对象
-function registerGlobalCode(config, ssr) {
-    const name = getGlobal(ssr);
-    const enableTreeShaking = (0, uni_cli_shared_1.isEnableTreeShaking)((0, uni_cli_shared_1.parseManifestJsonOnce)(process.env.UNI_INPUT_DIR));
-    if (enableTreeShaking && config.command === 'build' && !ssr) {
-        // 非 SSR 的发行模式，补充全局 uni 对象
-        return `import { upx2px, getApp } from '@dcloudio/uni-h5';${name}.uni = {};${name}.wx = {};${name}.rpx2px = upx2px`;
-    }
-    return `
-import {uni,upx2px,getCurrentPages,getApp,UniServiceJSBridge,UniViewJSBridge} from '@dcloudio/uni-h5'
-${name}.getApp = getApp
-${name}.getCurrentPages = getCurrentPages
-${name}.wx = uni
-${name}.uni = uni
-${name}.UniViewJSBridge = UniViewJSBridge
-${name}.UniServiceJSBridge = UniServiceJSBridge
-${name}.rpx2px = upx2px
-${name}.__setupPage = (com)=>setupPage(com)
-`;
-}
-function generateCssCode(config) {
-    const define = config.define;
-    const cssFiles = [uni_cli_shared_1.H5_FRAMEWORK_STYLE_PATH + 'base.css'];
-    // if (define.__UNI_FEATURE_PAGES__) {
-    cssFiles.push(uni_cli_shared_1.H5_FRAMEWORK_STYLE_PATH + 'async.css');
-    // }
-    if (define.__UNI_FEATURE_RESPONSIVE__) {
-        cssFiles.push(uni_cli_shared_1.H5_FRAMEWORK_STYLE_PATH + 'layout.css');
-    }
-    if (define.__UNI_FEATURE_NAVIGATIONBAR__) {
-        cssFiles.push(uni_cli_shared_1.H5_FRAMEWORK_STYLE_PATH + 'pageHead.css');
-    }
-    if (define.__UNI_FEATURE_TABBAR__) {
-        cssFiles.push(uni_cli_shared_1.H5_FRAMEWORK_STYLE_PATH + 'tabBar.css');
-    }
-    if (define.__UNI_FEATURE_NVUE__) {
-        cssFiles.push(uni_cli_shared_1.H5_FRAMEWORK_STYLE_PATH + 'nvue.css');
-    }
-    if (define.__UNI_FEATURE_PULL_DOWN_REFRESH__) {
-        cssFiles.push(uni_cli_shared_1.H5_FRAMEWORK_STYLE_PATH + 'pageRefresh.css');
-    }
-    if (define.__UNI_FEATURE_NAVIGATIONBAR_SEARCHINPUT__) {
-        cssFiles.push(uni_cli_shared_1.BASE_COMPONENTS_STYLE_PATH + 'input.css');
-    }
-    const enableTreeShaking = (0, uni_cli_shared_1.isEnableTreeShaking)((0, uni_cli_shared_1.parseManifestJsonOnce)(process.env.UNI_INPUT_DIR));
-    if (config.command === 'serve' || !enableTreeShaking) {
-        // 开发模式或禁用摇树优化，自动添加所有API相关css
-        Object.keys(uni_cli_shared_1.API_DEPS_CSS).forEach((name) => {
-            const styles = uni_cli_shared_1.API_DEPS_CSS[name];
-            styles.forEach((style) => {
-                if (!cssFiles.includes(style)) {
-                    cssFiles.push(style);
-                }
-            });
-        });
-    }
-    return cssFiles.map((file) => `import '${file}'`).join('\n');
 }
 function generateLayoutComponentsCode(globalName, pagesJson) {
     const windowNames = {
@@ -187,37 +140,20 @@ function generateRoutes(globalName, pagesJson, config) {
 function renderPage(component,props){
   return (openBlock(), createBlock(PageComponent, null, {page: withCtx(() => [createVNode(component, extend({},props,{ref: "page"}), null, 512 /* NEED_PATCH */)]), _: 1 /* STABLE */}))
 }
-${globalName}.__uniRoutes=[${[
-        ...generatePagesRoute((0, uni_cli_shared_1.normalizePagesRoute)(pagesJson), config),
-    ].join(',')}].map(uniRoute=>(uniRoute.meta.route = (uniRoute.alias || uniRoute.path).slice(1),uniRoute))`;
+if(!${globalName}.__uniRoutes){
+  ${globalName}.__uniRoutes = []
 }
-function generateConfig(globalName, pagesJson, config) {
+${globalName}.__uniRoutes=${globalName}.__uniRoutes.concat([
+  ${[
+        ...generatePagesRoute((0, uni_cli_shared_1.normalizePagesRoute)(pagesJson), config),
+    ].join(',')}].map(uniRoute=>(uniRoute.meta.route = (uniRoute.alias || uniRoute.path).slice(1),uniRoute)))`;
+}
+function generateConfig(globalName, pagesJson) {
     delete pagesJson.pages;
     delete pagesJson.subPackages;
     delete pagesJson.subpackages;
     pagesJson.compilerVersion = process.env.UNI_COMPILER_VERSION;
-    return `${globalName}.__uniConfig=extend(${JSON.stringify(pagesJson)},{
-  appId,
-  appName,
-  appVersion,
-  appVersionCode,
-  async,
-  debug,
-  networkTimeout,
-  sdkConfigs,
-  qqMapKey,
-  googleMapKey,
-  aMapKey,
-  aMapSecurityJsCode,
-  aMapServiceHost,
-  nvue,
-  locale,
-  fallbackLocale,
-  locales:Object.keys(locales).reduce((res,name)=>{const locale=name.replace(/\\.\\/locale\\/(uni-app.)?(.*).json/,'$2');extend(res[locale]||(res[locale]={}),locales[name].default);return res},{}),
-  router,
-  darkmode,
-  themeConfig,
-})
+    return `${globalName}.__uniConfig=extend(${JSON.stringify(pagesJson)},${globalName}.__uniConfig || {})
 `;
 }
 //# sourceMappingURL=pagesJson.js.map

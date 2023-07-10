@@ -6,7 +6,14 @@ import {
   parseJson,
   initI18nOptions,
   normalizeThemeConfigOnce,
+  API_DEPS_CSS,
+  FEATURE_DEFINES,
+  H5_FRAMEWORK_STYLE_PATH,
+  BASE_COMPONENTS_STYLE_PATH,
+  isEnableTreeShaking,
+  parseManifestJsonOnce
 } from '@dcloudio/uni-cli-shared'
+import { isSSR } from '../utils'
 
 const defaultRouter = {
   mode: 'hash',
@@ -23,6 +30,114 @@ const defaultAsync = {
   suspensible: true,
 }
 
+
+function getGlobal(ssr?: boolean) {
+  return ssr ? 'global' : 'window'
+}
+
+
+
+function generateConfig(
+  globalName: string,
+) {
+
+  return `${globalName}.__uniConfig=extend(${globalName}.__uniConfig || {},
+  
+  {
+  appId,
+  appName,
+  appVersion,
+  appVersionCode,
+  async,
+  debug,
+  networkTimeout,
+  sdkConfigs,
+  qqMapKey,
+  googleMapKey,
+  aMapKey,
+  aMapSecurityJsCode,
+  aMapServiceHost,
+  nvue,
+  locale,
+  fallbackLocale,
+  locales:Object.keys(locales).reduce((res,name)=>{const locale=name.replace(/\\.\\/locale\\/(uni-app.)?(.*).json/,'$2');extend(res[locale]||(res[locale]={}),locales[name].default);return res},{}),
+  router,
+  darkmode,
+  themeConfig,
+})
+`
+}
+
+
+
+function generateCssCode(config: ResolvedConfig) {
+  const define = config.define! as FEATURE_DEFINES
+  const cssFiles = [H5_FRAMEWORK_STYLE_PATH + 'base.css']
+
+  // if (define.__UNI_FEATURE_PAGES__) {
+  cssFiles.push(H5_FRAMEWORK_STYLE_PATH + 'async.css')
+  // }
+  if (define.__UNI_FEATURE_RESPONSIVE__) {
+    cssFiles.push(H5_FRAMEWORK_STYLE_PATH + 'layout.css')
+  }
+  if (define.__UNI_FEATURE_NAVIGATIONBAR__) {
+    cssFiles.push(H5_FRAMEWORK_STYLE_PATH + 'pageHead.css')
+  }
+  if (define.__UNI_FEATURE_TABBAR__) {
+    cssFiles.push(H5_FRAMEWORK_STYLE_PATH + 'tabBar.css')
+  }
+  if (define.__UNI_FEATURE_NVUE__) {
+    cssFiles.push(H5_FRAMEWORK_STYLE_PATH + 'nvue.css')
+  }
+  if (define.__UNI_FEATURE_PULL_DOWN_REFRESH__) {
+    cssFiles.push(H5_FRAMEWORK_STYLE_PATH + 'pageRefresh.css')
+  }
+  if (define.__UNI_FEATURE_NAVIGATIONBAR_SEARCHINPUT__) {
+    cssFiles.push(BASE_COMPONENTS_STYLE_PATH + 'input.css')
+  }
+  const enableTreeShaking = isEnableTreeShaking(
+    parseManifestJsonOnce(process.env.UNI_INPUT_DIR)
+  )
+  if (config.command === 'serve' || !enableTreeShaking) {
+    // 开发模式或禁用摇树优化，自动添加所有API相关css
+    Object.keys(API_DEPS_CSS).forEach((name) => {
+      const styles = API_DEPS_CSS[name as keyof typeof API_DEPS_CSS]
+      styles.forEach((style) => {
+        if (!cssFiles.includes(style)) {
+          cssFiles.push(style)
+        }
+      })
+    })
+  }
+  return cssFiles.map((file) => `import '${file}'`).join('\n')
+}
+
+
+// 兼容 wx 对象
+function registerGlobalCode(config: ResolvedConfig, ssr?: boolean) {
+  const name = getGlobal(ssr)
+  const enableTreeShaking = isEnableTreeShaking(
+    parseManifestJsonOnce(process.env.UNI_INPUT_DIR)
+  )
+
+  if (enableTreeShaking && config.command === 'build' && !ssr) {
+    // 非 SSR 的发行模式，补充全局 uni 对象
+    return `import { upx2px, getApp } from '@dcloudio/uni-h5';${name}.uni = {};${name}.wx = {};${name}.rpx2px = upx2px`
+  }
+
+  return `
+import {uni,upx2px,getCurrentPages,getApp,UniServiceJSBridge,UniViewJSBridge} from '@dcloudio/uni-h5'
+${name}.getApp = getApp
+${name}.getCurrentPages = getCurrentPages
+${name}.wx = uni
+${name}.uni = uni
+${name}.UniViewJSBridge = UniViewJSBridge
+${name}.UniServiceJSBridge = UniServiceJSBridge
+${name}.rpx2px = upx2px
+${name}.__setupPage = (com)=>setupPage(com)
+`
+}
+
 export function uniManifestJsonPlugin(): Plugin {
   return defineUniManifestJsonPlugin((opts) => {
     let resolvedConfig: ResolvedConfig
@@ -33,7 +148,7 @@ export function uniManifestJsonPlugin(): Plugin {
         defaultRouter.assets = config.build.assetsDir
         resolvedConfig = config
       },
-      transform(code, id) {
+      transform(code, id, opt) {
         if (!opts.filter(id)) {
           return
         }
@@ -104,8 +219,20 @@ export function uniManifestJsonPlugin(): Plugin {
               : process.env.UNI_PLATFORM
           ] || {}
 
+
+          const ssr = isSSR(opt)
+          const globalName = getGlobal(ssr)
+
+          const uniConfigCode = generateConfig(globalName)
+          const cssCode = generateCssCode(resolvedConfig)
+
         return {
-          code: `export const appId = ${JSON.stringify(manifest.appid || '')}
+          code: `
+          ${registerGlobalCode(resolvedConfig, ssr)}
+  const extend = Object.assign
+  const locales = import.meta.globEager('./locale/*.json')
+
+  export const appId = ${JSON.stringify(manifest.appid || '')}
   export const appName = ${JSON.stringify(manifest.name || '')}
   export const appVersion = ${JSON.stringify(manifest.versionName || '')}
   export const appVersionCode = ${JSON.stringify(manifest.versionCode || '')}
@@ -130,6 +257,13 @@ export function uniManifestJsonPlugin(): Plugin {
   export const themeConfig = ${JSON.stringify(
     normalizeThemeConfigOnce(platformConfig)
   )}
+
+
+  ${cssCode}
+${uniConfigCode}
+
+
+
   `,
           map: { mappings: '' },
         }

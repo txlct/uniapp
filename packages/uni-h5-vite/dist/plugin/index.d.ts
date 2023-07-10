@@ -1,2 +1,3 @@
 import { UniVitePlugin } from '@dcloudio/uni-cli-shared';
-export declare function uniH5Plugin(): UniVitePlugin;
+import type { VitePluginUniResolvedOptions } from '@dcloudio/uni-cli-shared';
+export declare function uniH5Plugin(uniOption: VitePluginUniResolvedOptions): UniVitePlugin;

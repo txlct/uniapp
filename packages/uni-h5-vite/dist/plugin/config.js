@@ -14,7 +14,7 @@ const ssr_1 = require("./configureServer/ssr");
 const shared_1 = require("@vue/shared");
 const getFilePath = (filePath) => path_1.default.resolve(process.env.UNI_INPUT_DIR, '../', filePath);
 const checkIsFileExist = (filePath) => fs_1.default.existsSync(filePath);
-function createConfig(options) {
+function createConfig(options, uniOption) {
     return function config(config, env) {
         const inputDir = process.env.UNI_INPUT_DIR;
         if ((0, uni_cli_shared_1.isInHBuilderX)()) {
@@ -70,6 +70,29 @@ function createConfig(options) {
             }
             return path_1.default.posix.join(assetsDir, isEntry ? '' : name, filename);
         };
+        const rollupOptions = {
+            input: {
+                [entryName]: checkIsFileExist(getFilePath(`${entryName}.html`))
+                    ? getFilePath(`${entryName}.html`)
+                    : getFilePath('index.html')
+            },
+            // resolveSSRExternal 会判定package.json，hbx 工程可能没有，通过 rollup 来配置
+            external: (0, uni_cli_shared_1.isSsr)(env.command, config) ? ssr_1.external : [],
+            output: {
+                assetFileNames() {
+                    const { assetsDir } = options.resolvedConfig.build;
+                    return `${assetsDir}/${assetsName}[name]-[hash][extname]`;
+                },
+                entryFileNames(chunkInfo) {
+                    return getChunkName(chunkInfo, true, `${entryName}.[hash].js`);
+                },
+                chunkFileNames(chunkInfo) {
+                    return getChunkName(chunkInfo);
+                },
+                ...uniOption.h5?.rollupOptions?.output
+            },
+            ...uniOption.h5?.rollupOptions
+        };
         return {
             css: {
                 postcss: {
@@ -91,24 +114,7 @@ function createConfig(options) {
                 external: ssr_1.external,
             },
             build: {
-                rollupOptions: {
-                    input: {
-                        [entryName]: checkIsFileExist(getFilePath(`${entryName}.html`))
-                            ? getFilePath(`${entryName}.html`)
-                            : getFilePath('index.html')
-                    },
-                    // resolveSSRExternal 会判定package.json，hbx 工程可能没有，通过 rollup 来配置
-                    external: (0, uni_cli_shared_1.isSsr)(env.command, config) ? ssr_1.external : [],
-                    output: {
-                        assetFileNames: `assets/${assetsName}[name]-[hash][extname]`,
-                        entryFileNames(chunkInfo) {
-                            return getChunkName(chunkInfo, true, `${entryName}.[hash].js`);
-                        },
-                        chunkFileNames(chunkInfo) {
-                            return getChunkName(chunkInfo);
-                        },
-                    },
-                },
+                rollupOptions,
             },
         };
     };

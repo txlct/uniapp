@@ -15,21 +15,24 @@ import { uniRenderjsPlugin } from './plugins/renderjs'
 import { uniResolveIdPlugin } from './plugins/resolveId'
 import { uniSetupPlugin } from './plugins/setup'
 import { uniSSRPlugin } from './plugins/ssr'
+import type { VitePluginUniResolvedOptions } from '@dcloudio/uni-cli-shared'
 
-export default [
+
+
+export default (options: VitePluginUniResolvedOptions)=> [
   uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE }),
   uniCssScopedPlugin({
     filter: (id) => isVueSfcFile(id) && !id.endsWith('App.vue'),
   }),
   uniResolveIdPlugin(),
-  uniMainJsPlugin(),
+  uniMainJsPlugin(options),
   uniManifestJsonPlugin(),
-  uniPagesJsonPlugin(),
+  uniPagesJsonPlugin(options),
   uniInjectPlugin(),
   uniCssPlugin(),
   uniSSRPlugin(),
   uniSetupPlugin(),
   uniRenderjsPlugin(),
-  uniH5Plugin(),
+  uniH5Plugin(options),
   uniPostVuePlugin(),
 ]

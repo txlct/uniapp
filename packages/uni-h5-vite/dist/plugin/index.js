@@ -13,7 +13,7 @@ const configureServer_1 = require("./configureServer");
 const uni_1 = require("./uni");
 const config_1 = require("./config");
 const shared_1 = require("@vue/shared");
-function uniH5Plugin() {
+function uniH5Plugin(uniOption) {
     const configOptions = {
         resolvedConfig: null,
     };
@@ -21,7 +21,7 @@ function uniH5Plugin() {
     return {
         name: 'uni:h5',
         uni: (0, uni_1.createUni)(),
-        config: (0, config_1.createConfig)(configOptions),
+        config: (0, config_1.createConfig)(configOptions, uniOption),
         configResolved(config) {
             configOptions.resolvedConfig = config;
         },

@@ -1,1 +1,2 @@
-export declare function uniMainJsPlugin(): import("vite").Plugin;
+import type { VitePluginUniResolvedOptions } from '@dcloudio/uni-cli-shared';
+export declare function uniMainJsPlugin(uniOptions: VitePluginUniResolvedOptions): import("vite").Plugin;

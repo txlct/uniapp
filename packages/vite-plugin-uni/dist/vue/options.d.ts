@@ -9,8 +9,6 @@ import type { ViteLegacyOptions, VitePluginUniResolvedOptions } from '..';
 export declare function createPluginVueInstance(options: VueOptions): any;
 export declare function initPluginVueOptions(options: VitePluginUniResolvedOptions, UniVitePlugins: UniVitePlugin[], uniPluginOptions: Required<Omit<Required<UniVitePlugin>['uni'], 'compiler'>> & {
     compiler?: TemplateCompiler;
-}): VueOptions;
-export declare function initPluginVueJsxOptions(options: VitePluginUniResolvedOptions, { isCustomElement, }: Required<Required<UniVitePlugin>['uni']>['compilerOptions'], jsxOptions: Required<Required<UniVitePlugin>['uni']>['jsxOptions']): import("@vue/babel-plugin-jsx").VueJSXPluginOptions & {
-    babelPlugins?: any[] | undefined;
-};
+}): any;
+export declare function initPluginVueJsxOptions(options: VitePluginUniResolvedOptions, { isCustomElement, }: Required<Required<UniVitePlugin>['uni']>['compilerOptions'], jsxOptions: Required<Required<UniVitePlugin>['uni']>['jsxOptions']): any;
 export declare function initPluginViteLegacyOptions(options: VitePluginUniResolvedOptions): ViteLegacyOptions;

@@ -1,7 +1,7 @@
 import os from 'os'
 import fs from 'fs'
 import path from 'path'
-import type { Plugin, ResolvedConfig, ServerOptions } from 'vite'
+import type { Plugin, ResolvedConfig, ServerOptions, BuildOptions } from 'vite'
 import {
   isInHBuilderX,
   normalizePath,
@@ -18,14 +18,18 @@ import { esbuildPrePlugin } from './esbuild/esbuildPrePlugin'
 import { external } from './configureServer/ssr'
 import { extend, hasOwn } from '@vue/shared'
 import { PreRenderedChunk } from 'rollup';
+import type { VitePluginUniResolvedOptions } from '@dcloudio/uni-cli-shared';
 
 const getFilePath = (filePath: string) => path.resolve(process.env.UNI_INPUT_DIR, '../', filePath);
 
 const checkIsFileExist = (filePath: string) => fs.existsSync(filePath);
 
+
 export function createConfig(options: {
   resolvedConfig: ResolvedConfig | null
-}): Plugin['config'] {
+}, uniOption: VitePluginUniResolvedOptions): Plugin['config'] {
+
+
   return function config(config, env) {
     const inputDir = process.env.UNI_INPUT_DIR
     if (isInHBuilderX()) {
@@ -95,6 +99,31 @@ export function createConfig(options: {
       return path.posix.join(assetsDir, isEntry ? '' : name, filename);
     };
 
+    const rollupOptions: BuildOptions['rollupOptions'] = {
+      input: {
+        [entryName]: checkIsFileExist(getFilePath(`${entryName}.html`))
+          ? getFilePath(`${entryName}.html`)
+          : getFilePath('index.html')
+      },
+      // resolveSSRExternal 会判定package.json，hbx 工程可能没有，通过 rollup 来配置
+      external: isSsr(env.command, config) ? external : [],
+      output: {
+        assetFileNames(){
+          const { assetsDir } = options.resolvedConfig!.build;
+          return `${assetsDir}/${assetsName}[name]-[hash][extname]`
+        }, 
+        entryFileNames(chunkInfo) {
+          return getChunkName(chunkInfo,  true, `${entryName}.[hash].js`);
+        },
+        chunkFileNames(chunkInfo) {
+          return getChunkName(chunkInfo);
+        },
+        ...uniOption.h5?.rollupOptions?.output
+      },
+      ...uniOption.h5?.rollupOptions
+    }
+
+
     return {
       css: {
         postcss: {
@@ -116,24 +145,7 @@ export function createConfig(options: {
         external,
       },
       build: {
-        rollupOptions: {
-          input: {
-            [entryName]: checkIsFileExist(getFilePath(`${entryName}.html`))
-              ? getFilePath(`${entryName}.html`)
-              : getFilePath('index.html')
-          },
-          // resolveSSRExternal 会判定package.json，hbx 工程可能没有，通过 rollup 来配置
-          external: isSsr(env.command, config) ? external : [],
-          output: {
-            assetFileNames: `assets/${assetsName}[name]-[hash][extname]`,
-            entryFileNames(chunkInfo) {
-              return getChunkName(chunkInfo,  true, `${entryName}.[hash].js`);
-            },
-            chunkFileNames(chunkInfo) {
-              return getChunkName(chunkInfo);
-            },
-          },
-        },
+        rollupOptions,
       },
     }
   }

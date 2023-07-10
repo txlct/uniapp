@@ -6,7 +6,9 @@
     "dev:mp": "uni -p mp-weixin",
     "dev:plugin": "cross-env UNI_OUTPUT_DIR=dist/dev/mp-weixin/plugin pnpm dev:mp --plugin",
     "dev:mp-plugin": "cross-env NODE_ENV=development UNI_PLATFORM=mp-weixin UNI_OUTPUT_DIR=dist/dev/mp-weixin/mp pnpm dev:mp --minify",
-    "build:h5": "uni build",
+    "build:h5": "uni build  --minify false",
+    "build:h5:page": "cross-env PAGE=true uni build  --minify false",
+    "build:h5-no-mini": "uni build --minify \"false\"",
     "build:mp": "uni build -p mp-weixin",
     "build:plugin": "cross-env UNI_OUTPUT_DIR=dist/build/mp-weixin/plugin pnpm run build:mp --plugin plugin",
     "test": "vite --debug"
@@ -27,8 +29,10 @@
     "cross-env": "^7.0.3",
     "es-module-lexer": "^0.9.3",
     "magic-string": "^0.27.0",
+    "rollup-plugin-external-globals": "^0.8.0",
     "typescript": "^4.9.4",
     "vite": "4.0.4",
+    "vite-plugin-external": "^1.2.8",
     "vite-plugin-inspect": "^0.7.15",
     "vue-tsc": "^1.0.24"
   }
