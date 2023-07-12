@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@dcloudio/uni-h5-vite": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vite?v3.0.6",
-    "@dcloudio/uni-h5-vue": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vue?v3.0.5-beta",
+    "@dcloudio/uni-h5-vue": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vue?v3.0.6",
     "@dcloudio/uni-i18n": "3.0.0-3070320230222002",
     "@dcloudio/uni-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.6",
     "@vue/server-renderer": "3.2.47",
