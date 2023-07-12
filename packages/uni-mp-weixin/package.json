@@ -1,6 +1,6 @@
 {
   "name": "@dcloudio/uni-mp-weixin",
-  "version": "3.0.0-3070320230222002-14",
+  "version": "3.0.0-3070320230222002-15",
   "description": "uni-app mp-weixin",
   "main": "dist/uni.compiler.js",
   "files": [
@@ -30,10 +30,10 @@
     "@vue/compiler-core": "3.2.47"
   },
   "dependencies": {
-    "@dcloudio/uni-cli-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.6-beta",
-    "@dcloudio/uni-mp-vite": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?v3.0.6-beta",
-    "@dcloudio/uni-mp-vue": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.6-beta",
-    "@dcloudio/uni-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.5-beta",
+    "@dcloudio/uni-cli-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.6",
+    "@dcloudio/uni-mp-vite": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?v3.0.6",
+    "@dcloudio/uni-mp-vue": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.6",
+    "@dcloudio/uni-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.6",
     "@vue/shared": "3.2.47",
     "jimp": "^0.10.1",
     "licia": "^1.29.0",
