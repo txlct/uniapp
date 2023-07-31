@@ -12,8 +12,9 @@ function uniPagesJsonPlugin(uniOptions) {
                 if (opts.filter(id)) {
                     const { resolvedConfig } = opts;
                     const ssr = (0, utils_1.isSSR)(opt);
+                    const reCode = generatePagesJsonCode(ssr, code, resolvedConfig);
                     return {
-                        code: generatePagesJsonCode(ssr, code, resolvedConfig),
+                        code: reCode,
                         map: { mappings: '' },
                     };
                 }
@@ -44,7 +45,7 @@ function generatePagesJsonCode(ssr, jsonStr, config) {
     const uniConfigCode = generateConfig(globalName, pagesJson);
     return `
 import { defineAsyncComponent, resolveComponent, createVNode, withCtx, openBlock, createBlock } from 'vue'
-import { PageComponent, useI18n, setupWindow, setupPage, getApp } from '@dcloudio/uni-h5'
+import { PageComponent, useI18n, setupWindow, setupPage } from '@dcloudio/uni-h5'
 const async = ${globalName}.__uniConfig && ${globalName}.__uniConfig.async || {}
 const app =  ${globalName}.__app 
 
@@ -121,19 +122,24 @@ function generatePagesDefineCode(pagesJson, _config) {
     }
   ` + pages.map((pageOptions) => generatePageDefineCode(pageOptions)).join('\n'));
 }
-function generatePageRoute({ path, meta }, _config) {
+function generatePageRoute({ path, meta }, _config, globalName) {
     const { isEntry } = meta;
     const alias = isEntry ? `\n  alias:'/${path}',` : '';
     // 目前单页面未处理 query=>props
     return `{
   path:'/${isEntry ? '' : path}',${alias}
-  component:{setup(){ const app = getApp(); const query = app && app.$route && app.$route.query || {}; return ()=>renderPage(${(0, uni_cli_shared_1.normalizeIdentifier)(path)},query)}},
+  component:{setup(){ 
+    const getApp = ${globalName}.getApp
+    console.log('%c [ getApp ]-177', 'font-size:13px; background:pink; color:#bf2c9f;', getApp)
+    const app = getApp(); 
+    const query = app && app.$route && app.$route.query || {}; 
+  return ()=>renderPage(${(0, uni_cli_shared_1.normalizeIdentifier)(path)},query)}},
   loader: ${(0, uni_cli_shared_1.normalizeIdentifier)(path)}Loader,
   meta: ${JSON.stringify(meta)}
 }`;
 }
-function generatePagesRoute(pagesRouteOptions, config) {
-    return pagesRouteOptions.map((pageOptions) => generatePageRoute(pageOptions, config));
+function generatePagesRoute(pagesRouteOptions, config, globalName) {
+    return pagesRouteOptions.map((pageOptions) => generatePageRoute(pageOptions, config, globalName));
 }
 function generateRoutes(globalName, pagesJson, config) {
     return `
@@ -145,7 +151,7 @@ if(!${globalName}.__uniRoutes){
 }
 ${globalName}.__uniRoutes=${globalName}.__uniRoutes.concat([
   ${[
-        ...generatePagesRoute((0, uni_cli_shared_1.normalizePagesRoute)(pagesJson), config),
+        ...generatePagesRoute((0, uni_cli_shared_1.normalizePagesRoute)(pagesJson), config, globalName),
     ].join(',')}].map(uniRoute=>(uniRoute.meta.route = (uniRoute.alias || uniRoute.path).slice(1),uniRoute)))`;
 }
 function generateConfig(globalName, pagesJson) {

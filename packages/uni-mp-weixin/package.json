@@ -30,10 +30,10 @@
     "@vue/compiler-core": "3.2.47"
   },
   "dependencies": {
-    "@dcloudio/uni-cli-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?feature/next",
-    "@dcloudio/uni-mp-vite": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?feature/next",
-    "@dcloudio/uni-mp-vue": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?feature/next",
-    "@dcloudio/uni-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?feature/next",
+    "@dcloudio/uni-cli-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?feature/mult-pages",
+    "@dcloudio/uni-mp-vite": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?feature/mult-pages",
+    "@dcloudio/uni-mp-vue": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?feature/mult-pages",
+    "@dcloudio/uni-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?feature/mult-pages",
     "@vue/shared": "3.2.47",
     "jimp": "^0.10.1",
     "licia": "^1.29.0",

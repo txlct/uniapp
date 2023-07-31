@@ -38,10 +38,10 @@ export default defineConfig({
       mp: {
         vendorConfig: /module\/index/,
       },
-      h5: {
-        rollupOptions: h5Option,
-        split: process.env.PAGE ? 'page': 'main'
-      } 
+      // h5: {
+      //   rollupOptions: h5Option,
+      //   split: process.env.PAGE ? 'page': 'main'
+      // } 
     }),
 
     // mainTsPlugin({

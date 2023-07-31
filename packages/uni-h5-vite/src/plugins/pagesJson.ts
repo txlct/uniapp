@@ -22,9 +22,9 @@ export function uniPagesJsonPlugin(uniOptions: VitePluginUniResolvedOptions): Pl
         if (opts.filter(id)) {
           const { resolvedConfig } = opts
           const ssr = isSSR(opt)
+          const reCode =  generatePagesJsonCode(ssr, code, resolvedConfig)
           return {
-            code:
-              generatePagesJsonCode(ssr, code, resolvedConfig),
+            code:reCode,
             map: { mappings: '' },
           }
         }
@@ -65,7 +65,7 @@ function generatePagesJsonCode(
 
   return `
 import { defineAsyncComponent, resolveComponent, createVNode, withCtx, openBlock, createBlock } from 'vue'
-import { PageComponent, useI18n, setupWindow, setupPage, getApp } from '@dcloudio/uni-h5'
+import { PageComponent, useI18n, setupWindow, setupPage } from '@dcloudio/uni-h5'
 const async = ${globalName}.__uniConfig && ${globalName}.__uniConfig.async || {}
 const app =  ${globalName}.__app 
 
@@ -163,14 +163,19 @@ function generatePagesDefineCode(
 
 function generatePageRoute(
   { path, meta }: UniApp.UniRoute,
-  _config: ResolvedConfig
+  _config: ResolvedConfig,
+  globalName: string
 ) {
   const { isEntry } = meta
   const alias = isEntry ? `\n  alias:'/${path}',` : ''
   // 目前单页面未处理 query=>props
   return `{
   path:'/${isEntry ? '' : path}',${alias}
-  component:{setup(){ const app = getApp(); const query = app && app.$route && app.$route.query || {}; return ()=>renderPage(${normalizeIdentifier(
+  component:{setup(){ 
+    const getApp = ${globalName}.getApp
+    const app = getApp(); 
+    const query = app && app.$route && app.$route.query || {}; 
+  return ()=>renderPage(${normalizeIdentifier(
     path
   )},query)}},
   loader: ${normalizeIdentifier(path)}Loader,
@@ -180,10 +185,11 @@ function generatePageRoute(
 
 function generatePagesRoute(
   pagesRouteOptions: UniApp.UniRoute[],
-  config: ResolvedConfig
+  config: ResolvedConfig,
+  globalName: string
 ) {
   return pagesRouteOptions.map((pageOptions) =>
-    generatePageRoute(pageOptions, config)
+    generatePageRoute(pageOptions, config, globalName)
   )
 }
 
@@ -201,7 +207,7 @@ if(!${globalName}.__uniRoutes){
 }
 ${globalName}.__uniRoutes=${globalName}.__uniRoutes.concat([
   ${[
-    ...generatePagesRoute(normalizePagesRoute(pagesJson), config),
+    ...generatePagesRoute(normalizePagesRoute(pagesJson), config, globalName),
   ].join(
     ','
   )}].map(uniRoute=>(uniRoute.meta.route = (uniRoute.alias || uniRoute.path).slice(1),uniRoute)))`
