@@ -3,6 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.uniPagesJsonPlugin = void 0;
 const uni_cli_shared_1 = require("@dcloudio/uni-cli-shared");
 const utils_1 = require("../utils");
+// import fs from 'fs'
+// import path from 'path'
 function uniPagesJsonPlugin(uniOptions) {
     return (0, uni_cli_shared_1.defineUniPagesJsonPlugin)((opts) => {
         return {
@@ -130,7 +132,6 @@ function generatePageRoute({ path, meta }, _config, globalName) {
   path:'/${isEntry ? '' : path}',${alias}
   component:{setup(){ 
     const getApp = ${globalName}.getApp
-    console.log('%c [ getApp ]-177', 'font-size:13px; background:pink; color:#bf2c9f;', getApp)
     const app = getApp(); 
     const query = app && app.$route && app.$route.query || {}; 
   return ()=>renderPage(${(0, uni_cli_shared_1.normalizeIdentifier)(path)},query)}},

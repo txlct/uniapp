@@ -538,11 +538,11 @@ const ServiceJSBridge = /* @__PURE__ */ shared.extend(
     invokeViewMethodKeepAlive
   }
 );
-function initAppVm(appVm2) {
-  appVm2.$vm = appVm2;
-  appVm2.$mpType = "app";
+function initAppVm(appVm) {
+  appVm.$vm = appVm;
+  appVm.$mpType = "app";
   const locale = vue.ref(useI18n().getLocale());
-  Object.defineProperty(appVm2, "$locale", {
+  Object.defineProperty(appVm, "$locale", {
     get() {
       return locale.value;
     },
@@ -7698,12 +7698,13 @@ const AsyncErrorComponent = /* @__PURE__ */ defineSystemComponent({
     }, [t2("uni.async.error")], 8, ["onClick"]);
   }
 });
-let appVm;
 function getApp$1() {
+  let appVm = window.appVm;
   return appVm;
 }
 function initApp(vm) {
-  appVm = vm;
+  window.appVm = vm;
+  let appVm = window.appVm;
   Object.defineProperty(appVm.$.ctx, "$children", {
     get() {
       return getCurrentPages().map((page) => page.$vm);

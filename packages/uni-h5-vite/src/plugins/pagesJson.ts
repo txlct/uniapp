@@ -6,12 +6,12 @@ import {
   normalizePagesRoute,
   normalizePagePath,
   // MANIFEST_JSON_JS,
-  PAGES_JSON_JS
+  // PAGES_JSON_JS
 } from '@dcloudio/uni-cli-shared'
 import type { VitePluginUniResolvedOptions } from '@dcloudio/uni-cli-shared'
 import { isSSR } from '../utils'
-import fs from 'fs'
-import path from 'path'
+// import fs from 'fs'
+// import path from 'path'
 
 export function uniPagesJsonPlugin(uniOptions: VitePluginUniResolvedOptions): Plugin {
   return defineUniPagesJsonPlugin((opts) => {

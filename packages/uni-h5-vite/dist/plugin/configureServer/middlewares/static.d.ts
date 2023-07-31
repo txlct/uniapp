@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { IncomingMessage, ServerResponse } from 'http';
 interface UniStaticMiddlewareOptions {
     etag: boolean;
