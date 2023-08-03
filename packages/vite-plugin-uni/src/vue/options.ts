@@ -159,13 +159,15 @@ export function initPluginVueOptions(
   return vueOptions
 }
 
+type RemoveBoolean<T> = T extends boolean ? never : T;
+
 export function initPluginVueJsxOptions(
   options: VitePluginUniResolvedOptions,
   {
     isCustomElement,
   }: Required<Required<UniVitePlugin>['uni']>['compilerOptions'],
   jsxOptions: Required<Required<UniVitePlugin>['uni']>['jsxOptions']
-) {
+) : RemoveBoolean<Required<VitePluginUniResolvedOptions>['vueJsxOptions']>{
   const vueJsxOptions = isPlainObject(options.vueJsxOptions)
     ? options.vueJsxOptions
     : (options.vueJsxOptions = {})
