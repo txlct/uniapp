@@ -20,7 +20,7 @@ exports.default = (options) => [
     }),
     (0, resolveId_1.uniResolveIdPlugin)(),
     (0, mainJs_1.uniMainJsPlugin)(options),
-    (0, manifestJson_1.uniManifestJsonPlugin)(),
+    (0, manifestJson_1.uniManifestJsonPlugin)(options),
     (0, pagesJson_1.uniPagesJsonPlugin)(options),
     (0, inject_1.uniInjectPlugin)(),
     (0, css_1.uniCssPlugin)(),

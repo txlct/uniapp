@@ -13,6 +13,7 @@ import {
   isEnableTreeShaking,
   parseManifestJsonOnce
 } from '@dcloudio/uni-cli-shared'
+import type { VitePluginUniResolvedOptions } from '@dcloudio/uni-cli-shared'
 import { isSSR } from '../utils'
 
 const defaultRouter = {
@@ -114,19 +115,19 @@ function generateCssCode(config: ResolvedConfig) {
 
 
 // 兼容 wx 对象
-function registerGlobalCode(config: ResolvedConfig, ssr?: boolean) {
+function registerGlobalCode(config: ResolvedConfig, uniOptions:VitePluginUniResolvedOptions, ssr?: boolean, ) {
   const name = getGlobal(ssr)
   const enableTreeShaking = isEnableTreeShaking(
     parseManifestJsonOnce(process.env.UNI_INPUT_DIR)
   )
 
-  if (enableTreeShaking && config.command === 'build' && !ssr) {
+  if (enableTreeShaking && config.command === 'build' && !ssr && !uniOptions.h5?.split) {
     // 非 SSR 的发行模式，补充全局 uni 对象
     return `import { upx2px, getApp } from '@dcloudio/uni-h5';${name}.uni = {};${name}.wx = {};${name}.rpx2px = upx2px;${name}.getApp = getApp`
   }
 
   return `
-import {uni,upx2px,getCurrentPages,getApp,UniServiceJSBridge,UniViewJSBridge} from '@dcloudio/uni-h5'
+import { uni,upx2px,getCurrentPages,getApp,UniServiceJSBridge,UniViewJSBridge, setupPage, PageComponent, setupWindow} from '@dcloudio/uni-h5'
 ${name}.getApp = getApp
 ${name}.getCurrentPages = getCurrentPages
 ${name}.wx = uni
@@ -134,11 +135,13 @@ ${name}.uni = uni
 ${name}.UniViewJSBridge = UniViewJSBridge
 ${name}.UniServiceJSBridge = UniServiceJSBridge
 ${name}.rpx2px = upx2px
+${name}.PageComponent = PageComponent
+${name}.setupWindow = setupWindow
 ${name}.__setupPage = (com)=>setupPage(com)
 `
 }
 
-export function uniManifestJsonPlugin(): Plugin {
+export function uniManifestJsonPlugin(uniOptions: VitePluginUniResolvedOptions): Plugin {
   return defineUniManifestJsonPlugin((opts) => {
     let resolvedConfig: ResolvedConfig
     return {
@@ -228,7 +231,7 @@ export function uniManifestJsonPlugin(): Plugin {
 
         return {
           code: `
-          ${registerGlobalCode(resolvedConfig, ssr)}
+          ${registerGlobalCode(resolvedConfig, uniOptions, ssr)}
   const extend = Object.assign
   const locales = import.meta.globEager('./locale/*.json')
 

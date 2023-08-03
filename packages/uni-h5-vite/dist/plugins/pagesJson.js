@@ -42,12 +42,11 @@ function generatePagesJsonCode(ssr, jsonStr, config) {
     const globalName = getGlobal(ssr);
     const pagesJson = (0, uni_cli_shared_1.normalizePagesJson)(jsonStr, process.env.UNI_PLATFORM);
     const { importLayoutComponentsCode, defineLayoutComponentsCode } = generateLayoutComponentsCode(globalName, pagesJson);
-    const definePagesCode = generatePagesDefineCode(pagesJson, config);
+    const definePagesCode = generatePagesDefineCode(globalName, pagesJson, config);
     const uniRoutesCode = generateRoutes(globalName, pagesJson, config);
     const uniConfigCode = generateConfig(globalName, pagesJson);
     return `
 import { defineAsyncComponent, resolveComponent, createVNode, withCtx, openBlock, createBlock } from 'vue'
-import { PageComponent, useI18n, setupWindow, setupPage } from '@dcloudio/uni-h5'
 const async = ${globalName}.__uniConfig && ${globalName}.__uniConfig.async || {}
 const app =  ${globalName}.__app 
 
@@ -81,7 +80,7 @@ function generateLayoutComponentsCode(globalName, pagesJson) {
         const windowConfig = pagesJson[name];
         if (windowConfig && windowConfig.path) {
             importLayoutComponentsCode += `import ${name} from './${windowConfig.path}'\n`;
-            defineLayoutComponentsCode += `${globalName}.__uniConfig.${name}.component = setupWindow(${name},${windowNames[name]})\n`;
+            defineLayoutComponentsCode += `${globalName}.__uniConfig.${name}.component = ${globalName}.setupWindow(${name},${windowNames[name]})\n`;
         }
     });
     return {
@@ -89,17 +88,17 @@ function generateLayoutComponentsCode(globalName, pagesJson) {
         defineLayoutComponentsCode,
     };
 }
-function generatePageDefineCode(pageOptions) {
+function generatePageDefineCode(globalName, pageOptions) {
     let pagePathWithExtname = (0, uni_cli_shared_1.normalizePagePath)(pageOptions.path, 'h5');
     if (!pagePathWithExtname) {
         // 不存在时，仍引用，此时编译会报错文件不存在
         pagePathWithExtname = pageOptions.path + '.vue';
     }
     const pageIdent = (0, uni_cli_shared_1.normalizeIdentifier)(pageOptions.path);
-    return `const ${pageIdent}Loader = ()=>import('./${pagePathWithExtname}').then(com => setupPage(com.default || com))
+    return `const ${pageIdent}Loader = ()=>import('./${pagePathWithExtname}').then(com => ${globalName}.__setupPage(com.default || com))
 const ${pageIdent} = defineAsyncComponent(extend({loader:${pageIdent}Loader},AsyncComponentOptions))`;
 }
-function generatePagesDefineCode(pagesJson, _config) {
+function generatePagesDefineCode(globalName, pagesJson, _config) {
     const { pages } = pagesJson;
     return (`const AsyncComponentOptions = {
       delay: async.delay,
@@ -122,7 +121,7 @@ function generatePagesDefineCode(pagesJson, _config) {
         }
       }
     }
-  ` + pages.map((pageOptions) => generatePageDefineCode(pageOptions)).join('\n'));
+  ` + pages.map((pageOptions) => generatePageDefineCode(globalName, pageOptions)).join('\n'));
 }
 function generatePageRoute({ path, meta }, _config, globalName) {
     const { isEntry } = meta;
@@ -145,7 +144,7 @@ function generatePagesRoute(pagesRouteOptions, config, globalName) {
 function generateRoutes(globalName, pagesJson, config) {
     return `
 function renderPage(component,props){
-  return (openBlock(), createBlock(PageComponent, null, {page: withCtx(() => [createVNode(component, extend({},props,{ref: "page"}), null, 512 /* NEED_PATCH */)]), _: 1 /* STABLE */}))
+  return (openBlock(), createBlock(${globalName}.PageComponent, null, {page: withCtx(() => [createVNode(component, extend({},props,{ref: "page"}), null, 512 /* NEED_PATCH */)]), _: 1 /* STABLE */}))
 }
 if(!${globalName}.__uniRoutes){
   ${globalName}.__uniRoutes = []

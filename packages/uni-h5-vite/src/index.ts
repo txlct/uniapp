@@ -26,7 +26,7 @@ export default (options: VitePluginUniResolvedOptions)=> [
   }),
   uniResolveIdPlugin(),
   uniMainJsPlugin(options),
-  uniManifestJsonPlugin(),
+  uniManifestJsonPlugin(options),
   uniPagesJsonPlugin(options),
   uniInjectPlugin(),
   uniCssPlugin(),

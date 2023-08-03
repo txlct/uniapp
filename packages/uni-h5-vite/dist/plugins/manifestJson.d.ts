@@ -1,2 +1,3 @@
 import type { Plugin } from 'vite';
-export declare function uniManifestJsonPlugin(): Plugin;
+import type { VitePluginUniResolvedOptions } from '@dcloudio/uni-cli-shared';
+export declare function uniManifestJsonPlugin(uniOptions: VitePluginUniResolvedOptions): Plugin;

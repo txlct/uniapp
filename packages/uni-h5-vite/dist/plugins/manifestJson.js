@@ -85,15 +85,15 @@ function generateCssCode(config) {
     return cssFiles.map((file) => `import '${file}'`).join('\n');
 }
 // 兼容 wx 对象
-function registerGlobalCode(config, ssr) {
+function registerGlobalCode(config, uniOptions, ssr) {
     const name = getGlobal(ssr);
     const enableTreeShaking = (0, uni_cli_shared_1.isEnableTreeShaking)((0, uni_cli_shared_1.parseManifestJsonOnce)(process.env.UNI_INPUT_DIR));
-    if (enableTreeShaking && config.command === 'build' && !ssr) {
+    if (enableTreeShaking && config.command === 'build' && !ssr && !uniOptions.h5?.split) {
         // 非 SSR 的发行模式，补充全局 uni 对象
         return `import { upx2px, getApp } from '@dcloudio/uni-h5';${name}.uni = {};${name}.wx = {};${name}.rpx2px = upx2px;${name}.getApp = getApp`;
     }
     return `
-import {uni,upx2px,getCurrentPages,getApp,UniServiceJSBridge,UniViewJSBridge} from '@dcloudio/uni-h5'
+import { uni,upx2px,getCurrentPages,getApp,UniServiceJSBridge,UniViewJSBridge, setupPage, PageComponent, setupWindow} from '@dcloudio/uni-h5'
 ${name}.getApp = getApp
 ${name}.getCurrentPages = getCurrentPages
 ${name}.wx = uni
@@ -101,10 +101,12 @@ ${name}.uni = uni
 ${name}.UniViewJSBridge = UniViewJSBridge
 ${name}.UniServiceJSBridge = UniServiceJSBridge
 ${name}.rpx2px = upx2px
+${name}.PageComponent = PageComponent
+${name}.setupWindow = setupWindow
 ${name}.__setupPage = (com)=>setupPage(com)
 `;
 }
-function uniManifestJsonPlugin() {
+function uniManifestJsonPlugin(uniOptions) {
     return (0, uni_cli_shared_1.defineUniManifestJsonPlugin)((opts) => {
         let resolvedConfig;
         return {
@@ -163,7 +165,7 @@ function uniManifestJsonPlugin() {
                 const cssCode = generateCssCode(resolvedConfig);
                 return {
                     code: `
-          ${registerGlobalCode(resolvedConfig, ssr)}
+          ${registerGlobalCode(resolvedConfig, uniOptions, ssr)}
   const extend = Object.assign
   const locales = import.meta.globEager('./locale/*.json')
 
