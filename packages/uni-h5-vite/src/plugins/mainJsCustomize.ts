@@ -2,10 +2,17 @@ import {
   defineUniMainJsPlugin,
   isSsr,
   PAGES_JSON_JS,
+  MANIFEST_JSON_JS
 } from '@dcloudio/uni-cli-shared'
 import { isSSR, isSsrManifest } from '../utils'
+import type { VitePluginUniResolvedOptions } from '@dcloudio/uni-cli-shared'
 
-export function uniMainJsPlugin() {
+function getGlobal(ssr?: boolean) {
+  return ssr ? 'global' : 'window'
+}
+
+
+export function uniMainJsCustomizePlugin(uniOptions: VitePluginUniResolvedOptions ) {
   return defineUniMainJsPlugin((opts) => {
     let runSSR = false
     return {
@@ -17,16 +24,39 @@ export function uniMainJsPlugin() {
       },
       transform(code, id, options) {
         if (opts.filter(id)) {
+          const ssr = isSSR(options)
+          const globalName = getGlobal(ssr)
+          if(uniOptions.h5?.split === 'main'){
+            
+            return {
+              code: `import './${MANIFEST_JSON_JS}';
+  ${createSplitApp(code, globalName)}`,
+              map: this.getCombinedSourcemap(),
+            }
+
+          }else if(uniOptions.h5?.split === 'page') {
+            return {
+              code: `import './${PAGES_JSON_JS}'`,
+              map: this.getCombinedSourcemap(),
+            }
+
+          }
           if (!runSSR) {
             code = code.includes('createSSRApp')
-              ? createApp(code)
+              ? createApp(code, globalName)
               : createLegacyApp(code)
           } else {
             code = isSSR(options)
               ? createSSRServerApp(code)
               : createSSRClientApp(code)
           }
-          code = `import './${PAGES_JSON_JS}';${code}`
+          code = `
+          import './${PAGES_JSON_JS}'
+          import './${MANIFEST_JSON_JS}';
+          
+          
+          ${code};
+          `
           return {
             code,
             map: this.getCombinedSourcemap(),
@@ -37,11 +67,24 @@ export function uniMainJsPlugin() {
   })
 }
 
-function createApp(code: string) {
+function createSplitApp(code: string, globalName: string){
   return `import { plugin as __plugin } from '@dcloudio/uni-h5';${code.replace(
     'createSSRApp',
     'createVueApp as createSSRApp'
-  )};const app = createApp().app; app.use(__plugin).mount("#app");`
+  )};const app = createApp().app;
+  app.use(__plugin).mount("#app");
+
+  `
+
+}
+
+
+function createApp(code: string, globalName: string) {
+  return `import { plugin as __plugin } from '@dcloudio/uni-h5';${code.replace(
+    'createSSRApp',
+    'createVueApp as createSSRApp'
+  )};const app = createApp().app; 
+  app.use(__plugin).mount("#app");`
 }
 
 function createLegacyApp(code: string) {

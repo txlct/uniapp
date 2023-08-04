@@ -16,18 +16,30 @@ import { uniResolveIdPlugin } from './plugins/resolveId'
 import { uniSetupPlugin } from './plugins/setup'
 import { uniSSRPlugin } from './plugins/ssr'
 import type { VitePluginUniResolvedOptions } from '@dcloudio/uni-cli-shared'
+import { uniMainJsCustomizePlugin } from './plugins/mainJsCustomize'
+import { uniManifestJsonCustomizePlugin } from './plugins/manifestJsonCustomize'
+import { uniPagesJsonCustomizePlugin } from './plugins/pagesJsonCustomize'
 
 
 
-export default (options: VitePluginUniResolvedOptions)=> [
+export default (options: VitePluginUniResolvedOptions)=> {
+  const vitrualTsPlugins = options.h5?.split ? 
+  [ 
+    uniMainJsCustomizePlugin(options),
+    uniManifestJsonCustomizePlugin(options),
+    uniPagesJsonCustomizePlugin(options)
+  ]:[
+    uniMainJsPlugin(),
+    uniManifestJsonPlugin(),
+    uniPagesJsonPlugin()
+  ]
+  return [
   uniEasycomPlugin({ exclude: UNI_EASYCOM_EXCLUDE }),
   uniCssScopedPlugin({
     filter: (id) => isVueSfcFile(id) && !id.endsWith('App.vue'),
   }),
   uniResolveIdPlugin(),
-  uniMainJsPlugin(options),
-  uniManifestJsonPlugin(options),
-  uniPagesJsonPlugin(options),
+  ...vitrualTsPlugins,
   uniInjectPlugin(),
   uniCssPlugin(),
   uniSSRPlugin(),
@@ -36,3 +48,4 @@ export default (options: VitePluginUniResolvedOptions)=> [
   uniH5Plugin(options),
   uniPostVuePlugin(),
 ]
+}
