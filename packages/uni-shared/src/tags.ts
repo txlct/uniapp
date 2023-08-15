@@ -4,7 +4,7 @@ export const BUILT_IN_TAG_NAMES = [
   'ad',
   'ad-content-page',
   'ad-draw',
-  'audio',
+  // 'audio',
   'button',
   'camera',
   'canvas',
