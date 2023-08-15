@@ -30,7 +30,6 @@ const run = (bin, args, opts = {}) =>
   execa(bin, args, { stdio: 'inherit', ...opts })
 const dryRun = (bin, args, opts = {}) =>
   console.log(colors.blue(`[dryrun] ${bin} ${args.join(' ')}`), opts)
-const runIfNotDry = isDryRun ? dryRun : run
 const getPkgRoot = (pkg) => path.resolve(__dirname, '../packages/' + pkg)
 const step = (msg) => console.log(colors.cyan(msg))
 
@@ -165,7 +164,7 @@ async function main() {
 
   // update pnpm-lock.yaml
   step('\nUpdating lockfile...')
-  await run(`pnpm`, ['install', '--prefer-offline'])
+  // await run(`pnpm`, ['install', '--prefer-offline'])
 
   const { stdout } = await run('git', ['diff'], { stdio: 'pipe' })
   if (stdout) {
