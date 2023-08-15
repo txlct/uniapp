@@ -11,7 +11,7 @@ const uni_shared_1 = require("@dcloudio/uni-shared");
 const uni_cli_shared_1 = require("@dcloudio/uni-cli-shared");
 const H5_COMPONENTS_PATH = '@dcloudio/uni-h5';
 const baseComponents = [
-    'audio',
+    // 'audio',
     'button',
     'canvas',
     'checkbox',
