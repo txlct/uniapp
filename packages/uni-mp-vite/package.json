@@ -1,6 +1,6 @@
 {
   "name": "@dcloudio/uni-mp-vite",
-  "version": "3.0.0-3070320230222002-17",
+  "version": "3.0.0-3070320230222002-18",
   "description": "uni-mp-vite",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,13 +17,13 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@dcloudio/uni-cli-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.8",
+    "@dcloudio/uni-cli-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.9",
     "@dcloudio/uni-i18n": "3.0.0-3070320230222002",
-    "@dcloudio/uni-mp-compiler": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?v3.0.8",
-    "@dcloudio/vite-plugin-uni": "https://gitpkg.now.sh/txlct/uniapp/packages/vite-plugin-uni?v3.0.8",
-    "@dcloudio/uni-mp-vue": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.8",
-    "@dcloudio/uni-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.8",
-    "@dcloudio/uni-mp-weixin": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-weixin?v3.0.8",
+    "@dcloudio/uni-mp-compiler": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?v3.0.9",
+    "@dcloudio/vite-plugin-uni": "https://gitpkg.now.sh/txlct/uniapp/packages/vite-plugin-uni?v3.0.9",
+    "@dcloudio/uni-mp-vue": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.9",
+    "@dcloudio/uni-shared": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.9",
+    "@dcloudio/uni-mp-weixin": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-weixin?v3.0.9",
     "@vue/compiler-sfc": "3.2.47",
     "@vue/shared": "3.2.47",
     "debug": "^4.3.3"
