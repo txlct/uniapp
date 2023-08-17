@@ -17,6 +17,7 @@ const skipTests = args.skipTests
 const skipBuild = args.skipBuild
 const onlyDist = args.onlyDist
 const isLocal = args.local;
+const isNeedTag = args.tag;
 const packages = fs
   .readdirSync(path.resolve(__dirname, '../packages'))
   .filter(
@@ -28,8 +29,6 @@ const skippedPackages = []
 const bin = (name) => path.resolve(__dirname, '../node_modules/.bin/' + name)
 const run = (bin, args, opts = {}) =>
   execa(bin, args, { stdio: 'inherit', ...opts })
-const dryRun = (bin, args, opts = {}) =>
-  console.log(colors.blue(`[dryrun] ${bin} ${args.join(' ')}`), opts)
 const getPkgRoot = (pkg) => path.resolve(__dirname, '../packages/' + pkg)
 const step = (msg) => console.log(colors.cyan(msg))
 
@@ -59,19 +58,6 @@ const setTargetMap = ({ tag, repo }) => {
 };  
 
 async function main() {
-  const targetVersion = (
-    await prompt({
-      type: 'input',
-      name: 'version',
-      message: 'Input custom package version',
-      initial: currentVersion,
-    })
-  ).version
-
-  if (!semver.valid(targetVersion)) {
-    throw new Error(`invalid target version: ${targetVersion}`)
-  }
-
   let isRemoteRepo = false;
 
   if (!isLocal) {
@@ -106,9 +92,31 @@ async function main() {
         : '请输入dependencies tag',
       initial: isRemoteRepo
         ? await getCurrentBranch()
-        : isLocal ? 'workspace:*' : currentVersion
+        : isLocal ? 'workspace:*' : '' 
     })
   );
+
+  let targetVersion = currentVersion;
+  let tagname = '';
+
+  if (isLocal || tag?.split('.')?.length < 3) {
+    ({ version: targetVersion } = (
+      await prompt({
+        type: 'input',
+        name: 'version',
+        message: '输入自定义版本号',
+        initial: currentVersion,
+      })
+    ))
+    tagname = targetVersion;
+  } else {
+    targetVersion = `${currentVersion.slice(0, currentVersion.lastIndexOf('-'))}-${tag}`;
+    tagname = tag;
+  }
+
+  if (!semver.valid(targetVersion)) {
+    throw new Error(`invalid target version: ${targetVersion}`)
+  }
 
   setTargetMap({ tag, repo });
 
@@ -162,25 +170,30 @@ async function main() {
     console.log(`(skipped)`)
   }
 
-  // update pnpm-lock.yaml
-  step('\nUpdating lockfile...')
-  // await run(`pnpm`, ['install', '--prefer-offline'])
-
   const { stdout } = await run('git', ['diff'], { stdio: 'pipe' })
-  if (stdout) {
-    // step('\nCommitting changes...')
-    // await runIfNotDry('git', ['add', '-A'])
-    // await runIfNotDry('git', ['commit', '-m', `release: v${targetVersion}`])
+
+  if (stdout && !isLocal && isRemoteRepo && isNeedTag) {
+    step('\nCommitting changes...')
+    await run('git', ['add', '-A']);
+    await run('git', ['commit', '-m', `release: ${tagname}`])
+    step('\nGit tag...')
+    await run('git', ['tag', `${tagname}`])
+    // push to GitHub
+    step('\nPushing tag to GitHub...')
+    await run('git', ['push', 'origin', `refs/tags/v${tagname}`])
+
+    // update pnpm-lock.yaml
+    step('\nUpdating lockfile...')
+    await run(`pnpm`, ['install', '--prefer-offline'])
+
+    step('\nCommitting pnpm-lock changes...')
+    await run('git', ['add', '-A']);
+    await run('git', ['commit', '-m', `release: ${tagname}`])
+    step('\nPushing to GitHub...')
+    await run('git', ['push', 'origin'])
   } else {
     console.log('No changes to commit.')
   }
-
-
-  // push to GitHub
-  // step('\nPushing to GitHub...')
-  // await runIfNotDry('git', ['tag', `v${targetVersion}`])
-  // await runIfNotDry('git', ['push', 'origin', `refs/tags/v${targetVersion}`])
-  // await runIfNotDry('git', ['push'])
 
   if (isDryRun) {
     console.log(`\nDry run finished - run git diff to see package changes.`)
@@ -195,7 +208,6 @@ async function main() {
       )
     )
   }
-  console.log()
 }
 
 function updateVersions(version) {
@@ -210,7 +222,7 @@ function updatePackage(pkgRoot, version) {
   const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'))
   const name = getPackageName(pkg.name);
 
-  if (!targets.includes(name)) return;
+  if (![...targets, 'uni-app-next'].includes(name)) return;
 
   pkg.version = version
   updateDeps(pkg, 'dependencies', version)
