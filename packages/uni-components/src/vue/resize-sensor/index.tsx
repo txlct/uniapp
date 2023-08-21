@@ -50,6 +50,9 @@ function useResizeSensorUpdate(
   )
   return () => {
     const rootEl = rootRef.value!
+
+    if (!rootEl) return;
+
     size.width = rootEl.offsetWidth
     size.height = rootEl.offsetHeight
     reset()
@@ -58,6 +61,8 @@ function useResizeSensorUpdate(
 
 function useResizeSensorReset(rootRef: Ref<HTMLElement | null>) {
   return () => {
+    if (!rootRef.value) return;
+
     const { firstElementChild, lastElementChild } = rootRef.value!
     firstElementChild!.scrollLeft = 100000
     firstElementChild!.scrollTop = 100000
@@ -78,6 +83,8 @@ function useResizeSensorLifecycle(
       nextTick(update)
     }
     const rootEl = rootRef.value!
+    if (!rootEl) return;
+
     if (rootEl.offsetParent !== rootEl.parentElement) {
       rootEl.parentElement!.style.position = 'relative'
     }

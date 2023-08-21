@@ -7041,6 +7041,8 @@ function useResizeSensorUpdate(rootRef, emit2, reset) {
   watch(() => extend({}, size), (value) => emit2("resize", value));
   return () => {
     const rootEl = rootRef.value;
+    if (!rootEl)
+      return;
     size.width = rootEl.offsetWidth;
     size.height = rootEl.offsetHeight;
     reset();
@@ -7048,6 +7050,8 @@ function useResizeSensorUpdate(rootRef, emit2, reset) {
 }
 function useResizeSensorReset(rootRef) {
   return () => {
+    if (!rootRef.value)
+      return;
     const {
       firstElementChild,
       lastElementChild
@@ -7065,6 +7069,8 @@ function useResizeSensorLifecycle(rootRef, props2, update, reset) {
       nextTick(update);
     }
     const rootEl = rootRef.value;
+    if (!rootEl)
+      return;
     if (rootEl.offsetParent !== rootEl.parentElement) {
       rootEl.parentElement.style.position = "relative";
     }

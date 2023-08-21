@@ -1781,6 +1781,8 @@ function useResizeSensorUpdate(rootRef, emit2, reset) {
   vue.watch(() => shared.extend({}, size), (value) => emit2("resize", value));
   return () => {
     const rootEl = rootRef.value;
+    if (!rootEl)
+      return;
     size.width = rootEl.offsetWidth;
     size.height = rootEl.offsetHeight;
     reset();
@@ -1788,6 +1790,8 @@ function useResizeSensorUpdate(rootRef, emit2, reset) {
 }
 function useResizeSensorReset(rootRef) {
   return () => {
+    if (!rootRef.value)
+      return;
     const {
       firstElementChild,
       lastElementChild
