@@ -180,7 +180,7 @@ async function main() {
     await run('git', ['tag', `${tagname}`])
     // push to GitHub
     step('\nPushing tag to GitHub...')
-    await run('git', ['push', 'origin', `refs/tags/v${tagname}`])
+    await run('git', ['push', 'origin', `${tagname}`, '-m', `release: ${tagname}`])
 
     // update pnpm-lock.yaml
     step('\nUpdating lockfile...')
