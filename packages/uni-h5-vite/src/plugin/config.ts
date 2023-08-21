@@ -21,7 +21,7 @@ import { PreRenderedChunk } from 'rollup';
 
 const getFilePath = (filePath: string) => path.resolve(process.env.UNI_INPUT_DIR, '../', filePath);
 
-const checkIsFileExist = (filePath: string) => fs.existsSync(filePath);
+// const checkIsFileExist = (filePath: string) => fs.existsSync(filePath);
 
 export function createConfig(options: {
   resolvedConfig: ResolvedConfig | null
@@ -118,7 +118,7 @@ export function createConfig(options: {
       build: {
         rollupOptions: {
           input: {
-            [entryName]: checkIsFileExist(getFilePath(`${entryName}.html`))
+            [entryName]: entryName
               ? getFilePath(`${entryName}.html`)
               : getFilePath('index.html')
           },

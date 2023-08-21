@@ -13,7 +13,7 @@ const esbuildPrePlugin_1 = require("./esbuild/esbuildPrePlugin");
 const ssr_1 = require("./configureServer/ssr");
 const shared_1 = require("@vue/shared");
 const getFilePath = (filePath) => path_1.default.resolve(process.env.UNI_INPUT_DIR, '../', filePath);
-const checkIsFileExist = (filePath) => fs_1.default.existsSync(filePath);
+// const checkIsFileExist = (filePath: string) => fs.existsSync(filePath);
 function createConfig(options) {
     return function config(config, env) {
         const inputDir = process.env.UNI_INPUT_DIR;
@@ -93,7 +93,7 @@ function createConfig(options) {
             build: {
                 rollupOptions: {
                     input: {
-                        [entryName]: checkIsFileExist(getFilePath(`${entryName}.html`))
+                        [entryName]: entryName
                             ? getFilePath(`${entryName}.html`)
                             : getFilePath('index.html')
                     },
