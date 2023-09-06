@@ -39,8 +39,8 @@ function removeCurrentPages(delta: number = 1) {
   const start = keys.length - 1
   const end = start - delta
   for (let i = start; i > end; i--) {
-    const page = keys[i].$page
-    removePage(normalizeRouteKey(page.path, page.id), false)
+    const page = keys?.[i]?.$page
+    page && removePage(normalizeRouteKey(page.path, page.id), false)
   }
 }
 

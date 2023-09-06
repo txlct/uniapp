@@ -15429,12 +15429,13 @@ function createRouterOptions() {
   };
 }
 function removeCurrentPages(delta = 1) {
+  var _a;
   const keys = getCurrentPages$1();
   const start = keys.length - 1;
   const end = start - delta;
   for (let i = start; i > end; i--) {
-    const page = keys[i].$page;
-    removePage(normalizeRouteKey(page.path, page.id), false);
+    const page = (_a = keys == null ? void 0 : keys[i]) == null ? void 0 : _a.$page;
+    page && removePage(normalizeRouteKey(page.path, page.id), false);
   }
 }
 function initHistory() {
