@@ -18,6 +18,7 @@ import { esbuildPrePlugin } from './esbuild/esbuildPrePlugin'
 import { external } from './configureServer/ssr'
 import { extend, hasOwn } from '@vue/shared'
 import { PreRenderedChunk } from 'rollup';
+import type { VitePluginUniResolvedOptions } from '@dcloudio/uni-cli-shared';
 
 const getFilePath = (filePath: string) => path.resolve(process.env.UNI_INPUT_DIR, '../', filePath);
 
@@ -25,7 +26,7 @@ const getFilePath = (filePath: string) => path.resolve(process.env.UNI_INPUT_DIR
 
 export function createConfig(options: {
   resolvedConfig: ResolvedConfig | null
-}): Plugin['config'] {
+}, uniOption: VitePluginUniResolvedOptions): Plugin['config'] {
   return function config(config, env) {
     const inputDir = process.env.UNI_INPUT_DIR
     if (isInHBuilderX()) {
@@ -76,25 +77,6 @@ export function createConfig(options: {
 
     const { name, entryName, assetsName } = getPlatformType();
 
-    const getChunkName = (chunkInfo: PreRenderedChunk, isEntry = false, filename = '[name].[hash].js',) => {
-      const { assetsDir } = options.resolvedConfig!.build;
-      if (chunkInfo.facadeModuleId && !isEntry) {
-        const dirname = path.relative(
-          inputDir,
-          path.dirname(chunkInfo.facadeModuleId)
-        );
-        if (dirname) {
-          return path.posix.join(
-            assetsDir,
-            name,
-            normalizePath(dirname).replace(/\//g, '-') +
-            `-${filename}`
-          );
-        }
-      }
-      return path.posix.join(assetsDir, isEntry ? '' : name, filename);
-    };
-
     return {
       css: {
         postcss: {
@@ -126,13 +108,33 @@ export function createConfig(options: {
           external: isSsr(env.command, config) ? external : [],
           output: {
             assetFileNames: `assets/${assetsName}[name]-[hash][extname]`,
-            entryFileNames(chunkInfo) {
-              return getChunkName(chunkInfo,  true, `${entryName}.[hash].js`);
+            entryFileNames() {
+              const { assetsDir } = options.resolvedConfig!.build;
+              return path.posix.join(assetsDir, `${entryName}.[hash].js`);
             },
-            chunkFileNames(chunkInfo) {
-              return getChunkName(chunkInfo);
+            chunkFileNames(chunkInfo: PreRenderedChunk) {
+              const { assetsDir } = options.resolvedConfig!.build
+              if (chunkInfo.facadeModuleId) {
+                const dirname = path.relative(
+                  inputDir,
+                  path.dirname(chunkInfo.facadeModuleId)
+                )
+                if (dirname) {
+                  return path.posix.join(
+                    assetsDir,
+                    name,
+                    normalizePath(dirname).replace(/\//g, '-') +
+                      '-[name].[hash].js'
+                  )
+                }
+              }
+              // 公共模块的js目录
+              const { commonChunk = [] } = uniOption?.h5 || {}
+              return path.posix.join(assetsDir, commonChunk.includes(chunkInfo.name) ? '': name, '[name].[hash].js')
             },
+            ...uniOption.h5?.rollupOptions?.output
           },
+          ...uniOption.h5?.rollupOptions
         },
       },
     }

@@ -13,7 +13,7 @@ const renderjs_1 = require("./plugins/renderjs");
 const resolveId_1 = require("./plugins/resolveId");
 const setup_1 = require("./plugins/setup");
 const ssr_1 = require("./plugins/ssr");
-exports.default = [
+exports.default = (options) => ([
     (0, easycom_1.uniEasycomPlugin)({ exclude: uni_cli_shared_1.UNI_EASYCOM_EXCLUDE }),
     (0, uni_cli_shared_1.uniCssScopedPlugin)({
         filter: (id) => (0, uni_cli_shared_1.isVueSfcFile)(id) && !id.endsWith('App.vue'),
@@ -27,7 +27,7 @@ exports.default = [
     (0, ssr_1.uniSSRPlugin)(),
     (0, setup_1.uniSetupPlugin)(),
     (0, renderjs_1.uniRenderjsPlugin)(),
-    (0, plugin_1.uniH5Plugin)(),
+    (0, plugin_1.uniH5Plugin)(options),
     (0, postVue_1.uniPostVuePlugin)(),
-];
+]);
 //# sourceMappingURL=index.js.map

@@ -38,6 +38,7 @@ __exportStar(require("./esbuild"), exports);
 __exportStar(require("./resolve"), exports);
 __exportStar(require("./scripts"), exports);
 __exportStar(require("./platform"), exports);
+__exportStar(require("./options"), exports);
 var uni_modules_1 = require("./uni_modules");
 Object.defineProperty(exports, "parseUniExtApis", { enumerable: true, get: function () { return uni_modules_1.parseUniExtApis; } });
 var messages_1 = require("./messages");

@@ -1,4 +1,5 @@
 import type { Plugin, ResolvedConfig } from 'vite';
+import type { VitePluginUniResolvedOptions } from '@dcloudio/uni-cli-shared';
 export declare function createConfig(options: {
     resolvedConfig: ResolvedConfig | null;
-}): Plugin['config'];
+}, uniOption: VitePluginUniResolvedOptions): Plugin['config'];

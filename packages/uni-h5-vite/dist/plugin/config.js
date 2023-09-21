@@ -14,7 +14,7 @@ const ssr_1 = require("./configureServer/ssr");
 const shared_1 = require("@vue/shared");
 const getFilePath = (filePath) => path_1.default.resolve(process.env.UNI_INPUT_DIR, '../', filePath);
 // const checkIsFileExist = (filePath: string) => fs.existsSync(filePath);
-function createConfig(options) {
+function createConfig(options, uniOption) {
     return function config(config, env) {
         const inputDir = process.env.UNI_INPUT_DIR;
         if ((0, uni_cli_shared_1.isInHBuilderX)()) {
@@ -59,17 +59,6 @@ function createConfig(options) {
             }
         }
         const { name, entryName, assetsName } = (0, uni_cli_shared_1.getPlatformType)();
-        const getChunkName = (chunkInfo, isEntry = false, filename = '[name].[hash].js') => {
-            const { assetsDir } = options.resolvedConfig.build;
-            if (chunkInfo.facadeModuleId && !isEntry) {
-                const dirname = path_1.default.relative(inputDir, path_1.default.dirname(chunkInfo.facadeModuleId));
-                if (dirname) {
-                    return path_1.default.posix.join(assetsDir, name, (0, uni_cli_shared_1.normalizePath)(dirname).replace(/\//g, '-') +
-                        `-${filename}`);
-                }
-            }
-            return path_1.default.posix.join(assetsDir, isEntry ? '' : name, filename);
-        };
         return {
             css: {
                 postcss: {
@@ -101,13 +90,26 @@ function createConfig(options) {
                     external: (0, uni_cli_shared_1.isSsr)(env.command, config) ? ssr_1.external : [],
                     output: {
                         assetFileNames: `assets/${assetsName}[name]-[hash][extname]`,
-                        entryFileNames(chunkInfo) {
-                            return getChunkName(chunkInfo, true, `${entryName}.[hash].js`);
+                        entryFileNames() {
+                            const { assetsDir } = options.resolvedConfig.build;
+                            return path_1.default.posix.join(assetsDir, `${entryName}.[hash].js`);
                         },
                         chunkFileNames(chunkInfo) {
-                            return getChunkName(chunkInfo);
+                            const { assetsDir } = options.resolvedConfig.build;
+                            if (chunkInfo.facadeModuleId) {
+                                const dirname = path_1.default.relative(inputDir, path_1.default.dirname(chunkInfo.facadeModuleId));
+                                if (dirname) {
+                                    return path_1.default.posix.join(assetsDir, name, (0, uni_cli_shared_1.normalizePath)(dirname).replace(/\//g, '-') +
+                                        '-[name].[hash].js');
+                                }
+                            }
+                            // 公共模块的js目录
+                            const { commonChunk = [] } = uniOption?.h5 || {};
+                            return path_1.default.posix.join(assetsDir, commonChunk.includes(chunkInfo.name) ? '' : name, '[name].[hash].js');
                         },
+                        ...uniOption.h5?.rollupOptions?.output
                     },
+                    ...uniOption.h5?.rollupOptions
                 },
             },
         };

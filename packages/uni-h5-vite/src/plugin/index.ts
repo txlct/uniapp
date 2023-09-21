@@ -6,11 +6,12 @@ import { createHandleHotUpdate } from './handleHotUpdate'
 import { createTransformIndexHtml } from './transformIndexHtml'
 import { createConfigureServer } from './configureServer'
 import { createUni } from './uni'
+import type { VitePluginUniResolvedOptions } from '@dcloudio/uni-cli-shared'
 
 import { createConfig } from './config'
 import { isString } from '@vue/shared'
 
-export function uniH5Plugin(): UniVitePlugin {
+export function uniH5Plugin(options: VitePluginUniResolvedOptions): UniVitePlugin {
   const configOptions: {
     resolvedConfig: ResolvedConfig | null
   } = {
@@ -20,7 +21,7 @@ export function uniH5Plugin(): UniVitePlugin {
   return {
     name: 'uni:h5',
     uni: createUni(),
-    config: createConfig(configOptions),
+    config: createConfig(configOptions, options),
     configResolved(config) {
       configOptions.resolvedConfig = config
     },
