@@ -6,7 +6,7 @@
     "entries": [
       {
         "find": "vue",
-        "replacement": "@dcloudio/uni-mp-vue/lib/vue.runtime.esm.js"
+        "replacement": "packages/uni-mp-vue/lib/vue.runtime.esm.js"
       }
     ]
   },
