@@ -11,7 +11,7 @@ importers:
       '@babel/preset-env': ^7.20.2
       '@dcloudio/types': 3.2.11
       '@dcloudio/uni-api': workspace:*
-      '@dcloudio/uni-app': https://gitpkg.now.sh/txlct/uniapp/packages/uni-app?v3.0.13
+      '@dcloudio/uni-app': https://gitpkg.now.sh/txlct/uniapp/packages/uni-app?v3.0.14
       '@jest/types': ^29.5.0
       '@microsoft/api-extractor': ^7.34.4
       '@rollup/plugin-alias': ^4.0.3
@@ -63,7 +63,7 @@ importers:
       '@babel/preset-env': 7.20.2_@babel+core@7.21.3
       '@dcloudio/types': 3.2.11
       '@dcloudio/uni-api': link:packages/uni-api
-      '@dcloudio/uni-app': '@gitpkg.now.sh/txlct/uniapp/packages/uni-app?v3.0.13_xfga23fhjtrsvaq7s3ggskupvi'
+      '@dcloudio/uni-app': '@gitpkg.now.sh/txlct/uniapp/packages/uni-app?v3.0.14_xfga23fhjtrsvaq7s3ggskupvi'
       '@jest/types': 29.5.0
       '@microsoft/api-extractor': 7.34.4_@types+node@18.15.11
       '@rollup/plugin-alias': 4.0.3_rollup@3.20.2
@@ -231,18 +231,18 @@ importers:
   packages/uni-app:
     specifiers:
       '@dcloudio/uni-cloud': 3.0.0-3070320230222002
-      '@dcloudio/uni-components': https://gitpkg.now.sh/txlct/uniapp/packages/uni-components?v3.0.13
+      '@dcloudio/uni-components': https://gitpkg.now.sh/txlct/uniapp/packages/uni-components?v3.0.14
       '@dcloudio/uni-i18n': 3.0.0-3070320230222002
       '@dcloudio/uni-push': 3.0.0-3070320230222002
-      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13
+      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14
       '@dcloudio/uni-stat': 3.0.0-3070320230222002
       '@vue/shared': 3.2.47
     dependencies:
       '@dcloudio/uni-cloud': link:../uni-cloud
-      '@dcloudio/uni-components': '@gitpkg.now.sh/txlct/uniapp/packages/uni-components?v3.0.13'
+      '@dcloudio/uni-components': '@gitpkg.now.sh/txlct/uniapp/packages/uni-components?v3.0.14'
       '@dcloudio/uni-i18n': link:../uni-i18n
       '@dcloudio/uni-push': link:../uni-push
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@dcloudio/uni-stat': link:../uni-stat
       '@vue/shared': 3.2.47
 
@@ -370,7 +370,7 @@ importers:
       '@babel/parser': ^7.20.5
       '@babel/types': ^7.20.7
       '@dcloudio/uni-i18n': 3.0.0-3070320230222002
-      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13
+      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14
       '@dcloudio/uni-uts-v1': 3.0.0-3070320230222002
       '@intlify/core-base': 9.1.9
       '@intlify/shared': 9.1.9
@@ -427,7 +427,7 @@ importers:
       '@babel/parser': 7.21.2
       '@babel/types': 7.21.2
       '@dcloudio/uni-i18n': link:../uni-i18n
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@intlify/core-base': 9.1.9
       '@intlify/shared': 9.1.9
       '@intlify/vue-devtools': 9.1.9
@@ -496,10 +496,10 @@ importers:
 
   packages/uni-components:
     specifiers:
-      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13
+      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14
       '@types/quill': ^1.3.7
     devDependencies:
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@types/quill': 1.3.10
 
   packages/uni-core:
@@ -517,11 +517,11 @@ importers:
   packages/uni-h5:
     specifiers:
       '@amap/amap-jsapi-types': ^0.0.8
-      '@dcloudio/uni-cli-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13
-      '@dcloudio/uni-h5-vite': https://gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vite?v3.0.13
-      '@dcloudio/uni-h5-vue': https://gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vue?v3.0.13
+      '@dcloudio/uni-cli-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14
+      '@dcloudio/uni-h5-vite': https://gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vite?v3.0.14
+      '@dcloudio/uni-h5-vue': https://gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vue?v3.0.14
       '@dcloudio/uni-i18n': 3.0.0-3070320230222002
-      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13
+      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14
       '@types/estree': ^0.0.51
       '@types/google.maps': ^3.45.6
       '@vue/server-renderer': 3.2.47
@@ -537,10 +537,10 @@ importers:
       vue-router: ^4.1.6
       xmlhttprequest: ^1.8.0
     dependencies:
-      '@dcloudio/uni-h5-vite': '@gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vite?v3.0.13_vue@3.2.47'
-      '@dcloudio/uni-h5-vue': '@gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vue?v3.0.13'
+      '@dcloudio/uni-h5-vite': '@gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vite?v3.0.14_vue@3.2.47'
+      '@dcloudio/uni-h5-vue': '@gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vue?v3.0.14'
       '@dcloudio/uni-i18n': link:../uni-i18n
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@vue/server-renderer': 3.2.47_vue@3.2.47
       '@vue/shared': 3.2.47
       debug: 4.3.4
@@ -551,7 +551,7 @@ importers:
       xmlhttprequest: 1.8.0
     devDependencies:
       '@amap/amap-jsapi-types': 0.0.8
-      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13_vue@3.2.47'
+      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14_vue@3.2.47'
       '@types/estree': 0.0.51
       '@types/google.maps': 3.52.2
       acorn-loose: 8.3.0
@@ -561,8 +561,8 @@ importers:
 
   packages/uni-h5-vite:
     specifiers:
-      '@dcloudio/uni-cli-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13
-      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13
+      '@dcloudio/uni-cli-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14
+      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14
       '@rollup/pluginutils': ^4.2.0
       '@types/debug': ^4.1.7
       '@types/fs-extra': ^9.0.13
@@ -581,8 +581,8 @@ importers:
       module-alias: ^2.2.2
       vue: 3.2.47
     dependencies:
-      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13_vue@3.2.47'
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14_vue@3.2.47'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@rollup/pluginutils': 4.2.1
       '@vue/compiler-dom': 3.2.47
       '@vue/compiler-sfc': 3.2.47
@@ -604,9 +604,9 @@ importers:
 
   packages/uni-h5-vue:
     specifiers:
-      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13
+      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14
     dependencies:
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
 
   packages/uni-i18n:
     specifiers: {}
@@ -662,8 +662,8 @@ importers:
       '@babel/generator': ^7.20.5
       '@babel/parser': ^7.20.5
       '@babel/types': ^7.20.7
-      '@dcloudio/uni-cli-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13
-      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13
+      '@dcloudio/uni-cli-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14
+      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14
       '@types/babel__generator': ^7.6.4
       '@vue/compiler-core': 3.2.47
       '@vue/compiler-dom': 3.2.47
@@ -675,8 +675,8 @@ importers:
       '@babel/generator': 7.21.1
       '@babel/parser': 7.21.2
       '@babel/types': 7.21.2
-      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13'
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@vue/compiler-core': 3.2.47
       '@vue/compiler-dom': 3.2.47
       '@vue/shared': 3.2.47
@@ -772,25 +772,25 @@ importers:
 
   packages/uni-mp-vite:
     specifiers:
-      '@dcloudio/uni-cli-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13
+      '@dcloudio/uni-cli-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14
       '@dcloudio/uni-i18n': 3.0.0-3070320230222002
-      '@dcloudio/uni-mp-compiler': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?v3.0.13
-      '@dcloudio/uni-mp-vue': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.13
-      '@dcloudio/uni-mp-weixin': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-weixin?v3.0.13
-      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13
-      '@dcloudio/vite-plugin-uni': https://gitpkg.now.sh/txlct/uniapp/packages/vite-plugin-uni?v3.0.13
+      '@dcloudio/uni-mp-compiler': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?v3.0.14
+      '@dcloudio/uni-mp-vue': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.14
+      '@dcloudio/uni-mp-weixin': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-weixin?v3.0.14
+      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14
+      '@dcloudio/vite-plugin-uni': https://gitpkg.now.sh/txlct/uniapp/packages/vite-plugin-uni?v3.0.14
       '@types/debug': ^4.1.7
       '@vue/compiler-sfc': 3.2.47
       '@vue/shared': 3.2.47
       debug: ^4.3.3
     dependencies:
-      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13'
+      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14'
       '@dcloudio/uni-i18n': link:../uni-i18n
-      '@dcloudio/uni-mp-compiler': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?v3.0.13'
-      '@dcloudio/uni-mp-vue': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.13'
-      '@dcloudio/uni-mp-weixin': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-weixin?v3.0.13'
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
-      '@dcloudio/vite-plugin-uni': '@gitpkg.now.sh/txlct/uniapp/packages/vite-plugin-uni?v3.0.13'
+      '@dcloudio/uni-mp-compiler': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?v3.0.14'
+      '@dcloudio/uni-mp-vue': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.14'
+      '@dcloudio/uni-mp-weixin': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-weixin?v3.0.14'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
+      '@dcloudio/vite-plugin-uni': '@gitpkg.now.sh/txlct/uniapp/packages/vite-plugin-uni?v3.0.14'
       '@vue/compiler-sfc': 3.2.47
       '@vue/shared': 3.2.47
       debug: 4.3.4
@@ -799,21 +799,21 @@ importers:
 
   packages/uni-mp-vue:
     specifiers:
-      '@dcloudio/uni-mp-vue': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.13
-      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13
+      '@dcloudio/uni-mp-vue': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.14
+      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14
       '@vue/shared': 3.2.47
     dependencies:
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@vue/shared': 3.2.47
     devDependencies:
-      '@dcloudio/uni-mp-vue': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.13'
+      '@dcloudio/uni-mp-vue': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.14'
 
   packages/uni-mp-weixin:
     specifiers:
-      '@dcloudio/uni-cli-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13
-      '@dcloudio/uni-mp-vite': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?v3.0.13
-      '@dcloudio/uni-mp-vue': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.13
-      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13
+      '@dcloudio/uni-cli-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14
+      '@dcloudio/uni-mp-vite': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?v3.0.14
+      '@dcloudio/uni-mp-vue': https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.14
+      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14
       '@vue/compiler-core': 3.2.47
       '@vue/shared': 3.2.47
       jimp: ^0.10.1
@@ -822,10 +822,10 @@ importers:
       qrcode-terminal: ^0.12.0
       ws: ^8.4.2
     dependencies:
-      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13'
-      '@dcloudio/uni-mp-vite': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?v3.0.13'
-      '@dcloudio/uni-mp-vue': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.13'
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14'
+      '@dcloudio/uni-mp-vite': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?v3.0.14'
+      '@dcloudio/uni-mp-vue': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.14'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@vue/shared': 3.2.47
       jimp: 0.10.3
       licia: 1.38.0
@@ -986,8 +986,8 @@ importers:
       '@babel/core': ^7.20.5
       '@babel/plugin-syntax-import-meta': ^7.10.4
       '@babel/plugin-transform-typescript': ^7.20.2
-      '@dcloudio/uni-cli-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13
-      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13
+      '@dcloudio/uni-cli-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14
+      '@dcloudio/uni-shared': https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14
       '@rollup/pluginutils': ^4.2.0
       '@types/debug': ^4.1.7
       '@types/estree': ^0.0.51
@@ -1020,8 +1020,8 @@ importers:
       '@babel/core': 7.21.0
       '@babel/plugin-syntax-import-meta': 7.10.4_@babel+core@7.21.0
       '@babel/plugin-transform-typescript': 7.21.0_@babel+core@7.21.0
-      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13_wguwgapmnmohuklfmtcvgu4xhm'
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14_wguwgapmnmohuklfmtcvgu4xhm'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@rollup/pluginutils': 4.2.1
       '@vitejs/plugin-legacy': 4.0.1_terser@5.16.6+vite@4.1.1
       '@vitejs/plugin-vue': 4.0.0_vite@4.1.1+vue@3.2.47
@@ -10033,20 +10033,20 @@ packages:
       commander: 9.5.0
     dev: true
 
-  '@gitpkg.now.sh/txlct/uniapp/packages/uni-app?v3.0.13_xfga23fhjtrsvaq7s3ggskupvi':
-    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-app?v3.0.13}
-    id: '@gitpkg.now.sh/txlct/uniapp/packages/uni-app?v3.0.13'
+  '@gitpkg.now.sh/txlct/uniapp/packages/uni-app?v3.0.14_xfga23fhjtrsvaq7s3ggskupvi':
+    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-app?v3.0.14}
+    id: '@gitpkg.now.sh/txlct/uniapp/packages/uni-app?v3.0.14'
     name: '@dcloudio/uni-app'
-    version: 3.0.0-3070320230222002-v3.0.13
+    version: 3.0.0-3070320230222002-v3.0.14
     peerDependencies:
       '@dcloudio/types': ^3.2.11
     dependencies:
       '@dcloudio/types': 3.2.11
       '@dcloudio/uni-cloud': 3.0.0-3070320230222002_vue@3.2.47
-      '@dcloudio/uni-components': '@gitpkg.now.sh/txlct/uniapp/packages/uni-components?v3.0.13'
+      '@dcloudio/uni-components': '@gitpkg.now.sh/txlct/uniapp/packages/uni-components?v3.0.14'
       '@dcloudio/uni-i18n': 3.0.0-3070320230222002
       '@dcloudio/uni-push': 3.0.0-3070320230222002_vue@3.2.47
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@dcloudio/uni-stat': 3.0.0-3070320230222002_vue@3.2.47
       '@vue/shared': 3.2.47
     transitivePeerDependencies:
@@ -10162,10 +10162,10 @@ packages:
       - vue
     dev: false
 
-  '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13':
-    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13}
+  '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14':
+    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14}
     name: '@dcloudio/uni-cli-shared'
-    version: 3.0.0-3070320230222002-v3.0.13
+    version: 3.0.0-3070320230222002-v3.0.14
     engines: {node: ^14.18.0 || >=16.0.0}
     dependencies:
       '@ampproject/remapping': 2.2.0
@@ -10173,7 +10173,7 @@ packages:
       '@babel/parser': 7.21.3
       '@babel/types': 7.21.3
       '@dcloudio/uni-i18n': 3.0.0-3070320230222002
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@intlify/core-base': 9.1.9
       '@intlify/shared': 9.1.9
       '@intlify/vue-devtools': 9.1.9
@@ -10219,11 +10219,11 @@ packages:
       - vue
     dev: false
 
-  '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13_terser@5.16.6':
-    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13}
-    id: '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13'
+  '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14_terser@5.16.6':
+    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14}
+    id: '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14'
     name: '@dcloudio/uni-cli-shared'
-    version: 3.0.0-3070320230222002-v3.0.13
+    version: 3.0.0-3070320230222002-v3.0.14
     engines: {node: ^14.18.0 || >=16.0.0}
     dependencies:
       '@ampproject/remapping': 2.2.0
@@ -10231,7 +10231,7 @@ packages:
       '@babel/parser': 7.21.3
       '@babel/types': 7.21.3
       '@dcloudio/uni-i18n': 3.0.0-3070320230222002
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@intlify/core-base': 9.1.9
       '@intlify/shared': 9.1.9
       '@intlify/vue-devtools': 9.1.9
@@ -10277,11 +10277,11 @@ packages:
       - vue
     dev: false
 
-  '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13_vue@3.2.47':
-    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13}
-    id: '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13'
+  '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14_vue@3.2.47':
+    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14}
+    id: '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14'
     name: '@dcloudio/uni-cli-shared'
-    version: 3.0.0-3070320230222002-v3.0.13
+    version: 3.0.0-3070320230222002-v3.0.14
     engines: {node: ^14.18.0 || >=16.0.0}
     dependencies:
       '@ampproject/remapping': 2.2.0
@@ -10289,7 +10289,7 @@ packages:
       '@babel/parser': 7.21.3
       '@babel/types': 7.21.3
       '@dcloudio/uni-i18n': 3.0.0-3070320230222002
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@intlify/core-base': 9.1.9
       '@intlify/shared': 9.1.9
       '@intlify/vue-devtools': 9.1.9
@@ -10334,11 +10334,11 @@ packages:
       - vite
       - vue
 
-  '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13_wguwgapmnmohuklfmtcvgu4xhm':
-    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13}
-    id: '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13'
+  '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14_wguwgapmnmohuklfmtcvgu4xhm':
+    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14}
+    id: '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14'
     name: '@dcloudio/uni-cli-shared'
-    version: 3.0.0-3070320230222002-v3.0.13
+    version: 3.0.0-3070320230222002-v3.0.14
     engines: {node: ^14.18.0 || >=16.0.0}
     dependencies:
       '@ampproject/remapping': 2.2.0
@@ -10346,7 +10346,7 @@ packages:
       '@babel/parser': 7.21.3
       '@babel/types': 7.21.3
       '@dcloudio/uni-i18n': 3.0.0-3070320230222002
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@intlify/core-base': 9.1.9
       '@intlify/shared': 9.1.9
       '@intlify/vue-devtools': 9.1.9
@@ -10392,19 +10392,19 @@ packages:
       - vue
     dev: false
 
-  '@gitpkg.now.sh/txlct/uniapp/packages/uni-components?v3.0.13':
-    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-components?v3.0.13}
+  '@gitpkg.now.sh/txlct/uniapp/packages/uni-components?v3.0.14':
+    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-components?v3.0.14}
     name: '@dcloudio/uni-components'
-    version: 3.0.0-3070320230222002-v3.0.13
+    version: 3.0.0-3070320230222002-v3.0.14
 
-  '@gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vite?v3.0.13_vue@3.2.47':
-    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vite?v3.0.13}
-    id: '@gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vite?v3.0.13'
+  '@gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vite?v3.0.14_vue@3.2.47':
+    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vite?v3.0.14}
+    id: '@gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vite?v3.0.14'
     name: '@dcloudio/uni-h5-vite'
-    version: 3.0.0-3070320230222002-v3.0.13
+    version: 3.0.0-3070320230222002-v3.0.14
     dependencies:
-      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13_vue@3.2.47'
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14_vue@3.2.47'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@rollup/pluginutils': 4.2.1
       '@vue/compiler-dom': 3.2.47
       '@vue/compiler-sfc': 3.2.47
@@ -10423,12 +10423,12 @@ packages:
       - vue
     dev: false
 
-  '@gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vue?v3.0.13':
-    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vue?v3.0.13}
+  '@gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vue?v3.0.14':
+    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-h5-vue?v3.0.14}
     name: '@dcloudio/uni-h5-vue'
-    version: 3.0.0-3070320230222002-v3.0.13
+    version: 3.0.0-3070320230222002-v3.0.14
     dependencies:
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
     dev: false
 
   '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?v3.0.1-beta':
@@ -10452,16 +10452,16 @@ packages:
       - vue
     dev: false
 
-  '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?v3.0.13':
-    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?v3.0.13}
+  '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?v3.0.14':
+    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?v3.0.14}
     name: '@dcloudio/uni-mp-compiler'
-    version: 3.0.0-3070320230222002-v3.0.13
+    version: 3.0.0-3070320230222002-v3.0.14
     dependencies:
       '@babel/generator': 7.21.3
       '@babel/parser': 7.21.3
       '@babel/types': 7.21.3
-      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13'
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@vue/compiler-core': 3.2.47
       '@vue/compiler-dom': 3.2.47
       '@vue/shared': 3.2.47
@@ -10497,18 +10497,18 @@ packages:
       - vue
     dev: false
 
-  '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?v3.0.13':
-    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?v3.0.13}
+  '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?v3.0.14':
+    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?v3.0.14}
     name: '@dcloudio/uni-mp-vite'
-    version: 3.0.0-3070320230222002-v3.0.13
+    version: 3.0.0-3070320230222002-v3.0.14
     dependencies:
-      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13'
+      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14'
       '@dcloudio/uni-i18n': 3.0.0-3070320230222002
-      '@dcloudio/uni-mp-compiler': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?v3.0.13'
-      '@dcloudio/uni-mp-vue': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.13'
-      '@dcloudio/uni-mp-weixin': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-weixin?v3.0.13'
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
-      '@dcloudio/vite-plugin-uni': '@gitpkg.now.sh/txlct/uniapp/packages/vite-plugin-uni?v3.0.13'
+      '@dcloudio/uni-mp-compiler': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-compiler?v3.0.14'
+      '@dcloudio/uni-mp-vue': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.14'
+      '@dcloudio/uni-mp-weixin': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-weixin?v3.0.14'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
+      '@dcloudio/vite-plugin-uni': '@gitpkg.now.sh/txlct/uniapp/packages/vite-plugin-uni?v3.0.14'
       '@vue/compiler-sfc': 3.2.47
       '@vue/shared': 3.2.47
       debug: 4.3.4
@@ -10541,23 +10541,23 @@ packages:
       '@vue/shared': 3.2.47
     dev: false
 
-  '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.13':
-    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.13}
+  '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.14':
+    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.14}
     name: '@dcloudio/uni-mp-vue'
-    version: 3.0.0-3070320230222002-v3.0.13
+    version: 3.0.0-3070320230222002-v3.0.14
     dependencies:
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@vue/shared': 3.2.47
 
-  '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-weixin?v3.0.13':
-    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-weixin?v3.0.13}
+  '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-weixin?v3.0.14':
+    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-mp-weixin?v3.0.14}
     name: '@dcloudio/uni-mp-weixin'
-    version: 3.0.0-3070320230222002-v3.0.13
+    version: 3.0.0-3070320230222002-v3.0.14
     dependencies:
-      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13'
-      '@dcloudio/uni-mp-vite': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?v3.0.13'
-      '@dcloudio/uni-mp-vue': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.13'
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14'
+      '@dcloudio/uni-mp-vite': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vite?v3.0.14'
+      '@dcloudio/uni-mp-vue': '@gitpkg.now.sh/txlct/uniapp/packages/uni-mp-vue?v3.0.14'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@vue/shared': 3.2.47
       jimp: 0.10.3
       licia: 1.38.0
@@ -10583,10 +10583,10 @@ packages:
       '@vue/shared': 3.2.47
     dev: false
 
-  '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13':
-    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13}
+  '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14':
+    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14}
     name: '@dcloudio/uni-shared'
-    version: 3.0.0-3070320230222002-v3.0.13
+    version: 3.0.0-3070320230222002-v3.0.14
     dependencies:
       '@vue/shared': 3.2.47
 
@@ -10630,10 +10630,10 @@ packages:
       - vue
     dev: false
 
-  '@gitpkg.now.sh/txlct/uniapp/packages/vite-plugin-uni?v3.0.13':
-    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/vite-plugin-uni?v3.0.13}
+  '@gitpkg.now.sh/txlct/uniapp/packages/vite-plugin-uni?v3.0.14':
+    resolution: {tarball: https://gitpkg.now.sh/txlct/uniapp/packages/vite-plugin-uni?v3.0.14}
     name: '@dcloudio/vite-plugin-uni'
-    version: 3.0.0-3070320230222002-v3.0.13
+    version: 3.0.0-3070320230222002-v3.0.14
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
@@ -10642,8 +10642,8 @@ packages:
       '@babel/core': 7.21.3
       '@babel/plugin-syntax-import-meta': 7.10.4_@babel+core@7.21.3
       '@babel/plugin-transform-typescript': 7.21.0_@babel+core@7.21.3
-      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.13_terser@5.16.6'
-      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.13'
+      '@dcloudio/uni-cli-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-cli-shared?v3.0.14_terser@5.16.6'
+      '@dcloudio/uni-shared': '@gitpkg.now.sh/txlct/uniapp/packages/uni-shared?v3.0.14'
       '@rollup/pluginutils': 4.2.1
       '@vitejs/plugin-legacy': 4.0.1_terser@5.16.6
       '@vitejs/plugin-vue': 4.1.0
