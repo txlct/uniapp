@@ -89,13 +89,25 @@ function createConfig(options, uniOption) {
                     // resolveSSRExternal 会判定package.json，hbx 工程可能没有，通过 rollup 来配置
                     external: (0, uni_cli_shared_1.isSsr)(env.command, config) ? ssr_1.external : [],
                     output: {
-                        assetFileNames: `assets/${assetsName}[name]-[hash][extname]`,
-                        entryFileNames() {
+                        assetFileNames: (chunkInfo) => {
+                            // 公共模块的js目录
+                            const { commonChunk = [] } = uniOption?.h5 || {};
+                            return `assets/${commonChunk.find(i => chunkInfo.name?.includes(i)) ? '' : assetsName}[name]-[hash][extname]`;
+                        },
+                        entryFileNames(chunkInfo) {
                             const { assetsDir } = options.resolvedConfig.build;
+                            if (chunkInfo.name === 'polyfills') {
+                                return path_1.default.posix.join(assetsDir, `[name].[hash].js`);
+                            }
                             return path_1.default.posix.join(assetsDir, `${entryName}.[hash].js`);
                         },
                         chunkFileNames(chunkInfo) {
                             const { assetsDir } = options.resolvedConfig.build;
+                            // 公共模块的js目录
+                            const { commonChunk = [] } = uniOption?.h5 || {};
+                            if (commonChunk.includes(chunkInfo.name)) {
+                                return path_1.default.posix.join(assetsDir, '[name].[hash].js');
+                            }
                             if (chunkInfo.facadeModuleId) {
                                 const dirname = path_1.default.relative(inputDir, path_1.default.dirname(chunkInfo.facadeModuleId));
                                 if (dirname) {
@@ -103,9 +115,7 @@ function createConfig(options, uniOption) {
                                         '-[name].[hash].js');
                                 }
                             }
-                            // 公共模块的js目录
-                            const { commonChunk = [] } = uniOption?.h5 || {};
-                            return path_1.default.posix.join(assetsDir, commonChunk.includes(chunkInfo.name) ? '' : name, '[name].[hash].js');
+                            return path_1.default.posix.join(assetsDir, name, '[name].[hash].js');
                         },
                         ...uniOption.h5?.rollupOptions?.output
                     },

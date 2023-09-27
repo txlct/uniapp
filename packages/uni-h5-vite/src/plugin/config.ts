@@ -107,13 +107,29 @@ export function createConfig(options: {
           // resolveSSRExternal 会判定package.json，hbx 工程可能没有，通过 rollup 来配置
           external: isSsr(env.command, config) ? external : [],
           output: {
-            assetFileNames: `assets/${assetsName}[name]-[hash][extname]`,
-            entryFileNames() {
+            assetFileNames: (chunkInfo)=>{
+              // 公共模块的js目录
+              const { commonChunk = [] } = uniOption?.h5 || {};
+
+              return `assets/${commonChunk.find(i=>chunkInfo.name?.includes(i)) ? '': assetsName}[name]-[hash][extname]`
+            } ,
+            entryFileNames(chunkInfo) {
               const { assetsDir } = options.resolvedConfig!.build;
+              if(chunkInfo.name === 'polyfills'){
+                return path.posix.join(assetsDir, `[name].[hash].js`);
+              }
+
               return path.posix.join(assetsDir, `${entryName}.[hash].js`);
             },
             chunkFileNames(chunkInfo: PreRenderedChunk) {
               const { assetsDir } = options.resolvedConfig!.build
+              // 公共模块的js目录
+              const { commonChunk = [] } = uniOption?.h5 || {}
+
+              if( commonChunk.includes(chunkInfo.name)){
+                return path.posix.join(assetsDir, '[name].[hash].js');
+              }
+
               if (chunkInfo.facadeModuleId) {
                 const dirname = path.relative(
                   inputDir,
@@ -128,9 +144,8 @@ export function createConfig(options: {
                   )
                 }
               }
-              // 公共模块的js目录
-              const { commonChunk = [] } = uniOption?.h5 || {}
-              return path.posix.join(assetsDir, commonChunk.includes(chunkInfo.name) ? '': name, '[name].[hash].js')
+              
+              return path.posix.join(assetsDir, name, '[name].[hash].js')
             },
             ...uniOption.h5?.rollupOptions?.output
           },
