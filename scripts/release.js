@@ -8,7 +8,7 @@ const { prompt } = require('enquirer')
 const execa = require('execa')
 const { targets: packageTargets, fuzzyMatchTarget } = require('./utils')
 
-const remoteRepoUrlPrefix = 'https://gitpkg.now.sh/txlct/uniapp/packages/'
+const remoteRepoUrlPrefix = 'https://gitpkg.vercel.app/txlct/uniapp/packages/'
 // 参数
 const targetsArgs = args._ || [];
 const targets = targetsArgs.length ? targetsArgs : packageTargets;
