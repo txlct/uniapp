@@ -907,11 +907,6 @@
   dependencies:
     "@cspotcode/source-map-consumer" "0.8.0"
 
-"@tencent/uni-i18n@^2.0.0-31920210514002":
-  version "2.0.0-31920210514002"
-  resolved "https://registry.yarnpkg.com/@tencent/uni-i18n/-/uni-i18n-2.0.0-31920210514002.tgz#f63d14c234ea0353fabe2d8c681601c7ba07e488"
-  integrity sha512-shHf27U0KEs//ieCBG1R1aRKNDn6KwcVUIb5GsPuDOqoN7WQY+nEz9QFdOSQY8j9tX4ABOAc1ra0Opz8xFVngA==
-
 "@hapi/address@2.x.x":
   version "2.1.4"
   resolved "https://registry.npmjs.org/@hapi/address/-/address-2.1.4.tgz#5d67ed43f3fd41a69d4b9ff7b56e7c0d1d0a81e5"
@@ -1207,6 +1202,10 @@
 "@soda/get-current-script@^1.0.0":
   version "1.0.0"
   resolved "https://registry.npmjs.org/@soda/get-current-script/-/get-current-script-1.0.0.tgz#623aa40623550e3b94767cffeb096a6fb597ed09"
+
+"@tencent/uni-i18n@https://gitpkg.vercel.app/txlct/uniapp/packages/uni-i18n?pnpm":
+  version "2.0.2-3070920230324001"
+  resolved "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-i18n?pnpm#d72cc2511e730f7ccdf80623ce667baaabf533d7"
 
 "@tsconfig/node10@^1.0.7":
   version "1.0.8"

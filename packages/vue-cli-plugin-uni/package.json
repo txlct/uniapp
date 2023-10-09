@@ -17,7 +17,7 @@
   "author": "fxy060608",
   "license": "Apache-2.0",
   "dependencies": {
-    "@tencent/uni-stat": "https://gitpkg.now.sh/txlct/uniapp/packages/uni-stat?pnpm",
+    "@tencent/uni-stat": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-stat?pnpm",
     "buffer-json": "^2.0.0",
     "clone-deep": "^4.0.1",
     "cross-env": "^5.2.0",
