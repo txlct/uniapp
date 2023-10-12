@@ -15,16 +15,19 @@ const pages_1 = require("./json/pages");
 const messages_1 = require("./messages");
 const uts_1 = require("./uts");
 const debugEasycom = (0, debug_1.default)('uni:easycom');
-const easycoms = [];
-const easycomsCache = new Map();
-const easycomsInvalidCache = new Set();
-let hasEasycom = false;
 function clearEasycom() {
-    easycoms.length = 0;
-    easycomsCache.clear();
-    easycomsInvalidCache.clear();
+    global.easycoms.length = 0;
+    global.easycomsCache.clear();
+    global.easycomsInvalidCache.clear();
 }
 function initEasycoms(inputDir, { dirs, platform }) {
+    global = {
+        ...global,
+        easycoms: [],
+        easycomsCache: new Map(),
+        easycomsInvalidCache: new Set(),
+        hasEasycom: false,
+    };
     const componentsDir = path_1.default.resolve(inputDir, 'components');
     const uniModulesDir = path_1.default.resolve(inputDir, 'uni_modules');
     const initEasycomOptions = (pagesJson) => {
@@ -48,12 +51,12 @@ function initEasycoms(inputDir, { dirs, platform }) {
     const options = initEasycomOptions((0, pages_1.parsePagesJsonOnce)(inputDir, platform));
     const initUTSEasycom = () => {
         (0, uts_1.initUTSComponents)(inputDir, platform).forEach((item) => {
-            const index = easycoms.findIndex((easycom) => item.pattern.toString() === easycom.pattern.toString());
+            const index = global.easycoms.findIndex((easycom) => item.pattern.toString() === easycom.pattern.toString());
             if (index > -1) {
-                easycoms.splice(index, 1, item);
+                global.easycoms.splice(index, 1, item);
             }
             else {
-                easycoms.push(item);
+                global.easycoms.push(item);
             }
         });
     };
@@ -74,7 +77,7 @@ function initEasycoms(inputDir, { dirs, platform }) {
             initEasycom(res.options);
             initUTSEasycom();
         },
-        easycoms,
+        easycoms: global.easycoms,
     };
     return res;
 }
@@ -109,33 +112,33 @@ function initEasycom({ dirs, rootDir, custom, extensions = ['.vue', '.jsx', '.ts
         });
     }
     Object.keys(easycomsObj).forEach((name) => {
-        easycoms.push({
+        global.easycoms.push({
             pattern: new RegExp(name),
             replacement: easycomsObj[name],
         });
     });
-    debugEasycom(easycoms);
-    hasEasycom = !!easycoms.length;
-    return easycoms;
+    debugEasycom(global.easycoms);
+    global.hasEasycom = !!global.easycoms.length;
+    return global.easycoms;
 }
 function matchEasycom(tag) {
-    if (!hasEasycom) {
+    if (!global.hasEasycom) {
         return;
     }
-    let source = easycomsCache.get(tag);
+    let source = global.easycomsCache.get(tag);
     if (source) {
         return source;
     }
-    if (easycomsInvalidCache.has(tag)) {
+    if (global.easycomsInvalidCache.has(tag)) {
         return false;
     }
-    const matcher = easycoms.find((matcher) => matcher.pattern.test(tag));
+    const matcher = global.easycoms.find((matcher) => matcher.pattern.test(tag));
     if (!matcher) {
-        easycomsInvalidCache.add(tag);
+        global.easycomsInvalidCache.add(tag);
         return false;
     }
     source = tag.replace(matcher.pattern, matcher.replacement);
-    easycomsCache.set(tag, source);
+    global.easycomsCache.set(tag, source);
     debugEasycom('matchEasycom', tag, source);
     return source;
 }

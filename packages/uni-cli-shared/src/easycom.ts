@@ -28,24 +28,33 @@ interface EasycomCustom {
 
 const debugEasycom = debug('uni:easycom')
 
-const easycoms: EasycomMatcher[] = []
-
-const easycomsCache = new Map<string, string>()
-const easycomsInvalidCache = new Set<string>()
-
-let hasEasycom = false
+type IGlobal = typeof globalThis & {
+  easycoms : EasycomMatcher[],
+  easycomsCache :  Map<string, string>,
+  easycomsInvalidCache :  Set<string>,
+  hasEasycom : boolean,
+}
 
 function clearEasycom() {
-  easycoms.length = 0
+  (global as IGlobal).easycoms.length = 0;
 
-  easycomsCache.clear()
-  easycomsInvalidCache.clear()
+  (global as IGlobal).easycomsCache.clear();
+  (global as IGlobal).easycomsInvalidCache.clear();
 }
 
 export function initEasycoms(
   inputDir: string,
   { dirs, platform }: { dirs: string[]; platform: UniApp.PLATFORM }
 ) {
+
+  global = {
+    ...global,
+    easycoms : [] as EasycomMatcher[],
+    easycomsCache :  new Map<string, string>(),
+    easycomsInvalidCache : new Set<string>(),
+    hasEasycom : false,
+  } as IGlobal
+
   const componentsDir = path.resolve(inputDir, 'components')
   const uniModulesDir = path.resolve(inputDir, 'uni_modules')
   const initEasycomOptions = (pagesJson?: UniApp.PagesJson) => {
@@ -70,13 +79,13 @@ export function initEasycoms(
   const options = initEasycomOptions(parsePagesJsonOnce(inputDir, platform))
   const initUTSEasycom = () => {
     initUTSComponents(inputDir, platform).forEach((item) => {
-      const index = easycoms.findIndex(
+      const index = (global as IGlobal).easycoms.findIndex(
         (easycom) => item.pattern.toString() === easycom.pattern.toString()
       )
       if (index > -1) {
-        easycoms.splice(index, 1, item)
+        (global as IGlobal).easycoms.splice(index, 1, item)
       } else {
-        easycoms.push(item)
+        (global as IGlobal).easycoms.push(item)
       }
     })
   }
@@ -101,7 +110,7 @@ export function initEasycoms(
       initEasycom(res.options)
       initUTSEasycom()
     },
-    easycoms,
+    easycoms: (global as IGlobal).easycoms,
   }
   return res
 }
@@ -147,34 +156,34 @@ function initEasycom({
     })
   }
   Object.keys(easycomsObj).forEach((name) => {
-    easycoms.push({
+    (global as IGlobal).easycoms.push({
       pattern: new RegExp(name),
       replacement: easycomsObj[name],
     })
   })
-  debugEasycom(easycoms)
-  hasEasycom = !!easycoms.length
-  return easycoms
+  debugEasycom((global as IGlobal).easycoms);
+  (global as IGlobal).hasEasycom = !!(global as IGlobal).easycoms.length
+  return (global as IGlobal).easycoms
 }
 
 export function matchEasycom(tag: string) {
-  if (!hasEasycom) {
+  if (!(global as IGlobal).hasEasycom) {
     return
   }
-  let source = easycomsCache.get(tag)
+  let source = (global as IGlobal).easycomsCache.get(tag)
   if (source) {
     return source
   }
-  if (easycomsInvalidCache.has(tag)) {
+  if ((global as IGlobal).easycomsInvalidCache.has(tag)) {
     return false
   }
-  const matcher = easycoms.find((matcher) => matcher.pattern.test(tag))
+  const matcher = (global as IGlobal).easycoms.find((matcher) => matcher.pattern.test(tag))
   if (!matcher) {
-    easycomsInvalidCache.add(tag)
+    (global as IGlobal).easycomsInvalidCache.add(tag)
     return false
   }
-  source = tag.replace(matcher.pattern, matcher.replacement)
-  easycomsCache.set(tag, source)
+  source = tag.replace(matcher.pattern, matcher.replacement);
+  (global as IGlobal).easycomsCache.set(tag, source)
   debugEasycom('matchEasycom', tag, source)
   return source
 }
