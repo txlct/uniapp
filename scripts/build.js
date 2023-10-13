@@ -130,7 +130,7 @@ async function build(target) {
 
   if (hasViteBundler) {
     const env = {}
-    const viteArgs = [isDev ? '' : 'build', '--config', path.resolve(pkgDir, 'vite.config.ts')]
+    const viteArgs = ['build', '--config', path.resolve(pkgDir, 'vite.config.ts'), isDev ? '--watch' : '']
       .filter(item => item);
 
     if (target === 'size-check') {
