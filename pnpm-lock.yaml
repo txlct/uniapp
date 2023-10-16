@@ -10168,7 +10168,7 @@ packages:
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-app?v3.0.15-beta}
     id: '@gitpkg.vercel.app/txlct/uniapp/packages/uni-app?v3.0.15-beta'
     name: '@dcloudio/uni-app'
-    version: 3.0.0-3070320230222002-v3.0.15-beta
+    version: 3.0.0-3070320230222002-v3.0.15
     peerDependencies:
       '@dcloudio/types': ^3.2.11
     dependencies:
@@ -10243,7 +10243,7 @@ packages:
   '@gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?v3.0.15-beta':
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?v3.0.15-beta}
     name: '@dcloudio/uni-cli-shared'
-    version: 3.0.0-3070320230222002-v3.0.15-beta
+    version: 3.0.0-3070320230222002-v3.0.15
     engines: {node: ^14.18.0 || >=16.0.0}
     dependencies:
       '@ampproject/remapping': 2.2.0
@@ -10301,7 +10301,7 @@ packages:
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?v3.0.15-beta}
     id: '@gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?v3.0.15-beta'
     name: '@dcloudio/uni-cli-shared'
-    version: 3.0.0-3070320230222002-v3.0.15-beta
+    version: 3.0.0-3070320230222002-v3.0.15
     engines: {node: ^14.18.0 || >=16.0.0}
     dependencies:
       '@ampproject/remapping': 2.2.0
@@ -10359,7 +10359,7 @@ packages:
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?v3.0.15-beta}
     id: '@gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?v3.0.15-beta'
     name: '@dcloudio/uni-cli-shared'
-    version: 3.0.0-3070320230222002-v3.0.15-beta
+    version: 3.0.0-3070320230222002-v3.0.15
     engines: {node: ^14.18.0 || >=16.0.0}
     dependencies:
       '@ampproject/remapping': 2.2.0
@@ -10416,7 +10416,7 @@ packages:
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?v3.0.15-beta}
     id: '@gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?v3.0.15-beta'
     name: '@dcloudio/uni-cli-shared'
-    version: 3.0.0-3070320230222002-v3.0.15-beta
+    version: 3.0.0-3070320230222002-v3.0.15
     engines: {node: ^14.18.0 || >=16.0.0}
     dependencies:
       '@ampproject/remapping': 2.2.0
@@ -10473,13 +10473,13 @@ packages:
   '@gitpkg.vercel.app/txlct/uniapp/packages/uni-components?v3.0.15-beta':
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-components?v3.0.15-beta}
     name: '@dcloudio/uni-components'
-    version: 3.0.0-3070320230222002-v3.0.15-beta
+    version: 3.0.0-3070320230222002-v3.0.15
 
   '@gitpkg.vercel.app/txlct/uniapp/packages/uni-h5-vite?v3.0.15-beta_vue@3.2.47':
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-h5-vite?v3.0.15-beta}
     id: '@gitpkg.vercel.app/txlct/uniapp/packages/uni-h5-vite?v3.0.15-beta'
     name: '@dcloudio/uni-h5-vite'
-    version: 3.0.0-3070320230222002-v3.0.15-beta
+    version: 3.0.0-3070320230222002-v3.0.15
     dependencies:
       '@dcloudio/uni-cli-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?v3.0.15-beta_vue@3.2.47'
       '@dcloudio/uni-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?v3.0.15-beta'
@@ -10504,7 +10504,7 @@ packages:
   '@gitpkg.vercel.app/txlct/uniapp/packages/uni-h5-vue?v3.0.15-beta':
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-h5-vue?v3.0.15-beta}
     name: '@dcloudio/uni-h5-vue'
-    version: 3.0.0-3070320230222002-v3.0.15-beta
+    version: 3.0.0-3070320230222002-v3.0.15
     dependencies:
       '@dcloudio/uni-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?v3.0.15-beta'
     dev: false
@@ -10512,7 +10512,7 @@ packages:
   '@gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-compiler?v3.0.15-beta':
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-compiler?v3.0.15-beta}
     name: '@dcloudio/uni-mp-compiler'
-    version: 3.0.0-3070320230222002-v3.0.15-beta
+    version: 3.0.0-3070320230222002-v3.0.15
     dependencies:
       '@babel/generator': 7.21.3
       '@babel/parser': 7.21.3
@@ -10557,7 +10557,7 @@ packages:
   '@gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-vite?v3.0.15-beta':
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-vite?v3.0.15-beta}
     name: '@dcloudio/uni-mp-vite'
-    version: 3.0.0-3070320230222002-v3.0.15-beta
+    version: 3.0.0-3070320230222002-v3.0.15
     dependencies:
       '@dcloudio/uni-cli-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?v3.0.15-beta'
       '@dcloudio/uni-i18n': 3.0.0-3070320230222002
@@ -10592,7 +10592,7 @@ packages:
   '@gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-vue?v3.0.15-beta':
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-vue?v3.0.15-beta}
     name: '@dcloudio/uni-mp-vue'
-    version: 3.0.0-3070320230222002-v3.0.15-beta
+    version: 3.0.0-3070320230222002-v3.0.15
     dependencies:
       '@dcloudio/uni-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?v3.0.15-beta'
       '@vue/shared': 3.2.47
@@ -10600,7 +10600,7 @@ packages:
   '@gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-weixin?v3.0.15-beta':
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-weixin?v3.0.15-beta}
     name: '@dcloudio/uni-mp-weixin'
-    version: 3.0.0-3070320230222002-v3.0.15-beta
+    version: 3.0.0-3070320230222002-v3.0.15
     dependencies:
       '@dcloudio/uni-cli-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?v3.0.15-beta'
       '@dcloudio/uni-mp-vite': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-vite?v3.0.15-beta'
@@ -10626,14 +10626,14 @@ packages:
   '@gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?v3.0.15-beta':
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?v3.0.15-beta}
     name: '@dcloudio/uni-shared'
-    version: 3.0.0-3070320230222002-v3.0.15-beta
+    version: 3.0.0-3070320230222002-v3.0.15
     dependencies:
       '@vue/shared': 3.2.47
 
   '@gitpkg.vercel.app/txlct/uniapp/packages/vite-plugin-uni?v3.0.15-beta':
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/vite-plugin-uni?v3.0.15-beta}
     name: '@dcloudio/vite-plugin-uni'
-    version: 3.0.0-3070320230222002-v3.0.15-beta
+    version: 3.0.0-3070320230222002-v3.0.15
     engines: {node: ^14.18.0 || >=16.0.0}
     hasBin: true
     peerDependencies:
