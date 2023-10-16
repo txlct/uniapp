@@ -47,13 +47,11 @@ export function initEasycoms(
   { dirs, platform }: { dirs: string[]; platform: UniApp.PLATFORM }
 ) {
 
-  global = {
-    ...global,
-    easycoms : [] as EasycomMatcher[],
-    easycomsCache :  new Map<string, string>(),
-    easycomsInvalidCache : new Set<string>(),
-    hasEasycom : false,
-  } as IGlobal
+  (global as IGlobal).easycoms = [] as EasycomMatcher[];
+  (global as IGlobal).easycomsCache = new Map<string, string>();
+  (global as IGlobal).easycomsInvalidCache = new Set<string>();
+  (global as IGlobal).hasEasycom = false;
+
 
   const componentsDir = path.resolve(inputDir, 'components')
   const uniModulesDir = path.resolve(inputDir, 'uni_modules')

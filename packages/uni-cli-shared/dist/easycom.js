@@ -21,13 +21,10 @@ function clearEasycom() {
     global.easycomsInvalidCache.clear();
 }
 function initEasycoms(inputDir, { dirs, platform }) {
-    global = {
-        ...global,
-        easycoms: [],
-        easycomsCache: new Map(),
-        easycomsInvalidCache: new Set(),
-        hasEasycom: false,
-    };
+    global.easycoms = [];
+    global.easycomsCache = new Map();
+    global.easycomsInvalidCache = new Set();
+    global.hasEasycom = false;
     const componentsDir = path_1.default.resolve(inputDir, 'components');
     const uniModulesDir = path_1.default.resolve(inputDir, 'uni_modules');
     const initEasycomOptions = (pagesJson) => {
