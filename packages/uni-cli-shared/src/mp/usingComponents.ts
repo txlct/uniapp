@@ -30,7 +30,7 @@ import { addMiniProgramUsingComponents, addMiniProgramComponentPlaceholder } fro
 
 type BindingComponents = Record<
   string,
-  { tag: string; type: 'unknown' | 'setup' | 'self', value?: string; }
+  { tag: string; type: 'unknown' | 'setup' | 'self' | 'plugin', value?: string; }
 >
 
 const mainDescriptors = new Map<string, MainDescriptor>()
@@ -206,8 +206,11 @@ function createUsingComponents(
   normalizeComponentName: (name: string) => string,
 ) {
   const usingComponents: Record<string, string> = {}
+  const pluginComponent = Object.values(bindingComponents)
+    .filter(({ type = '', value = '' }) => type === 'plugin' && value)
+    .map(item => item && { source: { value: item.value }, specifiers: [{ local: { name: item.tag } }] });
 
-  imports.forEach(({ source: { value }, specifiers: [specifier] }) => {
+  [...imports, ...pluginComponent].forEach(({ source: { value = '' }, specifiers: [specifier] }) => {
     const { name } = specifier.local
     const component = bindingComponents[name];
 
@@ -218,9 +221,9 @@ function createUsingComponents(
       hyphenate(component.tag)
     )
     if (!usingComponents[componentName]) {
-      usingComponents[componentName] = addLeadingSlash(
-        removeExt(normalizeMiniProgramFilename(value, inputDir))
-      )
+      usingComponents[componentName] = component.type === 'plugin' 
+        ? value
+        : addLeadingSlash(removeExt(normalizeMiniProgramFilename(value, inputDir)))
     }
   })
   return usingComponents
@@ -311,10 +314,16 @@ function parseBindingComponents(
     bindingComponents[normalizeComponentId(id)] = templateBindingComponents[id]
   })
   Object.keys(scriptBindingComponents).forEach((id) => {
-    const { tag } = scriptBindingComponents[id]
+    const { tag, value = '', type } = scriptBindingComponents[id]
     const name = findBindingComponent(tag, templateBindingComponents)
     if (name) {
-      bindingComponents[id] = bindingComponents[name]
+      bindingComponents[id] = {
+        ...bindingComponents[name],
+        ...(value.startsWith('plugin://') && {
+          type,
+          value,
+        })
+      }
     }
   })
   return bindingComponents
@@ -569,10 +578,6 @@ function parseComponents(ast: Program, propKeyName: 'components' | 'componentPla
         return
       }
 
-      const valueTypeCheckFn = isComponentPlaceholder
-        ? isStringLiteral
-        : isIdentifier;
-
       componentsExpr.properties.forEach((prop) => {
         if (!isObjectProperty(prop)) {
           return
@@ -580,6 +585,14 @@ function parseComponents(ast: Program, propKeyName: 'components' | 'componentPla
         if (!isIdentifier(prop.key) && !isStringLiteral(prop.key)) {
           return
         }
+
+        const value = (isStringLiteral(prop.value) && prop.value?.value) || '';
+        const isPlugin = value.startsWith('plugin://');
+        const isStringValue = isComponentPlaceholder || isPlugin;
+        const valueTypeCheckFn = isStringValue
+          ? isStringLiteral
+          : isIdentifier;
+
         if (!valueTypeCheckFn(prop.value)) {
           return
         }
@@ -591,9 +604,9 @@ function parseComponents(ast: Program, propKeyName: 'components' | 'componentPla
 
         bindingComponents[name] = {
           tag,
-          type: 'unknown',
-          // 仅在组件定义有componentPlaceholder时增加value占位符返回
-          ...(isComponentPlaceholder && isStringLiteral(prop.value) && { value: prop.value?.value || '' }),
+          type: isPlugin ? 'plugin' : 'unknown',
+          // 仅在组件定义有componentPlaceholder或plugin时增加value占位符返回
+          ...(isStringValue && value && { value }),
         }
       })
     },

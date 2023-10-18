@@ -98,7 +98,10 @@ function getComponentPlaceholder(bindingComponents, normalizeComponentName) {
 }
 function createUsingComponents(bindingComponents, imports, inputDir, normalizeComponentName) {
     const usingComponents = {};
-    imports.forEach(({ source: { value }, specifiers: [specifier] }) => {
+    const pluginComponent = Object.values(bindingComponents)
+        .filter(({ type = '', value = '' }) => type === 'plugin' && value)
+        .map(item => item && { source: { value: item.value }, specifiers: [{ local: { name: item.tag } }] });
+    [...imports, ...pluginComponent].forEach(({ source: { value = '' }, specifiers: [specifier] }) => {
         const { name } = specifier.local;
         const component = bindingComponents[name];
         if (!component) {
@@ -106,7 +109,9 @@ function createUsingComponents(bindingComponents, imports, inputDir, normalizeCo
         }
         const componentName = normalizeComponentName((0, shared_1.hyphenate)(component.tag));
         if (!usingComponents[componentName]) {
-            usingComponents[componentName] = (0, uni_shared_1.addLeadingSlash)((0, utils_1.removeExt)((0, utils_1.normalizeMiniProgramFilename)(value, inputDir)));
+            usingComponents[componentName] = component.type === 'plugin'
+                ? value
+                : (0, uni_shared_1.addLeadingSlash)((0, utils_1.removeExt)((0, utils_1.normalizeMiniProgramFilename)(value, inputDir)));
         }
     });
     return usingComponents;
@@ -160,10 +165,16 @@ function parseBindingComponents(templateBindingComponents, scriptBindingComponen
         bindingComponents[normalizeComponentId(id)] = templateBindingComponents[id];
     });
     Object.keys(scriptBindingComponents).forEach((id) => {
-        const { tag } = scriptBindingComponents[id];
+        const { tag, value = '', type } = scriptBindingComponents[id];
         const name = findBindingComponent(tag, templateBindingComponents);
         if (name) {
-            bindingComponents[id] = bindingComponents[name];
+            bindingComponents[id] = {
+                ...bindingComponents[name],
+                ...(value.startsWith('plugin://') && {
+                    type,
+                    value,
+                })
+            };
         }
     });
     return bindingComponents;
@@ -347,9 +358,6 @@ function parseComponents(ast, propKeyName = 'components') {
             if (!(0, types_1.isObjectExpression)(componentsExpr)) {
                 return;
             }
-            const valueTypeCheckFn = isComponentPlaceholder
-                ? types_1.isStringLiteral
-                : types_1.isIdentifier;
             componentsExpr.properties.forEach((prop) => {
                 if (!(0, types_1.isObjectProperty)(prop)) {
                     return;
@@ -357,6 +365,12 @@ function parseComponents(ast, propKeyName = 'components') {
                 if (!(0, types_1.isIdentifier)(prop.key) && !(0, types_1.isStringLiteral)(prop.key)) {
                     return;
                 }
+                const value = ((0, types_1.isStringLiteral)(prop.value) && prop.value?.value) || '';
+                const isPlugin = value.startsWith('plugin://');
+                const isStringValue = isComponentPlaceholder || isPlugin;
+                const valueTypeCheckFn = isStringValue
+                    ? types_1.isStringLiteral
+                    : types_1.isIdentifier;
                 if (!valueTypeCheckFn(prop.value)) {
                     return;
                 }
@@ -366,9 +380,9 @@ function parseComponents(ast, propKeyName = 'components') {
                     : prop.value.name;
                 bindingComponents[name] = {
                     tag,
-                    type: 'unknown',
-                    // 仅在组件定义有componentPlaceholder时增加value占位符返回
-                    ...(isComponentPlaceholder && (0, types_1.isStringLiteral)(prop.value) && { value: prop.value?.value || '' }),
+                    type: isPlugin ? 'plugin' : 'unknown',
+                    // 仅在组件定义有componentPlaceholder或plugin时增加value占位符返回
+                    ...(isStringValue && value && { value }),
                 };
             });
         },

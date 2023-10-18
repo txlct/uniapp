@@ -2,7 +2,7 @@ import { ImportDeclaration, Program } from '@babel/types';
 import type { PluginContext } from 'rollup';
 type BindingComponents = Record<string, {
     tag: string;
-    type: 'unknown' | 'setup' | 'self';
+    type: 'unknown' | 'setup' | 'self' | 'plugin';
     value?: string;
 }>;
 interface MainDescriptor {
