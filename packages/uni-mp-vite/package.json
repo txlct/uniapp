@@ -1,6 +1,6 @@
 {
   "name": "@dcloudio/uni-mp-vite",
-  "version": "3.0.0-3070320230222002-v3.0.15-beta2",
+  "version": "3.0.0-3070320230222002-v3.0.15-v3.0.15-beta3",
   "description": "uni-mp-vite",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,13 +17,13 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@dcloudio/uni-cli-shared": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?v3.0.15-beta2",
+    "@dcloudio/uni-cli-shared": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?v3.0.15-beta3",
     "@dcloudio/uni-i18n": "3.0.0-3070320230222002",
-    "@dcloudio/uni-mp-compiler": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-compiler?v3.0.15-beta2",
-    "@dcloudio/vite-plugin-uni": "https://gitpkg.vercel.app/txlct/uniapp/packages/vite-plugin-uni?v3.0.15-beta2",
-    "@dcloudio/uni-mp-vue": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-vue?v3.0.15-beta2",
-    "@dcloudio/uni-shared": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?v3.0.15-beta2",
-    "@dcloudio/uni-mp-weixin": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-weixin?v3.0.15-beta2",
+    "@dcloudio/uni-mp-compiler": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-compiler?v3.0.15-beta3",
+    "@dcloudio/vite-plugin-uni": "https://gitpkg.vercel.app/txlct/uniapp/packages/vite-plugin-uni?v3.0.15-beta3",
+    "@dcloudio/uni-mp-vue": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-vue?v3.0.15-beta3",
+    "@dcloudio/uni-shared": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?v3.0.15-beta3",
+    "@dcloudio/uni-mp-weixin": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-weixin?v3.0.15-beta3",
     "@vue/compiler-sfc": "3.2.47",
     "@vue/shared": "3.2.47",
     "debug": "^4.3.3"

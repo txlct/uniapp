@@ -2,11 +2,13 @@
   <comp>
     from {{ name }}
   </comp>
+  <vod-video></vod-video>
+  <test></test>
 </template>
 
 <script>
-// import comp from '@/components/comp/comp.vue';
 import { defineComponent, ref } from 'vue';
+import comp from '@/components/inner-comp/inner-comp.vue';
 
 export default defineComponent({
   name: 'demo',
@@ -14,7 +16,14 @@ export default defineComponent({
   //   comp,
   // },
 
+  components: {
+    comp,
+    'vod-video': 'plugin://vodVideo/player',
+    'test': 'plugin'
+  },
+
   componentPlaceholder: {
+    'vod-video': 'view',
     comp: 'button'
   },
 
