@@ -16,3 +16,4 @@ function rewriteSelfKey(dir) {
     dir.exp.content = '*this';
 }
 exports.rewriteSelfKey = rewriteSelfKey;
+//# sourceMappingURL=transformKey.js.map

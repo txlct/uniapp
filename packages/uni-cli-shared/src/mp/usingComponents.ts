@@ -26,7 +26,7 @@ import { M } from '../messages'
 import { BINDING_COMPONENTS, EXTNAME_VUE_RE } from '../constants'
 import { normalizeMiniProgramFilename, removeExt } from '../utils'
 import { cleanUrl, parseVueRequest } from '../vite/utils'
-import { addMiniProgramUsingComponents, addMiniProgramComponentPlaceholder } from '../json/mp/jsonFile'
+import { addMiniProgramUsingComponents, addMiniProgramComponentPlaceholder, setMiniProgramComponents } from '../json/mp/jsonFile'
 
 type BindingComponents = Record<
   string,
@@ -608,6 +608,9 @@ function parseComponents(ast: Program, propKeyName: 'components' | 'componentPla
           // 仅在组件定义有componentPlaceholder或plugin时增加value占位符返回
           ...(isStringValue && value && { value }),
         }
+
+        // 若配置插件路径，缓存tag列表
+        isPlugin && setMiniProgramComponents(tag, 'plugin');
       })
     },
   })

@@ -324,7 +324,7 @@ function createTransformContext(rootNode, { root = '', filename = '', isTS = fal
             return createCacheExpression(context.cached++, exp, isVNode);
         },
         isMiniProgramComponent(name) {
-            return miniProgramComponents[name];
+            return miniProgramComponents[name] || (0, uni_cli_shared_1.getMiniProgramComponents)(name);
         },
         rootNode: null,
     };
@@ -524,3 +524,4 @@ function transformFilterConditionalExpression(expr, context) {
     }
     return expr;
 }
+//# sourceMappingURL=transform.js.map

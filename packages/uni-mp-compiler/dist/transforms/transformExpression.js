@@ -293,3 +293,4 @@ function isBuiltInIdentifier(id) {
     return builtInIdentifiers.includes(id);
 }
 exports.isBuiltInIdentifier = isBuiltInIdentifier;
+//# sourceMappingURL=transformExpression.js.map

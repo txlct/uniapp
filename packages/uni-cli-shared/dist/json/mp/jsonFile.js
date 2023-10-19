@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.findMiniProgramUsingComponents = exports.isMiniProgramUsingComponent = exports.addMiniProgramComponentPlaceholder = exports.addMiniProgramUsingComponents = exports.addMiniProgramComponentJson = exports.addMiniProgramPageJson = exports.addMiniProgramAppJson = exports.findChangedJsonFiles = exports.normalizeJsonFilename = exports.findUsingComponents = exports.findJsonFile = exports.getComponentJsonFilenames = exports.hasJsonFile = exports.isMiniProgramPageSfcFile = exports.isMiniProgramPageFile = void 0;
+exports.findMiniProgramUsingComponents = exports.isMiniProgramUsingComponent = exports.addMiniProgramComponentPlaceholder = exports.addMiniProgramUsingComponents = exports.addMiniProgramComponentJson = exports.addMiniProgramPageJson = exports.addMiniProgramAppJson = exports.findChangedJsonFiles = exports.normalizeJsonFilename = exports.setMiniProgramComponents = exports.getMiniProgramComponents = exports.findUsingComponents = exports.findJsonFile = exports.getComponentJsonFilenames = exports.hasJsonFile = exports.isMiniProgramPageSfcFile = exports.isMiniProgramPageFile = void 0;
 const path_1 = __importDefault(require("path"));
 const shared_1 = require("@vue/shared");
 const utils_1 = require("../../utils");
@@ -15,6 +15,7 @@ const jsonPagesCache = new Map();
 const jsonComponentsCache = new Map();
 const jsonUsingComponentsCache = new Map();
 const jsonComponentPlaceholderCache = new Map();
+const miniProgramComponents = new Map();
 function isMiniProgramPageFile(file, inputDir) {
     if (inputDir && path_1.default.isAbsolute(file)) {
         file = (0, utils_1.normalizePath)(path_1.default.relative(inputDir, file));
@@ -47,6 +48,12 @@ function findUsingComponents(filename) {
     return jsonUsingComponentsCache.get(filename);
 }
 exports.findUsingComponents = findUsingComponents;
+const getMiniProgramComponents = (filename) => (miniProgramComponents.get(filename) || '');
+exports.getMiniProgramComponents = getMiniProgramComponents;
+const setMiniProgramComponents = (filename, value) => {
+    miniProgramComponents.set(filename, value);
+};
+exports.setMiniProgramComponents = setMiniProgramComponents;
 function normalizeJsonFilename(filename) {
     return (0, utils_1.normalizeNodeModules)(filename);
 }

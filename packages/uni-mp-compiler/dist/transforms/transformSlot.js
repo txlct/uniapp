@@ -185,3 +185,4 @@ function transformProperty(dir, _) {
         return `${dir.name}:${(0, codegen_1.genExpr)(dir.value)}`;
     }
 }
+//# sourceMappingURL=transformSlot.js.map

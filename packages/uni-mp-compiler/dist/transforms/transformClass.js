@@ -179,3 +179,4 @@ function createClassBindingByObjectExpression(expr) {
     });
     return (0, types_1.arrayExpression)(elements);
 }
+//# sourceMappingURL=transformClass.js.map

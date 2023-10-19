@@ -301,3 +301,4 @@ function createVForArrowFunctionExpression({ valueExpr, keyExpr, indexExpr, prop
     return (0, types_1.arrowFunctionExpression)(params, (0, types_1.blockStatement)([(0, types_1.returnStatement)((0, types_1.objectExpression)(properties))]));
 }
 exports.createVForArrowFunctionExpression = createVForArrowFunctionExpression;
+//# sourceMappingURL=vFor.js.map

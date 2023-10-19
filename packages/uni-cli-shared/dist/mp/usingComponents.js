@@ -384,6 +384,8 @@ function parseComponents(ast, propKeyName = 'components') {
                     // 仅在组件定义有componentPlaceholder或plugin时增加value占位符返回
                     ...(isStringValue && value && { value }),
                 };
+                // 若配置插件路径，缓存tag列表
+                isPlugin && (0, jsonFile_1.setMiniProgramComponents)(tag, 'plugin');
             });
         },
     });

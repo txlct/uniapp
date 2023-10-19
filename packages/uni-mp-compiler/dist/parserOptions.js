@@ -61,3 +61,4 @@ exports.parserOptions = {
         return 0 /* TextModes.DATA */;
     },
 };
+//# sourceMappingURL=parserOptions.js.map

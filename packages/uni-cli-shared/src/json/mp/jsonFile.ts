@@ -16,6 +16,7 @@ const jsonPagesCache = new Map<string, PageWindowOptions>()
 const jsonComponentsCache = new Map<string, ComponentJson>()
 const jsonUsingComponentsCache = new Map<string, UsingComponents>()
 const jsonComponentPlaceholderCache = new Map<string, UsingComponents>()
+const miniProgramComponents = new Map <string, 'plugin' | 'component' | 'dynamicLib'>();
 
 export function isMiniProgramPageFile(file: string, inputDir?: string) {
   if (inputDir && path.isAbsolute(file)) {
@@ -50,6 +51,14 @@ export function findJsonFile(filename: string) {
 export function findUsingComponents(filename: string) {
   return jsonUsingComponentsCache.get(filename)
 }
+
+export const getMiniProgramComponents = (filename: string) => (  
+  miniProgramComponents.get(filename) || ''
+);
+
+export const setMiniProgramComponents = (filename: string, value: 'plugin' | 'component' | 'dynamicLib') => {
+  miniProgramComponents.set(filename, value);
+};
 
 export function normalizeJsonFilename(filename: string) {
   return normalizeNodeModules(filename)
@@ -165,7 +174,7 @@ export function isMiniProgramUsingComponent(
 }
 
 interface MiniProgramComponents {
-  [name: string]: 'plugin' | 'component' | 'dynamicLib'
+  [name: string]: 'plugin' | 'component' | 'dynamicLib' 
 }
 
 export function findMiniProgramUsingComponents({

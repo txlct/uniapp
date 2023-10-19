@@ -118,3 +118,4 @@ function isBuiltIn({ arg, exp }) {
         builtInProps.includes(arg.content) &&
         exp?.type === 4 /* NodeTypes.SIMPLE_EXPRESSION */);
 }
+//# sourceMappingURL=transformIdentifier.js.map

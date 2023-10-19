@@ -26,3 +26,4 @@ const transformText = (node, _) => {
     ];
 };
 exports.transformText = transformText;
+//# sourceMappingURL=vText.js.map

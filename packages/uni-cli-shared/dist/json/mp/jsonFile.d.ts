@@ -5,6 +5,8 @@ export declare function hasJsonFile(filename: string): boolean;
 export declare function getComponentJsonFilenames(): string[];
 export declare function findJsonFile(filename: string): Record<string, any> | undefined;
 export declare function findUsingComponents(filename: string): UsingComponents | undefined;
+export declare const getMiniProgramComponents: (filename: string) => "plugin" | "component" | "dynamicLib" | "";
+export declare const setMiniProgramComponents: (filename: string, value: 'plugin' | 'component' | 'dynamicLib') => void;
 export declare function normalizeJsonFilename(filename: string): string;
 export declare function findChangedJsonFiles(supportGlobalUsingComponents?: boolean): Map<string, string>;
 export declare function addMiniProgramAppJson(appJson: Record<string, any>): void;

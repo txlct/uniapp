@@ -42,3 +42,4 @@ function compile(template, options = {}) {
     }));
 }
 exports.compile = compile;
+//# sourceMappingURL=index.js.map

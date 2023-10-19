@@ -197,3 +197,4 @@ function processVModel(node, transformVModel, context) {
         props.push(...dirs);
     }
 }
+//# sourceMappingURL=transformElement.js.map

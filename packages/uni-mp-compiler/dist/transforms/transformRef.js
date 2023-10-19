@@ -123,3 +123,4 @@ function processInlineRef(prop, context) {
     }
     return (0, types_1.arrowFunctionExpression)([], (0, types_1.objectExpression)(properties));
 }
+//# sourceMappingURL=transformRef.js.map

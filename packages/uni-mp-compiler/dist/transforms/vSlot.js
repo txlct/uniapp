@@ -272,3 +272,4 @@ function createVSlotCallExpression(slotComponent, vForScope, context) {
     ]);
 }
 exports.createVSlotCallExpression = createVSlotCallExpression;
+//# sourceMappingURL=vSlot.js.map

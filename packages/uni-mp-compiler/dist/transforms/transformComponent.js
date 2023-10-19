@@ -206,3 +206,4 @@ function rewritePropsBinding(dir, node, context) {
     dir.exp = (0, compiler_core_1.createSimpleExpression)((0, codegen_1.genBabelExpr)((0, utils_1.rewirteWithHelper)(runtimeHelpers_1.RENDER_PROPS, (0, ast_1.parseExpr)(dir.exp, context), dir.loc, context)) + ((0, vIf_1.isIfElementNode)(node) && node.vIf.name === 'else' ? `||''` : ''));
 }
 exports.rewritePropsBinding = rewritePropsBinding;
+//# sourceMappingURL=transformComponent.js.map

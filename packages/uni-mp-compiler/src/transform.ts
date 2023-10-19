@@ -36,7 +36,7 @@ import {
   CacheExpression,
   locStub,
 } from '@vue/compiler-core'
-import { findMiniProgramUsingComponents } from '@dcloudio/uni-cli-shared'
+import { findMiniProgramUsingComponents, getMiniProgramComponents } from '@dcloudio/uni-cli-shared'
 import IdentifierGenerator from './identifier'
 import {
   CodegenRootNode,
@@ -492,7 +492,7 @@ export function createTransformContext(
       return createCacheExpression(context.cached++, exp, isVNode)
     },
     isMiniProgramComponent(name) {
-      return miniProgramComponents[name]
+      return miniProgramComponents[name] || getMiniProgramComponents(name);
     },
     rootNode: null,
   }

@@ -33,3 +33,4 @@ function createRichText(node, dir) {
         loc: node.loc,
     };
 }
+//# sourceMappingURL=vHtml.js.map

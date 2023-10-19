@@ -39,3 +39,4 @@ function addCssVars(node, context) {
         }
     }
 }
+//# sourceMappingURL=transformRoot.js.map
