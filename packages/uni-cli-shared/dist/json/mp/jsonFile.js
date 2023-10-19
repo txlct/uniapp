@@ -167,6 +167,7 @@ function findMiniProgramUsingComponent(usingComponents, componentsDir) {
         const path = usingComponents[name];
         if (path.includes('plugin://')) {
             res[name] = 'plugin';
+            (0, exports.setMiniProgramComponents)(name, 'plugin');
         }
         else if (path.includes('dynamicLib://')) {
             res[name] = 'dynamicLib';
