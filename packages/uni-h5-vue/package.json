@@ -1,6 +1,6 @@
 {
   "name": "@dcloudio/uni-h5-vue",
-  "version": "3.0.0-3070320230222002-v3.0.15-v3.0.15-v3.0.15-beta4",
+  "version": "3.0.0-3070320230222002-v3.0.15-beta4",
   "description": "@dcloudio/uni-h5-vue",
   "main": "dist/vue.runtime.cjs.js",
   "module": "dist/vue.runtime.esm.js",
