@@ -12,6 +12,7 @@ import {
   ON_SHOW,
   ON_TAB_ITEM_TAP,
   ON_UNLOAD,
+  ON_SHARE_APP_MESSAGE,
 } from '@dcloudio/uni-shared'
 import { hasOwn, isArray, isFunction } from '@vue/shared'
 
@@ -31,6 +32,7 @@ export const PAGE_INIT_HOOKS = [
   ON_REACH_BOTTOM,
   ON_PULL_DOWN_REFRESH,
   ON_ADD_TO_FAVORITES,
+  ON_SHARE_APP_MESSAGE, // 分享菜单
   // 'onReady', // lifetimes.ready
   // 'onPageScroll', // 影响性能，开发者手动注册
   // 'onShareTimeline', // 右上角菜单，开发者手动注册
