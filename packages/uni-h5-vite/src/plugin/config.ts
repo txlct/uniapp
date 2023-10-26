@@ -75,7 +75,7 @@ export function createConfig(options: {
       }
     }
 
-    const { name, entryName, assetsName } = getPlatformType();
+    const { name, entryName, PREFIX } = getPlatformType();
 
     return {
       css: {
@@ -111,7 +111,7 @@ export function createConfig(options: {
               // 公共模块的js目录
               const { commonChunk = [] } = uniOption?.h5 || {};
 
-              return `assets/${commonChunk.find(i=>chunkInfo.name?.includes(i)) ? '': assetsName}[name]-[hash][extname]`
+              return `assets/${commonChunk.find(i=>chunkInfo.name?.includes(i)) ? '': PREFIX}[name]-[hash][extname]`
             } ,
             entryFileNames(chunkInfo) {
               const { assetsDir } = options.resolvedConfig!.build;
@@ -145,7 +145,7 @@ export function createConfig(options: {
                 }
               }
               
-              return path.posix.join(assetsDir, name, '[name].[hash].js')
+              return path.posix.join(assetsDir, PREFIX, '[name].[hash].js')
             },
             ...uniOption.h5?.rollupOptions?.output
           },

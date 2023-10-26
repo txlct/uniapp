@@ -58,7 +58,7 @@ function createConfig(options, uniOption) {
                 (0, shared_1.extend)(server.watch, userServer.watch);
             }
         }
-        const { name, entryName, assetsName } = (0, uni_cli_shared_1.getPlatformType)();
+        const { name, entryName, PREFIX } = (0, uni_cli_shared_1.getPlatformType)();
         return {
             css: {
                 postcss: {
@@ -92,7 +92,7 @@ function createConfig(options, uniOption) {
                         assetFileNames: (chunkInfo) => {
                             // 公共模块的js目录
                             const { commonChunk = [] } = uniOption?.h5 || {};
-                            return `assets/${commonChunk.find(i => chunkInfo.name?.includes(i)) ? '' : assetsName}[name]-[hash][extname]`;
+                            return `assets/${commonChunk.find(i => chunkInfo.name?.includes(i)) ? '' : PREFIX}[name]-[hash][extname]`;
                         },
                         entryFileNames(chunkInfo) {
                             const { assetsDir } = options.resolvedConfig.build;
@@ -115,7 +115,7 @@ function createConfig(options, uniOption) {
                                         '-[name].[hash].js');
                                 }
                             }
-                            return path_1.default.posix.join(assetsDir, name, '[name].[hash].js');
+                            return path_1.default.posix.join(assetsDir, PREFIX, '[name].[hash].js');
                         },
                         ...uniOption.h5?.rollupOptions?.output
                     },
