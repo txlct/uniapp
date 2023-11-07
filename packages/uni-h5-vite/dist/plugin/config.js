@@ -108,7 +108,7 @@ function createConfig(options, uniOption) {
                             if (commonChunk.includes(chunkInfo.name)) {
                                 return path_1.default.posix.join(assetsDir, '[name].[hash].js');
                             }
-                            if (chunkInfo.facadeModuleId) {
+                            if (chunkInfo.facadeModuleId?.includes('src/pages')) {
                                 const dirname = path_1.default.relative(inputDir, path_1.default.dirname(chunkInfo.facadeModuleId));
                                 if (dirname) {
                                     return path_1.default.posix.join(assetsDir, name, (0, uni_cli_shared_1.normalizePath)(dirname).replace(/\//g, '-') +

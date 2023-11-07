@@ -130,7 +130,7 @@ export function createConfig(options: {
                 return path.posix.join(assetsDir, '[name].[hash].js');
               }
 
-              if (chunkInfo.facadeModuleId) {
+              if (chunkInfo.facadeModuleId?.includes('src/pages')) {
                 const dirname = path.relative(
                   inputDir,
                   path.dirname(chunkInfo.facadeModuleId)
