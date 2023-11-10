@@ -5,3 +5,4 @@ export declare const enum DOMNamespaces {
     MATH_ML = 2
 }
 export declare const parserOptions: ParserOptions;
+//# sourceMappingURL=parserOptions.d.ts.map

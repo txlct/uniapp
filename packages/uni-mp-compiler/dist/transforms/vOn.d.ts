@@ -6,3 +6,4 @@ export interface VOnDirectiveNode extends DirectiveNode {
 }
 export declare const transformOn: DirectiveTransform;
 export declare function wrapperVOn(value: ExpressionNode, node: ElementNode, context: TransformContext): ExpressionNode;
+//# sourceMappingURL=vOn.d.ts.map

@@ -9,3 +9,4 @@ export declare const transformComponent: NodeTransform;
 export declare function rewriteBinding({ tag, props }: ComponentNode, context: TransformContext): void;
 export declare function isPropsBinding({ arg }: DirectiveNode): boolean | undefined;
 export declare function rewritePropsBinding(dir: DirectiveNode, node: ElementNode, context: TransformContext): void;
+//# sourceMappingURL=transformComponent.d.ts.map

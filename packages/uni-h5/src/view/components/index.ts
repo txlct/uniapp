@@ -11,6 +11,8 @@ import AdDraw from './ad-draw/index'
 import Camera from './camera/index'
 import LivePlayer from './live-player/index'
 import LivePusher from './live-pusher/index'
+import ChannelVideo from './chanel-video/index'
+
 export {
   Video,
   WebView,
@@ -25,4 +27,5 @@ export {
   Camera,
   LivePlayer,
   LivePusher,
+  ChannelVideo,
 }

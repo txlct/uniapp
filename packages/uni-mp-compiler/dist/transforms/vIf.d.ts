@@ -11,3 +11,4 @@ export declare function isIfElementNode(node: unknown): node is IfElementNode;
 export declare const transformIf: NodeTransform;
 export declare function processIf(node: ElementNode, dir: DirectiveNode, context: TransformContext, processCodegen?: (node: IfNode, branch: IfElementNode, isRoot: boolean) => (() => void) | undefined): (() => void) | undefined;
 export {};
+//# sourceMappingURL=vIf.d.ts.map

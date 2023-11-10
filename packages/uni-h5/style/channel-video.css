@@ -1,0 +1,8 @@
+uni-channel-video {
+  display: block;
+  overflow: hidden;
+}
+
+uni-channel-video[hidden] {
+  display: none;
+}

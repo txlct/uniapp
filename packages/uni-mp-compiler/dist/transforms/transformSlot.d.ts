@@ -4,3 +4,4 @@ export declare function rewriteSlot(node: SlotOutletNode, context: TransformCont
 export interface NameScopedSlotDirectiveNode extends DirectiveNode {
     slotName: string;
 }
+//# sourceMappingURL=transformSlot.d.ts.map

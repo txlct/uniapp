@@ -3,6 +3,7 @@
     "outDir": "dist",
     "sourceMap": false,
     "declaration": true,
+    "declarationMap": true,
     "declarationDir": "./dist/packages/uni-shared/src",
     "target": "es2015",
     "module": "esnext",

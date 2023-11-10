@@ -17,3 +17,4 @@ export interface TemplateCodegenContext {
 export declare function generate({ children }: RootNode, { slot, event, scopeId, emitFile, filename, directive, lazyElement, isBuiltInComponent, isMiniProgramComponent, component, }: TemplateCodegenOptions): void;
 export declare function genNode(node: TemplateChildNode, context: TemplateCodegenContext): void;
 export declare function genElementProps(node: ElementNode, virtualHost: boolean, context: TemplateCodegenContext): void;
+//# sourceMappingURL=codegen.d.ts.map

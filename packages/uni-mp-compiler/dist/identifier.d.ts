@@ -5,3 +5,4 @@ export default class IdentifierGenerator {
     _increment(): void;
     [Symbol.iterator](): Generator<string, void, unknown>;
 }
+//# sourceMappingURL=identifier.d.ts.map

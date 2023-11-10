@@ -4,3 +4,4 @@ export declare function isStyleBinding({ arg, exp }: DirectiveNode): boolean | u
 export declare function findStaticStyleIndex(props: (AttributeNode | DirectiveNode)[]): number;
 export declare function rewriteStyle(index: number, styleBindingProp: DirectiveNode, props: (AttributeNode | DirectiveNode)[], virtualHost: boolean, context: TransformContext): void;
 export declare function createVirtualHostStyle(props: (AttributeNode | DirectiveNode)[], context: TransformContext): DirectiveNode;
+//# sourceMappingURL=transformStyle.d.ts.map

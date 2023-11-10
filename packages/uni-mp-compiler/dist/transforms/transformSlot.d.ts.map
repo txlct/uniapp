@@ -1,0 +1,1 @@
+{"version":3,"file":"transformSlot.d.ts","sourceRoot":"","sources":["../../src/transforms/transformSlot.ts"],"names":[],"mappings":"AAAA,OAAO,EAKL,aAAa,EAQb,cAAc,EACf,MAAM,oBAAoB,CAAA;AAK3B,OAAO,EAAiC,gBAAgB,EAAE,MAAM,cAAc,CAAA;AAW9E,wBAAgB,WAAW,CAAC,IAAI,EAAE,cAAc,EAAE,OAAO,EAAE,gBAAgB,QAoG1E;AAkCD,MAAM,WAAW,2BAA4B,SAAQ,aAAa;IAChE,QAAQ,EAAE,MAAM,CAAA;CACjB"}

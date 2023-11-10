@@ -12,3 +12,4 @@ interface GenNodeContext {
 export declare function genBabelExpr(expr: Expression, opts?: GeneratorOptions): string;
 export declare function genExpr(node: CodegenNode | symbol | string, context?: GenNodeContext): string;
 export {};
+//# sourceMappingURL=codegen.d.ts.map

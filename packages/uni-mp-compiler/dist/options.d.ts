@@ -88,3 +88,4 @@ export interface TemplateCodegenOptions extends Omit<MiniProgramCompilerOptions,
 }
 export type CompilerOptions = ParserOptions & TransformOptions & CodegenOptions;
 export {};
+//# sourceMappingURL=options.d.ts.map

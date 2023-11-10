@@ -14,3 +14,4 @@ export declare function findCurrentPath(id: string, scope: CodegenScope): Binary
  */
 export declare function rewriteScopedSlotVForScope(vForScope: CodegenVForScope, parentScope: CodegenScope, context: TransformContext): void;
 export declare function createVSlotCallExpression(slotComponent: ComponentNode, vForScope: CodegenVForScope, context: TransformContext): import("@babel/types").CallExpression;
+//# sourceMappingURL=vSlot.d.ts.map

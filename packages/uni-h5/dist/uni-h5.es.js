@@ -2081,7 +2081,7 @@ function normalizeCustomEvent(name, domEvt, el, detail) {
   };
 }
 const uniFormKey = PolySymbol(process.env.NODE_ENV !== "production" ? "uniForm" : "uf");
-const index$z = /* @__PURE__ */ defineBuiltInComponent({
+const index$A = /* @__PURE__ */ defineBuiltInComponent({
   name: "Form",
   emits: ["submit", "reset"],
   setup(_props, {
@@ -2141,7 +2141,7 @@ function useProvideLabel() {
   });
   return handlers;
 }
-const index$y = /* @__PURE__ */ defineBuiltInComponent({
+const index$z = /* @__PURE__ */ defineBuiltInComponent({
   name: "Label",
   props: labelProps,
   setup(props2, {
@@ -2272,7 +2272,7 @@ const buttonProps = {
     default: false
   }
 };
-const index$x = /* @__PURE__ */ defineBuiltInComponent({
+const index$y = /* @__PURE__ */ defineBuiltInComponent({
   name: "Button",
   props: buttonProps,
   setup(props2, {
@@ -4689,13 +4689,13 @@ const createMediaQueryObserver = /* @__PURE__ */ defineSyncApi("createMediaQuery
   }
   return new ServiceMediaQueryObserver(getCurrentPageVm());
 });
-let index$w = 0;
+let index$x = 0;
 let optionsCache = {};
 function operateEditor(componentId, pageId, type, options) {
   const data = { options };
   const needCallOptions = options && ("success" in options || "fail" in options || "complete" in options);
   if (needCallOptions) {
-    const callbackId = String(index$w++);
+    const callbackId = String(index$x++);
     data.callbackId = callbackId;
     optionsCache[callbackId] = options;
   }
@@ -7270,7 +7270,7 @@ const props$x = {
     default: true
   }
 };
-const index$v = /* @__PURE__ */ defineBuiltInComponent({
+const index$w = /* @__PURE__ */ defineBuiltInComponent({
   inheritAttrs: false,
   name: "Canvas",
   compatConfig: {
@@ -7745,7 +7745,7 @@ const props$w = {
     default: ""
   }
 };
-const index$u = /* @__PURE__ */ defineBuiltInComponent({
+const index$v = /* @__PURE__ */ defineBuiltInComponent({
   name: "CheckboxGroup",
   props: props$w,
   emits: ["change"],
@@ -7821,7 +7821,7 @@ const props$v = {
     default: ""
   }
 };
-const index$t = /* @__PURE__ */ defineBuiltInComponent({
+const index$u = /* @__PURE__ */ defineBuiltInComponent({
   name: "Checkbox",
   props: props$v,
   setup(props2, {
@@ -8768,7 +8768,7 @@ const props$t = /* @__PURE__ */ extend({}, props$u, {
     default: false
   }
 });
-const index$s = /* @__PURE__ */ defineBuiltInComponent({
+const index$t = /* @__PURE__ */ defineBuiltInComponent({
   name: "Editor",
   props: props$t,
   emit: ["ready", "focus", "blur", "input", "statuschange", ...emit$1],
@@ -8830,7 +8830,7 @@ const ICONS = {
     c: GREY_COLOR
   }
 };
-const index$r = /* @__PURE__ */ defineBuiltInComponent({
+const index$s = /* @__PURE__ */ defineBuiltInComponent({
   name: "Icon",
   props: {
     type: {
@@ -8894,7 +8894,7 @@ const IMAGE_MODES = {
   "bottom left": ["left bottom"],
   "bottom right": ["right bottom"]
 };
-const index$q = /* @__PURE__ */ defineBuiltInComponent({
+const index$r = /* @__PURE__ */ defineBuiltInComponent({
   name: "Image",
   props: props$s,
   setup(props2, {
@@ -11288,7 +11288,7 @@ function createNavigatorOnClick(props2) {
     }
   };
 }
-const index$p = /* @__PURE__ */ defineBuiltInComponent({
+const index$q = /* @__PURE__ */ defineBuiltInComponent({
   name: "Navigator",
   inheritAttrs: false,
   compatConfig: {
@@ -12409,7 +12409,7 @@ const progressProps = {
     default: 0
   }
 };
-const index$o = /* @__PURE__ */ defineBuiltInComponent({
+const index$p = /* @__PURE__ */ defineBuiltInComponent({
   name: "Progress",
   props: progressProps,
   setup(props2) {
@@ -12491,7 +12491,7 @@ const props$p = {
     default: ""
   }
 };
-const index$n = /* @__PURE__ */ defineBuiltInComponent({
+const index$o = /* @__PURE__ */ defineBuiltInComponent({
   name: "RadioGroup",
   props: props$p,
   // emits: ['change'],
@@ -12599,7 +12599,7 @@ const props$o = {
     default: ""
   }
 };
-const index$m = /* @__PURE__ */ defineBuiltInComponent({
+const index$n = /* @__PURE__ */ defineBuiltInComponent({
   name: "Radio",
   props: props$o,
   setup(props2, {
@@ -12942,7 +12942,7 @@ const props$n = {
     }
   }
 };
-const index$l = /* @__PURE__ */ defineBuiltInComponent({
+const index$m = /* @__PURE__ */ defineBuiltInComponent({
   name: "RichText",
   compatConfig: {
     MODE: 3
@@ -13514,7 +13514,7 @@ const props$l = {
     default: false
   }
 };
-const index$k = /* @__PURE__ */ defineBuiltInComponent({
+const index$l = /* @__PURE__ */ defineBuiltInComponent({
   name: "Slider",
   props: props$l,
   emits: ["changing", "change"],
@@ -14490,7 +14490,7 @@ const props$i = {
     default: ""
   }
 };
-const index$j = /* @__PURE__ */ defineBuiltInComponent({
+const index$k = /* @__PURE__ */ defineBuiltInComponent({
   name: "Switch",
   props: props$i,
   emits: ["change"],
@@ -14594,7 +14594,7 @@ function normalizeText(text2, { space, decode: decode2 }) {
   }
   return text2.replace(/&nbsp;/g, SPACE_UNICODE.nbsp).replace(/&ensp;/g, SPACE_UNICODE.ensp).replace(/&emsp;/g, SPACE_UNICODE.emsp).replace(/&lt;/g, "<").replace(/&gt;/g, ">").replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&apos;/g, "'");
 }
-const index$i = /* @__PURE__ */ defineBuiltInComponent({
+const index$j = /* @__PURE__ */ defineBuiltInComponent({
   name: "Text",
   props: {
     selectable: {
@@ -14670,7 +14670,7 @@ function setFixMargin() {
   const DARK_TEST_STRING = "(prefers-color-scheme: dark)";
   fixMargin = String(navigator.platform).indexOf("iP") === 0 && String(navigator.vendor).indexOf("Apple") === 0 && window.matchMedia(DARK_TEST_STRING).media !== DARK_TEST_STRING;
 }
-const index$h = /* @__PURE__ */ defineBuiltInComponent({
+const index$i = /* @__PURE__ */ defineBuiltInComponent({
   name: "Textarea",
   props: props$h,
   emits: ["confirm", "linechange", ...emit],
@@ -14798,7 +14798,7 @@ const index$h = /* @__PURE__ */ defineBuiltInComponent({
     };
   }
 });
-const index$g = /* @__PURE__ */ defineBuiltInComponent({
+const index$h = /* @__PURE__ */ defineBuiltInComponent({
   name: "View",
   props: extend({}, hoverProps),
   setup(props2, {
@@ -14869,13 +14869,13 @@ function useOn(name, callback) {
   onMounted(() => UniViewJSBridge.on(name, callback));
   onBeforeUnmount(() => UniViewJSBridge.off(name));
 }
-let index$f = 0;
+let index$g = 0;
 function useContextInfo(_id) {
   const page = useCurrentPageId();
   const instance2 = getCurrentInstance();
   const vm = instance2.proxy;
   const type = vm.$options.name.toLowerCase();
-  const id2 = _id || vm.id || `context${index$f++}`;
+  const id2 = _id || vm.id || `context${index$g++}`;
   onMounted(() => {
     const el = vm.$el;
     el.__uniContextInfo = {
@@ -15451,7 +15451,7 @@ function initHistory() {
   });
   return history2;
 }
-const index$e = {
+const index$f = {
   install(app) {
     initApp$1(app);
     initViewPlugin(app);
@@ -16368,7 +16368,7 @@ const props$g = {
     default: true
   }
 };
-const index$d = /* @__PURE__ */ defineBuiltInComponent({
+const index$e = /* @__PURE__ */ defineBuiltInComponent({
   name: "Video",
   props: props$g,
   emits: ["fullscreenchange", "progress", "loadedmetadata", "waiting", "error", "play", "pause", "ended", "timeupdate"],
@@ -16601,7 +16601,7 @@ const props$f = {
     default: true
   }
 };
-const index$c = /* @__PURE__ */ defineBuiltInComponent({
+const index$d = /* @__PURE__ */ defineBuiltInComponent({
   inheritAttrs: false,
   name: "WebView",
   props: props$f,
@@ -16690,11 +16690,11 @@ function useWebViewSize(rootRef, iframeRef, fullscreen) {
   };
   return _resize;
 }
-let index$b = 0;
+let index$c = 0;
 function getJSONP(url, options, success, error) {
   var js = document.createElement("script");
   var callbackKey = options.callback || "callback";
-  var callbackName = "__uni_jsonp_callback_" + index$b++;
+  var callbackName = "__uni_jsonp_callback_" + index$c++;
   var timeout = options.timeout || 3e4;
   var timing;
   function end() {
@@ -19091,13 +19091,13 @@ function usePopup(props2, {
   });
   return visible;
 }
-let index$a = 0;
+let index$b = 0;
 let overflow = "";
 function preventScroll(prevent) {
-  let before = index$a;
-  index$a += prevent ? 1 : -1;
-  index$a = Math.max(0, index$a);
-  if (index$a > 0) {
+  let before = index$b;
+  index$b += prevent ? 1 : -1;
+  index$b = Math.max(0, index$b);
+  if (index$b > 0) {
     if (before === 0) {
       overflow = document.body.style.overflow;
       document.body.style.overflow = "hidden";
@@ -22689,6 +22689,16 @@ const createLivePlayerContext = /* @__PURE__ */ defineSyncApi(
   API_CREATE_LIVE_PLAYER_CONTEXT,
   createUnsupportedSyncApi(API_CREATE_LIVE_PLAYER_CONTEXT)
 );
+const API_RESERVE_CHANNEL_LIVE = "reserveChannelsLive";
+const reserveChannelsLive = /* @__PURE__ */ defineAsyncApi(
+  API_RESERVE_CHANNEL_LIVE,
+  createUnsupportedSyncApi(API_RESERVE_CHANNEL_LIVE)
+);
+const API_GET_CHANNELS_LIVE_NOTICE_INFO = "getChannelsLiveNoticeInfo";
+const getChannelsLiveNoticeInfo = /* @__PURE__ */ defineAsyncApi(
+  API_GET_CHANNELS_LIVE_NOTICE_INFO,
+  createUnsupportedSyncApi(API_GET_CHANNELS_LIVE_NOTICE_INFO)
+);
 const API_SAVE_FILE = "saveFile";
 const saveFile = /* @__PURE__ */ defineAsyncApi(
   API_SAVE_FILE,
@@ -22808,6 +22818,7 @@ const api = /* @__PURE__ */ Object.defineProperty({
   cssVar,
   downloadFile,
   getAppBaseInfo,
+  getChannelsLiveNoticeInfo,
   getClipboardData,
   getDeviceInfo,
   getEnterOptionsSync,
@@ -22900,6 +22911,7 @@ const api = /* @__PURE__ */ Object.defineProperty({
   removeStorageSync,
   removeTabBarBadge,
   request,
+  reserveChannelsLive,
   saveFile,
   saveImageToPhotosAlbum,
   saveVideoToPhotosAlbum,
@@ -23528,7 +23540,7 @@ const props$1 = {
     default: 0
   }
 };
-const index$9 = /* @__PURE__ */ defineBuiltInComponent({
+const index$a = /* @__PURE__ */ defineBuiltInComponent({
   name: "CoverView",
   compatConfig: {
     MODE: 3
@@ -23569,7 +23581,7 @@ const index$9 = /* @__PURE__ */ defineBuiltInComponent({
     };
   }
 });
-const index$8 = /* @__PURE__ */ defineBuiltInComponent({
+const index$9 = /* @__PURE__ */ defineBuiltInComponent({
   name: "CoverImage",
   compatConfig: {
     MODE: 3
@@ -23744,7 +23756,7 @@ const props = {
     default: ""
   }
 };
-const index$7 = /* @__PURE__ */ defineBuiltInComponent({
+const index$8 = /* @__PURE__ */ defineBuiltInComponent({
   name: "Picker",
   compatConfig: {
     MODE: 3
@@ -24385,12 +24397,13 @@ function usePickerForm(_resetFormData, _getFormData) {
     });
   }
 }
-const index$6 = /* @__PURE__ */ defineUnsupportedComponent("ad");
-const index$5 = /* @__PURE__ */ defineUnsupportedComponent("ad-content-page");
-const index$4 = /* @__PURE__ */ defineUnsupportedComponent("ad-draw");
-const index$3 = /* @__PURE__ */ defineUnsupportedComponent("camera");
-const index$2 = /* @__PURE__ */ defineUnsupportedComponent("live-player");
-const index$1 = /* @__PURE__ */ defineUnsupportedComponent("live-pusher");
+const index$7 = /* @__PURE__ */ defineUnsupportedComponent("ad");
+const index$6 = /* @__PURE__ */ defineUnsupportedComponent("ad-content-page");
+const index$5 = /* @__PURE__ */ defineUnsupportedComponent("ad-draw");
+const index$4 = /* @__PURE__ */ defineUnsupportedComponent("camera");
+const index$3 = /* @__PURE__ */ defineUnsupportedComponent("live-player");
+const index$2 = /* @__PURE__ */ defineUnsupportedComponent("live-pusher");
+const index$1 = /* @__PURE__ */ defineUnsupportedComponent("channel-video");
 const UniViewJSBridge$1 = /* @__PURE__ */ extend(ViewJSBridge, {
   publishHandler(event, args, pageId) {
     UniServiceJSBridge.subscribeHandler(event, args, pageId);
@@ -25159,52 +25172,53 @@ export {
   $off,
   $on,
   $once,
-  index$6 as Ad,
-  index$5 as AdContentPage,
-  index$4 as AdDraw,
+  index$7 as Ad,
+  index$6 as AdContentPage,
+  index$5 as AdDraw,
   AsyncErrorComponent,
   AsyncLoadingComponent,
-  index$x as Button,
-  index$3 as Camera,
-  index$v as Canvas,
-  index$t as Checkbox,
-  index$u as CheckboxGroup,
-  index$8 as CoverImage,
-  index$9 as CoverView,
-  index$s as Editor,
-  index$z as Form,
-  index$r as Icon,
-  index$q as Image,
+  index$y as Button,
+  index$4 as Camera,
+  index$w as Canvas,
+  index$1 as ChannelVideo,
+  index$u as Checkbox,
+  index$v as CheckboxGroup,
+  index$9 as CoverImage,
+  index$a as CoverView,
+  index$t as Editor,
+  index$A as Form,
+  index$s as Icon,
+  index$r as Image,
   Input,
-  index$y as Label,
+  index$z as Label,
   LayoutComponent,
-  index$2 as LivePlayer,
-  index$1 as LivePusher,
+  index$3 as LivePlayer,
+  index$2 as LivePusher,
   Map$1 as Map,
   MovableArea,
   MovableView,
-  index$p as Navigator,
+  index$q as Navigator,
   index as PageComponent,
-  index$7 as Picker,
+  index$8 as Picker,
   PickerView,
   PickerViewColumn,
-  index$o as Progress,
-  index$m as Radio,
-  index$n as RadioGroup,
+  index$p as Progress,
+  index$n as Radio,
+  index$o as RadioGroup,
   ResizeSensor,
-  index$l as RichText,
+  index$m as RichText,
   ScrollView,
-  index$k as Slider,
+  index$l as Slider,
   Swiper,
   SwiperItem,
-  index$j as Switch,
-  index$i as Text,
-  index$h as Textarea,
+  index$k as Switch,
+  index$j as Text,
+  index$i as Textarea,
   UniServiceJSBridge$1 as UniServiceJSBridge,
   UniViewJSBridge$1 as UniViewJSBridge,
-  index$d as Video,
-  index$g as View,
-  index$c as WebView,
+  index$e as Video,
+  index$h as View,
+  index$d as WebView,
   addInterceptor,
   addPhoneContact,
   arrayBufferToBase64,
@@ -25239,6 +25253,7 @@ export {
   downloadFile,
   getApp$1 as getApp,
   getAppBaseInfo,
+  getChannelsLiveNoticeInfo,
   getClipboardData,
   getCurrentPages$1 as getCurrentPages,
   getDeviceInfo,
@@ -25323,7 +25338,7 @@ export {
   openDocument,
   openLocation,
   pageScrollTo,
-  index$e as plugin,
+  index$f as plugin,
   preloadPage,
   previewImage,
   reLaunch,
@@ -25334,6 +25349,7 @@ export {
   removeStorageSync,
   removeTabBarBadge,
   request,
+  reserveChannelsLive,
   saveFile,
   saveImageToPhotosAlbum,
   saveVideoToPhotosAlbum,

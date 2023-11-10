@@ -1,0 +1,1 @@
+{"version":3,"file":"transformKey.d.ts","sourceRoot":"","sources":["../../src/transforms/transformKey.ts"],"names":[],"mappings":"AAAA,OAAO,EACL,aAAa,EAGd,MAAM,oBAAoB,CAAA;AAC3B,OAAO,EAAE,cAAc,EAAE,MAAM,QAAQ,CAAA;AAEvC,wBAAgB,SAAS,CACvB,EAAE,GAAG,EAAE,GAAG,EAAE,EAAE,aAAa,EAC3B,IAAI,EAAE,cAAc,CAAC,MAAM,CAAC,GAAG,KAAK,uBAWrC;AAED,wBAAgB,cAAc,CAAC,GAAG,EAAE,aAAa,QAEhD"}

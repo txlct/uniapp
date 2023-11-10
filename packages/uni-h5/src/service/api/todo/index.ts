@@ -44,6 +44,23 @@ export const createLivePlayerContext = defineSyncApi<
   createUnsupportedSyncApi(API_CREATE_LIVE_PLAYER_CONTEXT)
 )
 
+// channel-video
+const API_RESERVE_CHANNEL_LIVE = 'reserveChannelsLive'
+export const reserveChannelsLive = defineAsyncApi<
+  typeof uni.reserveChannelsLive
+>(
+  API_RESERVE_CHANNEL_LIVE,
+  createUnsupportedSyncApi(API_RESERVE_CHANNEL_LIVE)
+);
+
+const API_GET_CHANNELS_LIVE_NOTICE_INFO = 'getChannelsLiveNoticeInfo';
+export const getChannelsLiveNoticeInfo = defineAsyncApi<
+  typeof uni.getChannelsLiveNoticeInfo
+>(
+  API_GET_CHANNELS_LIVE_NOTICE_INFO,
+  createUnsupportedSyncApi(API_GET_CHANNELS_LIVE_NOTICE_INFO)
+);
+
 const API_SAVE_FILE = 'saveFile'
 export const saveFile = defineAsyncApi<typeof uni.saveFile>(
   API_SAVE_FILE,

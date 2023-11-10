@@ -35,3 +35,4 @@ export interface ForParseResult {
 export declare function parseForExpression(input: SimpleExpressionNode, context: TransformContext): ForParseResult | undefined;
 export declare function createForLoopParams({ value, key, index }: ForParseResult, memoArgs?: ExpressionNode[]): ExpressionNode[];
 export declare function createVForArrowFunctionExpression({ valueExpr, keyExpr, indexExpr, properties, }: CodegenVForScope): import("@babel/types").ArrowFunctionExpression;
+//# sourceMappingURL=vFor.d.ts.map

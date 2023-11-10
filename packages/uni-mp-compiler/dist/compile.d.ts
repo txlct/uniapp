@@ -11,3 +11,4 @@ export declare function getBaseTransformPreset({ prefixIdentifiers, skipTransfor
 export declare function baseCompile(template: string, options?: CompilerOptions): Omit<import("@vue/compiler-core").CodegenResult, "ast"> & {
     ast: CodegenRootNode;
 };
+//# sourceMappingURL=compile.d.ts.map

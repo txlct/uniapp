@@ -76,3 +76,4 @@ export declare function createTransformContext(rootNode: RootNode, { root, filen
 export declare type StructuralDirectiveTransform = (node: ElementNode, dir: DirectiveNode, context: TransformContext) => void | (() => void);
 export declare function createStructuralDirectiveTransform(name: string | RegExp, fn: StructuralDirectiveTransform): NodeTransform;
 export {};
+//# sourceMappingURL=transform.d.ts.map

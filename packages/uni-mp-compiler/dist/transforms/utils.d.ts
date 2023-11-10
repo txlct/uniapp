@@ -25,3 +25,4 @@ export declare function findReferencedScope(node: Expression, scope: CodegenScop
 export declare function isReferencedByIds(node: Expression, knownIds: string[]): boolean;
 export declare function isStaticLiteral(value: object | null | undefined): boolean;
 export declare function removeAttribute(node: ElementNode, name: string): void;
+//# sourceMappingURL=utils.d.ts.map

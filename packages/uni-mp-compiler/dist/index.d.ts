@@ -10,3 +10,4 @@ export { transformModel } from './transforms/vModel';
 export * from './runtimeHelpers';
 export declare function parse(template: string, options?: ParserOptions): RootNode;
 export declare function compile(template: string, options?: CompilerOptions): CodegenResult;
+//# sourceMappingURL=index.d.ts.map

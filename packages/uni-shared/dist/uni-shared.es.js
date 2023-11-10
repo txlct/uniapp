@@ -44,6 +44,7 @@ const BUILT_IN_TAG_NAMES = [
     'video',
     'view',
     'web-view',
+    'channel-video',
 ];
 const BUILT_IN_TAGS = BUILT_IN_TAG_NAMES.map((tag) => 'uni-' + tag);
 const TAGS = [

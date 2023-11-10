@@ -14,3 +14,4 @@ export interface MPCompilerError extends CompilerError {
     code: MPErrorCodes;
 }
 export declare function createMPCompilerError(code: MPErrorCodes, loc?: SourceLocation, additionalMessage?: string): MPCompilerError;
+//# sourceMappingURL=errors.d.ts.map

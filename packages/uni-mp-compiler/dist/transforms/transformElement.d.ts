@@ -7,3 +7,4 @@ export interface DirectiveTransformResult {
 }
 export declare const transformElement: NodeTransform;
 export declare function processProps(node: ElementNode, context: TransformContext, props?: ElementNode['props']): void;
+//# sourceMappingURL=transformElement.d.ts.map
