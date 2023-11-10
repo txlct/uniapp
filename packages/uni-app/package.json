@@ -1,6 +1,6 @@
 {
   "name": "@dcloudio/uni-app",
-  "version": "3.0.0-3070320230222002-v3.0.18",
+  "version": "3.0.0-3070320230222002-v3.0.18-beta",
   "description": "@dcloudio/uni-app",
   "main": "./dist/uni-app.cjs.js",
   "module": "./dist/uni-app.es.js",
@@ -25,10 +25,10 @@
   },
   "dependencies": {
     "@dcloudio/uni-cloud": "3.0.0-3070320230222002",
-    "@dcloudio/uni-components": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-components?v3.0.18",
+    "@dcloudio/uni-components": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-components?feature/channel-video",
     "@dcloudio/uni-i18n": "3.0.0-3070320230222002",
     "@dcloudio/uni-push": "3.0.0-3070320230222002",
-    "@dcloudio/uni-shared": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?v3.0.18",
+    "@dcloudio/uni-shared": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?feature/channel-video",
     "@dcloudio/uni-stat": "3.0.0-3070320230222002",
     "@vue/shared": "3.2.47"
   },
