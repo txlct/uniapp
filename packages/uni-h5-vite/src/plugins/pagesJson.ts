@@ -180,8 +180,10 @@ function generatePageDefineCode(pageOptions: UniApp.PagesJsonPageOptions) {
 
   if(pageOptions.style.notAsync){
     return `
-    import ${pageIdent} from './${pagePathWithExtname}';
-    const ${pageIdent}Loader = ${pageIdent};
+    import ${pageIdent}Cmp from './${pagePathWithExtname}';
+    // const ${pageIdent} = setupPage(${pageIdent}Cmp.default || ${pageIdent}Cmp);
+    const ${pageIdent}Loader = () => Promise.resolve(setupPage(${pageIdent}Cmp.default || ${pageIdent}Cmp));
+    const ${pageIdent} = defineAsyncComponent(extend({loader:${pageIdent}Loader},AsyncComponentOptions))
     `
   }
   return `const ${pageIdent}Loader = ()=>import('./${pagePathWithExtname}').then(com => setupPage(com.default || com))
