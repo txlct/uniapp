@@ -1,7 +1,6 @@
 {
     "typescript.tsdk": "node_modules/typescript/lib",
     "files.exclude": {
-        "**/uni-app-plus": true,
         "**/uni-mp-alipay": true,
         "**/uni-mp-baidu": true,
         "**/uni-mp-kuaishou": true,
@@ -11,7 +10,6 @@
         "**/uni-nvue-styler": true,
         "**/uni-quickapp-webview": true,
         "**/uni-cloud": true,
-        "**/uni-app-*": true,
         "**/playground/nvue": true,
         "**/playground/ssr": true,
         "**/playground/uts": true,

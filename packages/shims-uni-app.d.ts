@@ -226,6 +226,7 @@ declare namespace UniNamespace {
     subNVues?: PagesJsonPageStyleSubNVue[]
     disableSwipeBack?: Boolean
     popGesture?: 'close' | 'none'
+    notAsync: boolean
   }
   interface PageRouteMeta extends PagesJsonPageStyle {
     id?: number

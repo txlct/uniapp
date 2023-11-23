@@ -84,7 +84,8 @@ function createConfig(options, uniOption) {
                     input: {
                         [entryName]: entryName
                             ? getFilePath(`${entryName}.html`)
-                            : getFilePath('index.html')
+                            : getFilePath('index.html'),
+                        ...(typeof uniOption.h5?.rollupOptions?.input === 'object' ? uniOption.h5?.rollupOptions?.input : {})
                     },
                     // resolveSSRExternal 会判定package.json，hbx 工程可能没有，通过 rollup 来配置
                     external: (0, uni_cli_shared_1.isSsr)(env.command, config) ? ssr_1.external : [],

@@ -177,8 +177,17 @@ function generatePageDefineCode(pageOptions: UniApp.PagesJsonPageOptions) {
     pagePathWithExtname = pageOptions.path + '.vue'
   }
   const pageIdent = normalizeIdentifier(pageOptions.path)
+
+  if(pageOptions.style.notAsync){
+    return `
+    import ${pageIdent} from './${pagePathWithExtname}';
+    const ${pageIdent}Loader = ${pageIdent};
+    `
+  }
   return `const ${pageIdent}Loader = ()=>import('./${pagePathWithExtname}').then(com => setupPage(com.default || com))
-const ${pageIdent} = defineAsyncComponent(extend({loader:${pageIdent}Loader},AsyncComponentOptions))`
+const ${pageIdent} = defineAsyncComponent(extend({loader:${pageIdent}Loader},AsyncComponentOptions))
+`
+
 }
 
 function generatePagesDefineCode(
@@ -213,9 +222,11 @@ function generatePagesDefineCode(
 }
 
 function generatePageRoute(
-  { path, meta }: UniApp.UniRoute,
+  pageOptions: UniApp.UniRoute,
   _config: ResolvedConfig
 ) {
+  const { path, meta } = pageOptions
+
   const { isEntry } = meta
   const alias = isEntry ? `\n  alias:'/${path}',` : ''
   // 目前单页面未处理 query=>props
