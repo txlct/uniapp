@@ -7,8 +7,9 @@ const currentVersion = require('../package.json').version
 const { prompt } = require('enquirer')
 const execa = require('execa')
 const { targets: packageTargets, fuzzyMatchTarget } = require('./utils')
+const { remove, ensureDir } = require('fs-extra');
 
-const remoteRepoUrlPrefix = 'https://gitpkg.vercel.app/txlct/uniapp/packages/'
+const remoteRepoUrlPrefix = 'https://xqh-1257029999.cos.ap-guangzhou.myqcloud.com/'
 // 参数
 const targetsArgs = args._ || [];
 const targets = targetsArgs.length ? targetsArgs : packageTargets;
@@ -50,12 +51,29 @@ const setTargetMap = ({ tag, repo }) => {
     const slash = repo.endsWith('/') ? '' : '/';
 
     const value = repo
-      ? `${repo}${slash}${name}${tag ? `?${tag}` : ''}`
+      ? `${repo}${slash}${name}${tag ? `-${tag}.tgz` : ''}`
       : tag;
 
     targetMap.set(target, value)
   });
 };  
+
+const buildPackPublish  = async (tag) => {
+  await remove(`./pack/*`);
+  await ensureDir('./pack');
+
+  for (const pkg of packages) {
+    if (!targets.includes(pkg)) continue;
+
+    const pkgRoot = getPkgRoot(pkg);
+
+    process.chdir(pkgRoot);
+
+    await run('npm', ['pack', '--pack-destination', path.resolve(__dirname, '../pack')]);
+  }
+
+  process.chdir(path.resolve(__dirname, '..'));
+};
 
 async function main() {
   let isRemoteRepo = false;
@@ -173,24 +191,28 @@ async function main() {
   const { stdout } = await run('git', ['diff'], { stdio: 'pipe' })
 
   if (stdout && !isLocal && isRemoteRepo && isNeedTag) {
-    step('\nCommitting changes...')
-    await run('git', ['add', '-A']);
-    await run('git', ['commit', '-m', `release: ${tagname}`])
-    step('\nGit tag...')
-    await run('git', ['tag', `${tagname}`])
-    // push to GitHub
-    step('\nPushing tag to GitHub...')
-    await run('git', ['push', 'origin', `${tagname}`])
+    step('\nGenerate npm pack... ');
 
-    // update pnpm-lock.yaml
-    step('\nUpdating lockfile...')
-    await run(`pnpm`, ['install', '--prefer-offline'])
+    // generate pack publish tar file
+    buildPackPublish(tagname);
+    // step('\nCommitting changes...')
+    // await run('git', ['add', '-A']);
+    // await run('git', ['commit', '-m', `release: ${tagname}`])
+    // step('\nGit tag...')
+    // await run('git', ['tag', `${tagname}`])
+    // // push to GitHub
+    // step('\nPushing tag to GitHub...')
+    // await run('git', ['push', 'origin', `${tagname}`])
 
-    step('\nCommitting pnpm-lock changes...')
-    await run('git', ['add', '-A']);
-    await run('git', ['commit', '-m', `release: ${tagname}`])
-    step('\nPushing to GitHub...')
-    await run('git', ['push', 'origin'])
+    // // update pnpm-lock.yaml
+    // step('\nUpdating lockfile...')
+    // await run(`pnpm`, ['install', '--prefer-offline'])
+
+    // step('\nCommitting pnpm-lock changes...')
+    // await run('git', ['add', '-A']);
+    // await run('git', ['commit', '-m', `release: ${tagname}`])
+    // step('\nPushing to GitHub...')
+    // await run('git', ['push', 'origin'])
   } else {
     console.log('No changes to commit.')
   }

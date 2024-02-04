@@ -30,10 +30,10 @@
     "@vue/compiler-core": "3.2.47"
   },
   "dependencies": {
-    "@dcloudio/uni-cli-shared": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?v3.0.22",
-    "@dcloudio/uni-mp-vite": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-vite?v3.0.22",
-    "@dcloudio/uni-mp-vue": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-vue?v3.0.22",
-    "@dcloudio/uni-shared": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?v3.0.22",
+    "@dcloudio/uni-cli-shared": "https://xqh-1257029999.cos.ap-guangzhou.myqcloud.com/uni-cli-shared-v3.0.22.tgz",
+    "@dcloudio/uni-mp-vite": "https://xqh-1257029999.cos.ap-guangzhou.myqcloud.com/uni-mp-vite-v3.0.22.tgz",
+    "@dcloudio/uni-mp-vue": "https://xqh-1257029999.cos.ap-guangzhou.myqcloud.com/uni-mp-vue-v3.0.22.tgz",
+    "@dcloudio/uni-shared": "https://xqh-1257029999.cos.ap-guangzhou.myqcloud.com/uni-shared-v3.0.22.tgz",
     "@vue/shared": "3.2.47",
     "jimp": "^0.10.1",
     "licia": "^1.29.0",

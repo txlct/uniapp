@@ -25,10 +25,10 @@
   },
   "dependencies": {
     "@dcloudio/uni-cloud": "3.0.0-3070320230222002",
-    "@dcloudio/uni-components": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-components?v3.0.22",
+    "@dcloudio/uni-components": "https://xqh-1257029999.cos.ap-guangzhou.myqcloud.com/uni-components-v3.0.22.tgz",
     "@dcloudio/uni-i18n": "3.0.0-3070320230222002",
     "@dcloudio/uni-push": "3.0.0-3070320230222002",
-    "@dcloudio/uni-shared": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?v3.0.22",
+    "@dcloudio/uni-shared": "https://xqh-1257029999.cos.ap-guangzhou.myqcloud.com/uni-shared-v3.0.22.tgz",
     "@dcloudio/uni-stat": "3.0.0-3070320230222002",
     "@vue/shared": "3.2.47"
   },
