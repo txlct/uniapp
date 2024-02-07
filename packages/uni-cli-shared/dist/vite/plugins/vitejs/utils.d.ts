@@ -30,3 +30,4 @@ interface ImageCandidate {
 export declare function processSrcSet(srcs: string, replacer: (arg: ImageCandidate) => Promise<string>): Promise<string>;
 export declare function combineSourcemaps(filename: string, sourcemapList: Array<DecodedSourceMap | RawSourceMap>, excludeContent?: boolean): RawSourceMap;
 export {};
+//# sourceMappingURL=utils.d.ts.map

@@ -9,3 +9,4 @@ export declare function formatInfoMsg(msg: string, options?: LogOptions & {
     nvue?: boolean;
 }): string;
 export declare function formatWarnMsg(msg: string, options?: LogOptions): string;
+//# sourceMappingURL=format.d.ts.map

@@ -3,3 +3,4 @@ import { ParserPlugin } from '@babel/parser';
 export declare function parseProgram(code: string, importer: string, { babelParserPlugins }: {
     babelParserPlugins?: ParserPlugin[];
 }): Program;
+//# sourceMappingURL=ast.d.ts.map

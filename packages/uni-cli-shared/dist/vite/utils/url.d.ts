@@ -29,3 +29,4 @@ export declare const queryRE: RegExp;
 export declare const hashRE: RegExp;
 export declare const cleanUrl: (url: string) => string;
 export declare function isJsFile(id: string): boolean;
+//# sourceMappingURL=url.d.ts.map

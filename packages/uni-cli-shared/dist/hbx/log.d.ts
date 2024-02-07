@@ -5,3 +5,4 @@ export declare const h5ServeFormatter: Formatter;
 export declare const removeInfoFormatter: Formatter;
 export declare const removeWarnFormatter: Formatter;
 export declare const errorFormatter: Formatter<LogErrorOptions>;
+//# sourceMappingURL=log.d.ts.map

@@ -1,7 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import debug from 'debug'
-import { BuildOptions, UserConfig } from 'vite'
+import type { BuildOptions, FilterPattern, UserConfig } from 'vite'
 
 import {
   emptyDir,
@@ -17,6 +17,7 @@ import {
   isMiniProgramAssetFile,
   dynamicImportPolyfill,
   DEFAULT_ASSETS_RE,
+  parseSubpackagesRootOnce,
 } from '@dcloudio/uni-cli-shared'
 import { GetManualChunk, GetModuleInfo, PreRenderedChunk } from 'rollup'
 import {
@@ -27,10 +28,9 @@ import {
 } from '../plugins/entry'
 import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni'
 
-const debugChunk = debug('uni:chunk')
-
+const debugChunk = debug('uni:chunk');
 export function buildOptions(
-  vendorConfig: Required<VitePluginUniOptions>['mp']['vendorConfig']
+  mp: Required<VitePluginUniOptions>['mp']
 ): UserConfig['build'] {
   const platform = process.env.UNI_PLATFORM
   const inputDir = process.env.UNI_INPUT_DIR
@@ -39,15 +39,16 @@ export function buildOptions(
   if (fs.existsSync(outputDir)) {
     emptyDir(outputDir, ['project.config.json', 'project.private.config.json'])
   }
-  return createBuildOptions(inputDir, platform, vendorConfig)
+  return createBuildOptions(inputDir, platform, mp)
 }
 
 export function createBuildOptions(
   inputDir: string,
   platform: UniApp.PLATFORM,
-  vendorConfig: Required<VitePluginUniOptions>['mp']['vendorConfig']
+  mp: Required<VitePluginUniOptions>['mp'],
 ): BuildOptions {
   const { renderDynamicImport } = dynamicImportPolyfill()
+
   return {
     // sourcemap: 'inline', // TODO
     // target: ['chrome53'], // 由小程序自己启用 es6 编译
@@ -68,7 +69,7 @@ export function createBuildOptions(
           return chunk.name + '.js'
         },
         format: 'cjs',
-        manualChunks: createMoveToVendorChunkFn(vendorConfig),
+        manualChunks: createMoveToVendorChunkFn(mp),
         chunkFileNames: createChunkFileNames(inputDir),
         plugins: [
           {
@@ -119,11 +120,67 @@ function isVueJs(id: string) {
 
 const chunkFileNameBlackList = ['main', 'pages.json', 'manifest.json']
 
+const checkIsInList = (list: FilterPattern, filename: string): boolean => (
+  Array.isArray(list) && list.some((item => new RegExp(item).test(filename)))
+);
+
 function createMoveToVendorChunkFn(
-  vendorConfig: Required<VitePluginUniOptions>['mp']['vendorConfig']
+  mp: Required<VitePluginUniOptions>['mp'],
 ): GetManualChunk {
-  const cache = new Map<string, boolean>()
-  const inputDir = normalizePath(process.env.UNI_INPUT_DIR)
+  const cache = new Map<string, boolean>();
+  const inputDir = normalizePath(process.env.UNI_INPUT_DIR);
+  const {
+    vendorConfig = {},
+    chunk: { include = [], exclude = [], excludeSubPackages = [] } = {}
+  } = mp || {};
+
+  const subPackages = parseSubpackagesRootOnce(
+    process.env.UNI_INPUT_DIR!,
+    process.env.UNI_PLATFORM
+  ).filter(item => Array.isArray(excludeSubPackages)
+    // 过滤excludePackages配置项，不进行处理
+    ? !excludeSubPackages.some(exclude => new RegExp(exclude).test(item))
+    : item
+  );
+
+  // 是否匹配分包目录
+  const isMatchSubPackageRoot = (importers: readonly string[]) => {
+    if (!subPackages?.length) {
+      return null;
+    }
+
+    // const importers = files.filter(file => Array.isArray(include)
+    //   // 若包含白名单目录则过滤，无需进行检查
+    //   ? !include.some(item => new RegExp(item).test(file))
+    //   : file
+    // );
+
+    // 是否主包
+    const isMainPackages = importers.some(importer =>
+      // 不在所有的分包配置中
+      subPackages.every((sub) => !importer.includes(sub))
+    );
+
+    if (isMainPackages) {
+      return null;
+    }
+
+    // 是否过滤的包
+    const isBlackList = importers.some((importer: string) => Array.isArray(exclude) && exclude.some(item => new RegExp(item).test(importer)));
+
+    if (isBlackList) {
+      console.log("🚀 ~ isMatchSubPackageRoot ~ isExclude : >>>", isBlackList);
+      return null;
+    }
+
+    // 匹配单一分包才可执行分包js公共逻辑，否则并入common/vendor;
+    const match = subPackages.filter((sub) => importers.some((item: string) => new RegExp(sub).test(item)));
+
+    if (match.length !== 1) return null;
+
+    return match[0];
+  };
+
   return (id, { getModuleInfo }) => {
     const normalizedId = normalizePath(id)
     const filename = normalizedId.split('?')[0]
@@ -150,11 +207,26 @@ function createMoveToVendorChunkFn(
           !chunkFileNameBlackList.includes(chunkFileName) &&
           !hasJsonFile(chunkFileName) // 无同名的page,component
         ) {
-          debugChunk(chunkFileName, normalizedId)
-          return chunkFileName
+          debugChunk(chunkFileName, normalizedId);
+          return chunkFileName;
         }
-        return
+
+        return;
       }
+
+      const isInclude = checkIsInList(include, filename); 
+
+      if (isInclude && subPackages.length) {
+        const { importers = [] } = getModuleInfo(id) || {};
+        const match = isMatchSubPackageRoot(importers);
+
+        if (match) {
+          console.log("🚀 ~ return ~ match : >>>", match);
+          return `${match}/common/vendor`;
+        }
+        // 有分包的情况下，放入分包common/vendor中
+      }
+
       // 非项目内的 js 资源，均打包到 vendor
       debugChunk('common/vendor', normalizedId)
       return 'common/vendor'
@@ -224,6 +296,15 @@ function createChunkFileNames(
       }
       return removeExt(normalizeMiniProgramFilename(id, inputDir)) + '.js'
     }
+    // const matchinclude = checkIsinclude(vendorConfig, chunk.facadeModuleId);
+    // if (matchinclude) {
+    //   const [matchPath = ''] = chunk.facadeModuleId.match(new RegExp(`(?=${matchinclude}).*`, 'gmi')) || [];
+
+    //   if (matchPath) {
+    //     console.log("🚀 ~ file: build.ts:282 ~ chunkFileNames ~ matchPath : >>>", matchPath);
+    //     return removeExt(matchPath) + '.js';
+    //   }
+    // }
     return '[name].js'
   }
 }

@@ -8,3 +8,4 @@ export declare function isUniAppLocaleFile(filepath: string): boolean;
 export declare function getLocaleFiles(cwd: string): string[];
 export declare function initLocales(dir: string, withMessages?: boolean): Record<string, Record<string, string>>;
 export declare function resolveI18nLocale(platform: UniApp.PLATFORM, locales: string[], locale?: string): string;
+//# sourceMappingURL=i18n.d.ts.map

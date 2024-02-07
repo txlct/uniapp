@@ -2,3 +2,4 @@ export declare function rewriteConsoleExpr(method: string, id: string, filename:
     code: string;
     map: import("magic-string").SourceMap | null;
 };
+//# sourceMappingURL=console.d.ts.map

@@ -38,3 +38,4 @@ export declare function getAssetFilename(hash: string, config: ResolvedConfig): 
 export declare function assetFileNamesToFileName(assetFileNames: Exclude<OutputOptions['assetFileNames'], undefined>, file: string, contentHash: string, content: string | Buffer): string;
 export declare function getAssetHash(content: Buffer | string): string;
 export declare function urlToBuiltUrl(url: string, importer: string, config: ResolvedConfig, pluginContext: PluginContext): string;
+//# sourceMappingURL=asset.d.ts.map

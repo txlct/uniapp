@@ -3,3 +3,4 @@ export declare function getSplashscreen(manifestJson: Record<string, any>): {
     autoclose: boolean;
     alwaysShowBeforeRender: boolean;
 };
+//# sourceMappingURL=splashscreen.d.ts.map

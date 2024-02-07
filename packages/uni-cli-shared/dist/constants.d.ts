@@ -28,3 +28,4 @@ export declare const COMMON_EXCLUDE: RegExp[];
 export declare const KNOWN_ASSET_TYPES: string[];
 export declare const DEFAULT_ASSETS_RE: RegExp;
 export declare const TEXT_STYLE: string[];
+//# sourceMappingURL=constants.d.ts.map

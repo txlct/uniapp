@@ -88,3 +88,4 @@ export declare function addMiniProgramTemplateFile(filename: string, code: strin
 export declare function clearMiniProgramTemplateFilter(filename: string): void;
 export declare function addMiniProgramTemplateFilter(filename: string, filter: MiniProgramFilterOptions): void;
 export {};
+//# sourceMappingURL=template.d.ts.map

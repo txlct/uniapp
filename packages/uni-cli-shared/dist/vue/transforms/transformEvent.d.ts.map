@@ -1,0 +1,1 @@
+{"version":3,"file":"transformEvent.d.ts","sourceRoot":"","sources":["../../../src/vue/transforms/transformEvent.ts"],"names":[],"mappings":"AAAA,OAAO,EAAE,aAAa,EAAE,WAAW,EAAE,aAAa,EAAE,MAAM,oBAAoB,CAAA;AAI9E,wBAAgB,oBAAoB,CAClC,OAAO,EAAE,MAAM,CACb,MAAM,EACN,MAAM,GAAG,CAAC,CAAC,IAAI,EAAE,WAAW,EAAE,GAAG,EAAE,aAAa,KAAK,MAAM,CAAC,CAC7D,GACA,aAAa,CAoBf"}

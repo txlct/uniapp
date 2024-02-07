@@ -17,3 +17,4 @@ export declare function initDefine(stringifyBoolean?: boolean): {
     'process.env.VUE_APP_PLATFORM': string;
     'process.env.VUE_APP_DARK_MODE': string;
 };
+//# sourceMappingURL=define.d.ts.map

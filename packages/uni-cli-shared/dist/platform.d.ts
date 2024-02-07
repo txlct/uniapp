@@ -9,3 +9,4 @@ export declare const getPlatformType: () => {
     PLATFORM_TYPE: string;
     PREFIX: string;
 };
+//# sourceMappingURL=platform.d.ts.map

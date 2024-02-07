@@ -10,3 +10,4 @@ export declare function resolveUTSAppModule(id: string, importer: string): strin
 export declare function resolveUTSModule(id: string, importer: string): string | undefined;
 export declare function resolveUTSCompiler(): typeof UTSCompiler;
 export declare function initUTSComponents(inputDir: string, platform: UniApp.PLATFORM): EasycomMatcher[];
+//# sourceMappingURL=uts.d.ts.map

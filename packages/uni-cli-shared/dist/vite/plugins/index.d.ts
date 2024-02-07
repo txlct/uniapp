@@ -8,3 +8,4 @@ export * from './dynamicImportPolyfill';
 export { assetPlugin, getAssetHash } from './vitejs/plugins/asset';
 export { isCSSRequest, cssPlugin, cssPostPlugin, minifyCSS, cssLangRE, commonjsProxyRE, } from './vitejs/plugins/css';
 export { generateCodeFrame } from './vitejs/utils';
+//# sourceMappingURL=index.d.ts.map

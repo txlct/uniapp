@@ -39,3 +39,4 @@ export declare function initFeatures(options: InitFeaturesOptions): {
     __UNI_FEATURE_NAVIGATIONBAR_TRANSPARENT__: boolean;
 };
 export {};
+//# sourceMappingURL=features.d.ts.map

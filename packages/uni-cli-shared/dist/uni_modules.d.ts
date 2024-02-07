@@ -33,3 +33,4 @@ type Injects = {
 export declare function parseInjects(vite: boolean | undefined, platform: UniApp.PLATFORM, source: string, exports?: Exports): Injects;
 export declare function parseInject(vite: boolean | undefined, source: string, globalObject: string, define: Define): Injects;
 export {};
+//# sourceMappingURL=uni_modules.d.ts.map

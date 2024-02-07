@@ -16,3 +16,4 @@ export declare function isElementNode(node: Node): node is ElementNode;
 export declare function isAttributeNode(node: Node): node is AttributeNode;
 export declare function isDirectiveNode(node: Node): node is DirectiveNode;
 export declare function isSimpleExpressionNode(node: Node): node is SimpleExpressionNode;
+//# sourceMappingURL=ast.d.ts.map

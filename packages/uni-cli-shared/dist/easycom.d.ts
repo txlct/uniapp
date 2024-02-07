@@ -27,3 +27,4 @@ export declare function addImportDeclaration(importDeclarations: string[], local
 export declare function genResolveEasycomCode(importDeclarations: string[], code: string, name: string): string;
 export declare const UNI_EASYCOM_EXCLUDE: RegExp[];
 export {};
+//# sourceMappingURL=easycom.d.ts.map

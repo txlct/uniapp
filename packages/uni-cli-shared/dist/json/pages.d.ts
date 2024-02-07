@@ -29,3 +29,4 @@ export declare function normalizePagesRoute(pagesJson: UniApp.PagesJson): UniApp
 declare function parseSubpackagesRoot(inputDir: string, platform: UniApp.PLATFORM): string[];
 export declare const parseSubpackagesRootOnce: typeof parseSubpackagesRoot;
 export {};
+//# sourceMappingURL=pages.d.ts.map

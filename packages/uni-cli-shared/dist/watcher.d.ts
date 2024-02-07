@@ -28,3 +28,4 @@ export declare class FileWatcher {
     to(from: string): string;
 }
 export {};
+//# sourceMappingURL=watcher.d.ts.map

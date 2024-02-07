@@ -10,3 +10,4 @@ interface CreateTransformModelOptions {
  */
 export declare function createTransformModel(baseTransformModel: DirectiveTransform, { match }?: CreateTransformModelOptions): DirectiveTransform;
 export {};
+//# sourceMappingURL=vModel.d.ts.map

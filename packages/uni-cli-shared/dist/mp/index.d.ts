@@ -10,3 +10,4 @@ export { HTML_TO_MINI_PROGRAM_TAGS } from './tags';
 export { copyMiniProgramPluginJson, copyMiniProgramThemeJson } from './plugin';
 export { parseMainDescriptor, parseScriptDescriptor, parseTemplateDescriptor, transformDynamicImports, updateMiniProgramGlobalComponents, updateMiniProgramComponentsByMainFilename, updateMiniProgramComponentsByScriptFilename, updateMiniProgramComponentsByTemplateFilename, } from './usingComponents';
 export { hasExternalClasses, parseExternalClasses, findMiniProgramComponentExternalClasses, updateMiniProgramComponentExternalClasses, } from './externalClasses';
+//# sourceMappingURL=index.d.ts.map

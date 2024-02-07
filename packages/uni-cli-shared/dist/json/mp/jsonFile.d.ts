@@ -28,3 +28,4 @@ export declare function findMiniProgramUsingComponents({ filename, inputDir, com
     componentsDir?: string;
 }): MiniProgramComponents;
 export {};
+//# sourceMappingURL=jsonFile.d.ts.map

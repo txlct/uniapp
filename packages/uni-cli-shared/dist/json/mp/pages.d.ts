@@ -15,3 +15,4 @@ export declare function parseMiniProgramPagesJson(jsonStr: string, platform: Uni
 };
 export declare function mergeMiniProgramAppJson(appJson: Record<string, any>, platformJson?: Record<string, any>): void;
 export {};
+//# sourceMappingURL=pages.d.ts.map

@@ -5,3 +5,4 @@ export declare function getBuiltInPaths(): string[];
 export declare function resolveBuiltIn(path: string): string;
 export declare function resolveVueI18nRuntime(): string;
 export declare function resolveComponentsLibPath(): string;
+//# sourceMappingURL=resolve.d.ts.map

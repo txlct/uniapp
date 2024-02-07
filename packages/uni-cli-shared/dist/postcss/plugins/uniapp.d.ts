@@ -9,3 +9,4 @@ declare const uniapp: {
     postcss: boolean;
 };
 export default uniapp;
+//# sourceMappingURL=uniapp.d.ts.map

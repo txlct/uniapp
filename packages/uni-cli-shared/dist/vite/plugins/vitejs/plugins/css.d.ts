@@ -52,3 +52,4 @@ export interface StylePreprocessorResults {
     errors: RollupError[];
     deps: string[];
 }
+//# sourceMappingURL=css.d.ts.map

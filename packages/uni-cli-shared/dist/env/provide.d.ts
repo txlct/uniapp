@@ -9,3 +9,4 @@ export declare function initAppProvide(): {
 export declare function initH5Provide(): {
     __f__: string[];
 };
+//# sourceMappingURL=provide.d.ts.map

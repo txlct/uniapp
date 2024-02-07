@@ -51,3 +51,4 @@ export declare const M: {
     readonly 'uts.ios.windows.tips': "When running on Windows to iOS mobile phone, the modification of the uts plugin code needs to be submitted to the cloud to package the custom playground to take effect.";
     readonly 'uts.ios.standard.tips': "When the standard playground runs to an IOS phone, the uts plugin is temporarily not supported. If you need to call the uts plugin, please use a custom playground";
 };
+//# sourceMappingURL=index.d.ts.map

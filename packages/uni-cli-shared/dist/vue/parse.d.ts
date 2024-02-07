@@ -11,3 +11,4 @@ export declare function parseVueCode(code: string, isNVue?: boolean): {
 export declare function parseBlockCode(ast: RootNode, code: string): string;
 export declare function parseWxsNodes(ast: RootNode): ElementNode[];
 export declare function parseWxsCode(wxsNodes: ElementNode[], code: string): string;
+//# sourceMappingURL=parse.d.ts.map

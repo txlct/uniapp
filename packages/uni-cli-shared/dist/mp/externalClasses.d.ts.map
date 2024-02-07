@@ -1,0 +1,1 @@
+{"version":3,"file":"externalClasses.d.ts","sourceRoot":"","sources":["../../src/mp/externalClasses.ts"],"names":[],"mappings":"AAAA,OAAO,EAKL,OAAO,EACR,MAAM,cAAc,CAAA;AAKrB,wBAAgB,kBAAkB,CAAC,IAAI,EAAE,MAAM,WAE9C;AAED,wBAAgB,uCAAuC,CAAC,QAAQ,EAAE,MAAM,wBAEvE;AAED,wBAAgB,yCAAyC,CACvD,QAAQ,EAAE,MAAM,EAChB,OAAO,EAAE,MAAM,EAAE,QAGlB;AAED,wBAAgB,oBAAoB,CAAC,GAAG,EAAE,OAAO,YAsBhD"}

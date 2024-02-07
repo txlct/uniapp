@@ -51,7 +51,7 @@
     "@babel/preset-env": "^7.20.2",
     "@dcloudio/types": "3.2.11",
     "@dcloudio/uni-api": "workspace:*",
-    "@dcloudio/uni-app": "https://xqh-1257029999.cos.ap-guangzhou.myqcloud.com/uni-app-v3.0.22.tgz",
+    "@dcloudio/uni-app": "workspace:*",
     "@jest/types": "^29.5.0",
     "@microsoft/api-extractor": "^7.34.4",
     "@rollup/plugin-alias": "^4.0.3",

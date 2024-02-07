@@ -18,3 +18,4 @@ export declare function pathToGlob(pathString: string, glob: string, options?: {
 }): string;
 export declare function resolveSourceMapPath(outputDir?: string, platform?: UniApp.PLATFORM): string;
 export declare function installDepTips(type: 'dependencies' | 'devDependencies', module: string, version?: string): string;
+//# sourceMappingURL=utils.d.ts.map

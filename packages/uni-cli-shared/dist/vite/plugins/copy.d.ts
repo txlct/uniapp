@@ -9,3 +9,4 @@ export interface UniViteCopyPluginOptions {
     verbose: boolean;
 }
 export declare function uniViteCopyPlugin({ targets, verbose, }: UniViteCopyPluginOptions): Plugin;
+//# sourceMappingURL=copy.d.ts.map

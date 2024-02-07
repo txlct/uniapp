@@ -17,3 +17,4 @@ export declare const COMPONENT_DEPS_CSS: {
     'web-view': string[];
     picker: string[];
 };
+//# sourceMappingURL=deps.d.ts.map

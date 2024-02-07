@@ -8,3 +8,4 @@ export declare function initPostcssPlugin({ uniApp, autoprefixer, }?: {
     uniApp?: UniAppCssProcessorOptions;
     autoprefixer?: Options | false;
 }): Plugin[];
+//# sourceMappingURL=index.d.ts.map

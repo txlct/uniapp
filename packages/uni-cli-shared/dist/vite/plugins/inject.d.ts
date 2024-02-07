@@ -10,3 +10,4 @@ export interface InjectOptions {
 }
 export declare function uniViteInjectPlugin(name: string, options: InjectOptions): Plugin;
 export {};
+//# sourceMappingURL=inject.d.ts.map

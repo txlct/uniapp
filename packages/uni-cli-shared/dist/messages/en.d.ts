@@ -26,3 +26,4 @@ declare const _default: {
     readonly 'uts.ios.standard.tips': "When the standard playground runs to an IOS phone, the uts plugin is temporarily not supported. If you need to call the uts plugin, please use a custom playground";
 };
 export default _default;
+//# sourceMappingURL=en.d.ts.map

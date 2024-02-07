@@ -10,7 +10,7 @@ const debug_1 = __importDefault(require("debug"));
 const uni_cli_shared_1 = require("@dcloudio/uni-cli-shared");
 const entry_1 = require("../plugins/entry");
 const debugChunk = (0, debug_1.default)('uni:chunk');
-function buildOptions(vendorConfig) {
+function buildOptions(mp) {
     const platform = process.env.UNI_PLATFORM;
     const inputDir = process.env.UNI_INPUT_DIR;
     const outputDir = process.env.UNI_OUTPUT_DIR;
@@ -18,10 +18,10 @@ function buildOptions(vendorConfig) {
     if (fs_1.default.existsSync(outputDir)) {
         (0, uni_cli_shared_1.emptyDir)(outputDir, ['project.config.json', 'project.private.config.json']);
     }
-    return createBuildOptions(inputDir, platform, vendorConfig);
+    return createBuildOptions(inputDir, platform, mp);
 }
 exports.buildOptions = buildOptions;
-function createBuildOptions(inputDir, platform, vendorConfig) {
+function createBuildOptions(inputDir, platform, mp) {
     const { renderDynamicImport } = (0, uni_cli_shared_1.dynamicImportPolyfill)();
     return {
         // sourcemap: 'inline', // TODO
@@ -43,7 +43,7 @@ function createBuildOptions(inputDir, platform, vendorConfig) {
                     return chunk.name + '.js';
                 },
                 format: 'cjs',
-                manualChunks: createMoveToVendorChunkFn(vendorConfig),
+                manualChunks: createMoveToVendorChunkFn(mp),
                 chunkFileNames: createChunkFileNames(inputDir),
                 plugins: [
                     {
@@ -91,9 +91,44 @@ function isVueJs(id) {
     return id.includes('\0plugin-vue:export-helper');
 }
 const chunkFileNameBlackList = ['main', 'pages.json', 'manifest.json'];
-function createMoveToVendorChunkFn(vendorConfig) {
+const checkIsInList = (list, filename) => (Array.isArray(list) && list.some((item => new RegExp(item).test(filename))));
+function createMoveToVendorChunkFn(mp) {
     const cache = new Map();
     const inputDir = (0, uni_cli_shared_1.normalizePath)(process.env.UNI_INPUT_DIR);
+    const { vendorConfig = {}, chunk: { include = [], exclude = [], excludeSubPackages = [] } = {} } = mp || {};
+    const subPackages = (0, uni_cli_shared_1.parseSubpackagesRootOnce)(process.env.UNI_INPUT_DIR, process.env.UNI_PLATFORM).filter(item => Array.isArray(excludeSubPackages)
+        // 过滤excludePackages配置项，不进行处理
+        ? !excludeSubPackages.some(exclude => new RegExp(exclude).test(item))
+        : item);
+    // 是否匹配分包目录
+    const isMatchSubPackageRoot = (importers) => {
+        if (!subPackages?.length) {
+            return null;
+        }
+        // const importers = files.filter(file => Array.isArray(include)
+        //   // 若包含白名单目录则过滤，无需进行检查
+        //   ? !include.some(item => new RegExp(item).test(file))
+        //   : file
+        // );
+        // 是否主包
+        const isMainPackages = importers.some(importer => 
+        // 不在所有的分包配置中
+        subPackages.every((sub) => !importer.includes(sub)));
+        if (isMainPackages) {
+            return null;
+        }
+        // 是否过滤的包
+        const isBlackList = importers.some((importer) => Array.isArray(exclude) && exclude.some(item => new RegExp(item).test(importer)));
+        if (isBlackList) {
+            console.log("🚀 ~ isMatchSubPackageRoot ~ isExclude : >>>", isBlackList);
+            return null;
+        }
+        // 匹配单一分包才可执行分包js公共逻辑，否则并入common/vendor;
+        const match = subPackages.filter((sub) => importers.some((item) => new RegExp(sub).test(item)));
+        if (match.length !== 1)
+            return null;
+        return match[0];
+    };
     return (id, { getModuleInfo }) => {
         const normalizedId = (0, uni_cli_shared_1.normalizePath)(id);
         const filename = normalizedId.split('?')[0];
@@ -120,6 +155,16 @@ function createMoveToVendorChunkFn(vendorConfig) {
                     return chunkFileName;
                 }
                 return;
+            }
+            const isInclude = checkIsInList(include, filename);
+            if (isInclude && subPackages.length) {
+                const { importers = [] } = getModuleInfo(id) || {};
+                const match = isMatchSubPackageRoot(importers);
+                if (match) {
+                    console.log("🚀 ~ return ~ match : >>>", match);
+                    return `${match}/common/vendor`;
+                }
+                // 有分包的情况下，放入分包common/vendor中
             }
             // 非项目内的 js 资源，均打包到 vendor
             debugChunk('common/vendor', normalizedId);
@@ -169,6 +214,14 @@ function createChunkFileNames(inputDir) {
             }
             return (0, uni_cli_shared_1.removeExt)((0, uni_cli_shared_1.normalizeMiniProgramFilename)(id, inputDir)) + '.js';
         }
+        // const matchinclude = checkIsinclude(vendorConfig, chunk.facadeModuleId);
+        // if (matchinclude) {
+        //   const [matchPath = ''] = chunk.facadeModuleId.match(new RegExp(`(?=${matchinclude}).*`, 'gmi')) || [];
+        //   if (matchPath) {
+        //     console.log("🚀 ~ file: build.ts:282 ~ chunkFileNames ~ matchPath : >>>", matchPath);
+        //     return removeExt(matchPath) + '.js';
+        //   }
+        // }
         return '[name].js';
     };
 }

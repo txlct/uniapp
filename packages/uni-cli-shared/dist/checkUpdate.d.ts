@@ -28,3 +28,4 @@ export declare function md5(str: string): string;
 export declare function getMac(): string;
 export declare function createPostData({ versionType, compilerVersion }: CheckUpdateOptions, manifestJson: Record<string, any>, updateCache: CheckUpdateCache): string;
 export {};
+//# sourceMappingURL=checkUpdate.d.ts.map

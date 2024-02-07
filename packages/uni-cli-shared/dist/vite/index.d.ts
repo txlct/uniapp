@@ -34,3 +34,4 @@ export interface UniVitePlugin extends Plugin {
 export * from './utils';
 export * from './plugins';
 export * from './features';
+//# sourceMappingURL=index.d.ts.map

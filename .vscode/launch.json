@@ -33,6 +33,9 @@
       "skipFiles": [
         "<node_internals>/**"
       ],
+      "env": {
+        "DEBUG": "uni:chunk",
+      },
       "cwd": "${workspaceFolder}/packages/playground/vue3",
       "type": "node"
     },

@@ -31,3 +31,4 @@ export declare function isEnableTreeShaking(manifestJson: Record<string, any>): 
 export declare function getDevServerOptions(manifestJson: Record<string, any>): any;
 export declare function getPlatformManifestJsonOnce(): any;
 export {};
+//# sourceMappingURL=manifest.d.ts.map

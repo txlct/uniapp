@@ -5,3 +5,4 @@ export declare const runByHBuilderX: () => boolean;
  */
 export declare function initModulePaths(): void;
 export declare function fixBinaryPath(): void;
+//# sourceMappingURL=env.d.ts.map

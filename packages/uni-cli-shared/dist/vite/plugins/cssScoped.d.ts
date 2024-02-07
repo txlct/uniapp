@@ -6,3 +6,4 @@ interface UniCssScopedPluginOptions {
 export declare function uniRemoveCssScopedPlugin({ filter }?: UniCssScopedPluginOptions): Plugin;
 export declare function uniCssScopedPlugin({ filter }?: UniCssScopedPluginOptions): Plugin;
 export {};
+//# sourceMappingURL=cssScoped.d.ts.map

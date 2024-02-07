@@ -2,3 +2,4 @@ export declare function initNVue(manifestJson: Record<string, any>, pagesJson: U
 export declare function getNVueCompiler(manifestJson: Record<string, any>): "uni-app" | "weex" | "vue" | "vite";
 export declare function getNVueStyleCompiler(manifestJson: Record<string, any>): "uni-app" | "weex";
 export declare function getNVueFlexDirection(manifestJson: Record<string, any>): "column" | "row" | "row-reverse" | "column-reverse";
+//# sourceMappingURL=nvue.d.ts.map

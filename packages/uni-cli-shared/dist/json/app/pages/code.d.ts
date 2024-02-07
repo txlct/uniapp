@@ -2,3 +2,4 @@ export declare const arrayBufferCode = "\nif (typeof uni !== 'undefined' && uni 
 export declare const polyfillCode: string;
 export declare const restoreGlobalCode = "\nif(uni.restoreGlobal){\n  uni.restoreGlobal(Vue,weex,plus,setTimeout,clearTimeout,setInterval,clearInterval)\n}\n";
 export declare const globalCode: string;
+//# sourceMappingURL=code.d.ts.map

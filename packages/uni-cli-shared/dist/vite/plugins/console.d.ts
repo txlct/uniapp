@@ -7,3 +7,4 @@ export interface ConsoleOptions {
     exclude?: FilterPattern;
 }
 export declare function uniConsolePlugin(options: ConsoleOptions): Plugin;
+//# sourceMappingURL=console.d.ts.map

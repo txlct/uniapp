@@ -2,3 +2,4 @@ export declare function normalizeAppManifestJson(userManifestJson: Record<string
 export * from './env';
 export { APP_CONFUSION_FILENAME, isConfusionFile, hasConfusionFile, } from './confusion';
 export { getNVueCompiler, getNVueStyleCompiler, getNVueFlexDirection, } from './nvue';
+//# sourceMappingURL=index.d.ts.map

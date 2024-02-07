@@ -8,3 +8,4 @@ export declare function parseScripts(name: string, pkgPath: string): {
         [name: string]: boolean;
     };
 } | undefined;
+//# sourceMappingURL=scripts.d.ts.map

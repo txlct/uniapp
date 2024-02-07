@@ -7,3 +7,4 @@ export declare function isDataUrl(url: string): boolean;
  * Parses string url into URL object.
  */
 export declare function parseUrl(url: string): UrlWithStringQuery;
+//# sourceMappingURL=templateUtils.d.ts.map

@@ -6,3 +6,4 @@
  */
 export declare const FS_PREFIX = "/@fs/";
 export declare const CLIENT_PUBLIC_PATH = "/@vite/client";
+//# sourceMappingURL=constants.d.ts.map

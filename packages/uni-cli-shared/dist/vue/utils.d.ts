@@ -29,3 +29,4 @@ export declare function createUniVueTransformAssetUrls(base: string): {
 };
 export declare function getBaseNodeTransforms(base: string): import("@vue/compiler-core").NodeTransform[];
 export declare function renameProp(name: string, prop?: DirectiveNode | AttributeNode): void;
+//# sourceMappingURL=utils.d.ts.map

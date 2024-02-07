@@ -3,3 +3,4 @@ export declare function formatMiniProgramEvent(eventName: string, { isCatch, isC
     isCapture?: boolean;
     isComponent?: boolean;
 }): string;
+//# sourceMappingURL=event.d.ts.map

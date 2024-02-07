@@ -10,3 +10,4 @@ import { ImportSpecifier } from 'es-module-lexer';
 export declare function findVueComponentImports(source: string, importer: string, resolve: PluginContext['resolve']): Promise<(ImportSpecifier & {
     i: string;
 })[]>;
+//# sourceMappingURL=imports.d.ts.map

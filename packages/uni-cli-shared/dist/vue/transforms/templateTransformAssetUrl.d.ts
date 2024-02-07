@@ -31,3 +31,4 @@ export declare const createAssetUrlTransformWithOptions: (options: Required<Asse
  * ```
  */
 export declare const transformAssetUrl: NodeTransform;
+//# sourceMappingURL=templateTransformAssetUrl.d.ts.map

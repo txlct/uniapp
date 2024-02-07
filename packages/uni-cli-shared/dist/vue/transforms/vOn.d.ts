@@ -14,3 +14,4 @@ export declare function addEventOpts(event: string, value: ExpressionNode, node:
 export declare const ATTR_DATASET_EVENT_OPTS = "data-e-o";
 export declare const STRINGIFY_JSON: unique symbol;
 export {};
+//# sourceMappingURL=vOn.d.ts.map

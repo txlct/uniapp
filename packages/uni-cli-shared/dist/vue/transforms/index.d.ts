@@ -11,3 +11,4 @@ export declare const transformH5BuiltInComponents: import("@vue/compiler-core").
 export declare const transformMatchMedia: import("@vue/compiler-core").NodeTransform;
 export declare const transformTapToClick: import("@vue/compiler-core").NodeTransform;
 export declare const transformComponentLink: (node: import("@vue/compiler-core").RootNode | import("@vue/compiler-core").TemplateChildNode, context: import("@vue/compiler-core").TransformContext) => void;
+//# sourceMappingURL=index.d.ts.map

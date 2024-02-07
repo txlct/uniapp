@@ -12,3 +12,4 @@ interface ProjectConfig {
 export declare function isMiniProgramProjectJsonKey(name: string): boolean;
 export declare function parseMiniProgramProjectJson(jsonStr: string, platform: UniApp.PLATFORM, { template, pagesJson }: ParseMiniProgramProjectJsonOptions): ProjectConfig;
 export {};
+//# sourceMappingURL=project.d.ts.map

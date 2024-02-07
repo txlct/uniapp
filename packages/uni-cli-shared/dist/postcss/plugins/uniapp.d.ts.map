@@ -1,0 +1,1 @@
+{"version":3,"file":"uniapp.d.ts","sourceRoot":"","sources":["../../../src/postcss/plugins/uniapp.ts"],"names":[],"mappings":"AACA,OAAO,KAAK,EAAqB,MAAM,EAAQ,MAAM,SAAS,CAAA;AAS9D,MAAM,WAAW,yBAAyB;IACxC,IAAI,CAAC,EAAE,MAAM,CAAA;IACb,SAAS,CAAC,EAAE,MAAM,CAAA;IAClB,aAAa,CAAC,EAAE,MAAM,CAAA;CACvB;AAsHD,QAAA,MAAM,MAAM;YAAW,yBAAyB;;CA2B/C,CAAA;AAED,eAAe,MAAM,CAAA"}

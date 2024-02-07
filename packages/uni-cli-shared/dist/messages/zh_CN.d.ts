@@ -26,3 +26,4 @@ declare const _default: {
     readonly 'uts.ios.standard.tips': "iOS手机在标准基座真机运行暂不支持uts插件，如需调用uts插件请使用自定义基座";
 };
 export default _default;
+//# sourceMappingURL=zh_CN.d.ts.map

@@ -10,7 +10,7 @@ const pagesJson_1 = require("../plugins/pagesJson");
 const polyfill_1 = require("./polyfill");
 function uniMiniProgramPlugin(options, opt) {
     const { vite: { alias, copyOptions }, template, style, } = options;
-    const { mp: { vendorConfig = {} } = {} } = opt;
+    const { mp = {} } = opt;
     let nvueCssEmitted = false;
     let resolvedConfig;
     (0, polyfill_1.rewriteCompileScriptOnce)();
@@ -54,7 +54,7 @@ function uniMiniProgramPlugin(options, opt) {
                 optimizeDeps: {
                     disabled: true,
                 },
-                build: (0, build_1.buildOptions)(vendorConfig),
+                build: (0, build_1.buildOptions)(mp),
             };
         },
         configResolved(config) {
