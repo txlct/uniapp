@@ -94,7 +94,7 @@ const chunkFileNameBlackList = ['main', 'pages.json', 'manifest.json'];
 function createMoveToVendorChunkFn(mp) {
     const cache = new Map();
     const inputDir = (0, uni_cli_shared_1.normalizePath)(process.env.UNI_INPUT_DIR);
-    const { vendorConfig = {}, chunk: { include = [], exclude = [], excludeSubPackages = ['modules'] } = {} } = mp || {};
+    const { vendorConfig = {}, chunk: { include = [], exclude = [], excludeSubPackages = [] } = {} } = mp || {};
     const subPackages = (0, uni_cli_shared_1.parseSubpackagesRootOnce)(process.env.UNI_INPUT_DIR, process.env.UNI_PLATFORM).filter(item => Array.isArray(excludeSubPackages)
         // 过滤excludePackages配置项，不进行处理
         ? !excludeSubPackages.some(exclude => new RegExp(exclude).test(item))

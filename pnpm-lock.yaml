@@ -8999,10 +8999,10 @@ packages:
     dependencies:
       '@dcloudio/types': 3.2.11
       '@dcloudio/uni-cloud': 3.0.0-3070320230222002_vue@3.2.47
-      '@dcloudio/uni-components': link:packages/uni-components
+      '@dcloudio/uni-components': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-components?feature/mp-chunk'
       '@dcloudio/uni-i18n': 3.0.0-3070320230222002
       '@dcloudio/uni-push': 3.0.0-3070320230222002_vue@3.2.47
-      '@dcloudio/uni-shared': link:packages/uni-shared
+      '@dcloudio/uni-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?feature/mp-chunk'
       '@dcloudio/uni-stat': 3.0.0-3070320230222002_vue@3.2.47
       '@vue/shared': 3.2.47
     transitivePeerDependencies:
@@ -9023,12 +9023,70 @@ packages:
       '@babel/parser': 7.21.3
       '@babel/types': 7.21.3
       '@dcloudio/uni-i18n': 3.0.0-3070320230222002
-      '@dcloudio/uni-shared': link:packages/uni-shared
+      '@dcloudio/uni-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?feature/mp-chunk'
       '@intlify/core-base': 9.1.9
       '@intlify/shared': 9.1.9
       '@intlify/vue-devtools': 9.1.9
       '@rollup/pluginutils': 4.2.1
       '@vitejs/plugin-legacy': 4.0.1
+      '@vue/babel-plugin-jsx': 1.1.1_@babel+core@7.21.3
+      '@vue/compiler-core': 3.2.47
+      '@vue/compiler-dom': 3.2.47
+      '@vue/compiler-sfc': 3.2.47
+      '@vue/server-renderer': 3.2.47
+      '@vue/shared': 3.2.47
+      autoprefixer: 10.4.14
+      base64url: 3.0.1
+      chokidar: 3.5.3
+      compare-versions: 3.6.0
+      debug: 4.3.4
+      es-module-lexer: 0.9.3
+      esbuild: 0.16.17
+      estree-walker: 2.0.2
+      fast-glob: 3.2.12
+      fs-extra: 10.1.0
+      hash-sum: 2.0.0
+      jsonc-parser: 3.2.0
+      magic-string: 0.27.0
+      merge: 2.1.1
+      mime: 3.0.0
+      module-alias: 2.2.2
+      os-locale-s-fix: 1.0.8-fix-1
+      picocolors: 1.0.0
+      postcss-import: 14.1.0
+      postcss-load-config: 3.1.4
+      postcss-modules: 4.3.1
+      postcss-selector-parser: 6.0.11
+      resolve: 1.22.1
+      tapable: 2.2.1
+      xregexp: 3.1.0
+    transitivePeerDependencies:
+      - postcss
+      - supports-color
+      - terser
+      - ts-node
+      - vite
+      - vue
+    dev: false
+
+  '@gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?feature/mp-chunk_terser@5.16.6':
+    resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?feature/mp-chunk}
+    id: '@gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?feature/mp-chunk'
+    name: '@dcloudio/uni-cli-shared'
+    version: 3.0.0-3070320230222002-v3.0.22
+    engines: {node: ^14.18.0 || >=16.0.0}
+    dependencies:
+      '@ampproject/remapping': 2.2.0
+      '@babel/core': 7.21.3
+      '@babel/parser': 7.21.3
+      '@babel/types': 7.21.3
+      '@dcloudio/uni-i18n': 3.0.0-3070320230222002
+      '@dcloudio/uni-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?feature/mp-chunk'
+      '@intlify/core-base': 9.1.9
+      '@intlify/shared': 9.1.9
+      '@intlify/vue-devtools': 9.1.9
+      '@rollup/pluginutils': 4.2.1
+      '@vitejs/plugin-legacy': 4.0.1_terser@5.16.6
       '@vue/babel-plugin-jsx': 1.1.1_@babel+core@7.21.3
       '@vue/compiler-core': 3.2.47
       '@vue/compiler-dom': 3.2.47
@@ -9081,7 +9139,7 @@ packages:
       '@babel/parser': 7.21.3
       '@babel/types': 7.21.3
       '@dcloudio/uni-i18n': 3.0.0-3070320230222002
-      '@dcloudio/uni-shared': link:packages/uni-shared
+      '@dcloudio/uni-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?feature/mp-chunk'
       '@intlify/core-base': 9.1.9
       '@intlify/shared': 9.1.9
       '@intlify/vue-devtools': 9.1.9
@@ -9138,7 +9196,7 @@ packages:
       '@babel/parser': 7.21.3
       '@babel/types': 7.21.3
       '@dcloudio/uni-i18n': 3.0.0-3070320230222002
-      '@dcloudio/uni-shared': link:packages/uni-shared
+      '@dcloudio/uni-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?feature/mp-chunk'
       '@intlify/core-base': 9.1.9
       '@intlify/shared': 9.1.9
       '@intlify/vue-devtools': 9.1.9
@@ -9188,7 +9246,6 @@ packages:
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-components?feature/mp-chunk}
     name: '@dcloudio/uni-components'
     version: 3.0.0-3070320230222002-v3.0.22
-    dev: false
 
   '@gitpkg.vercel.app/txlct/uniapp/packages/uni-h5-vite?feature/mp-chunk_vue@3.2.47':
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-h5-vite?feature/mp-chunk}
@@ -9196,8 +9253,8 @@ packages:
     name: '@dcloudio/uni-h5-vite'
     version: 3.0.0-3070320230222002-v3.0.22
     dependencies:
-      '@dcloudio/uni-cli-shared': link:packages/uni-cli-shared
-      '@dcloudio/uni-shared': link:packages/uni-shared
+      '@dcloudio/uni-cli-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?feature/mp-chunk_vue@3.2.47'
+      '@dcloudio/uni-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?feature/mp-chunk'
       '@rollup/pluginutils': 4.2.1
       '@vue/compiler-dom': 3.2.47
       '@vue/compiler-sfc': 3.2.47
@@ -9208,7 +9265,11 @@ packages:
       mime: 3.0.0
       module-alias: 2.2.2
     transitivePeerDependencies:
+      - postcss
       - supports-color
+      - terser
+      - ts-node
+      - vite
       - vue
     dev: false
 
@@ -9217,32 +9278,36 @@ packages:
     name: '@dcloudio/uni-h5-vue'
     version: 3.0.0-3070320230222002-v3.0.22
     dependencies:
-      '@dcloudio/uni-shared': link:packages/uni-shared
+      '@dcloudio/uni-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?feature/mp-chunk'
     dev: false
 
   '@gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-compiler?feature/mp-chunk':
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-compiler?feature/mp-chunk}
-    name: mp-chunk
-    version: 0.0.0
+    name: '@dcloudio/uni-mp-compiler'
+    version: 3.0.0-3070320230222002-v3.0.22
+    dependencies:
+      '@babel/generator': 7.21.3
+      '@babel/parser': 7.21.3
+      '@babel/types': 7.21.3
+      '@dcloudio/uni-cli-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?feature/mp-chunk'
+      '@dcloudio/uni-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?feature/mp-chunk'
+      '@vue/compiler-core': 3.2.47
+      '@vue/compiler-dom': 3.2.47
+      '@vue/shared': 3.2.47
+      estree-walker: 2.0.2
+    transitivePeerDependencies:
+      - postcss
+      - supports-color
+      - terser
+      - ts-node
+      - vite
+      - vue
     dev: false
 
   '@gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-vite?feature/mp-chunk':
     resolution: {tarball: https://gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-vite?feature/mp-chunk}
-    name: '@dcloudio/uni-mp-vite'
-    version: 3.0.0-3070320230222002-v3.0.22
-    dependencies:
-      '@dcloudio/uni-cli-shared': link:packages/uni-cli-shared
-      '@dcloudio/uni-i18n': 3.0.0-3070320230222002
-      '@dcloudio/uni-mp-compiler': link:packages/uni-mp-compiler
-      '@dcloudio/uni-mp-vue': link:packages/uni-mp-vue
-      '@dcloudio/uni-mp-weixin': link:packages/uni-mp-weixin
-      '@dcloudio/uni-shared': link:packages/uni-shared
-      '@dcloudio/vite-plugin-uni': link:packages/vite-plugin-uni
-      '@vue/compiler-sfc': 3.2.47
-      '@vue/shared': 3.2.47
-      debug: 4.3.4
-    transitivePeerDependencies:
-      - supports-color
+    name: mp-chunk
+    version: 0.0.0
     dev: false
 
   '@gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-vue?feature/mp-chunk':
@@ -9250,7 +9315,7 @@ packages:
     name: '@dcloudio/uni-mp-vue'
     version: 3.0.0-3070320230222002-v3.0.22
     dependencies:
-      '@dcloudio/uni-shared': link:packages/uni-shared
+      '@dcloudio/uni-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?feature/mp-chunk'
       '@vue/shared': 3.2.47
 
   '@gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-weixin?feature/mp-chunk':
@@ -9278,8 +9343,8 @@ packages:
       '@babel/core': 7.21.3
       '@babel/plugin-syntax-import-meta': 7.10.4_@babel+core@7.21.3
       '@babel/plugin-transform-typescript': 7.21.0_@babel+core@7.21.3
-      '@dcloudio/uni-cli-shared': link:packages/uni-cli-shared
-      '@dcloudio/uni-shared': link:packages/uni-shared
+      '@dcloudio/uni-cli-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?feature/mp-chunk_terser@5.16.6'
+      '@dcloudio/uni-shared': '@gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?feature/mp-chunk'
       '@rollup/pluginutils': 4.2.1
       '@vitejs/plugin-legacy': 4.0.1_terser@5.16.6
       '@vitejs/plugin-vue': 4.1.0
@@ -9300,7 +9365,9 @@ packages:
       picocolors: 1.0.0
       terser: 5.16.6
     transitivePeerDependencies:
+      - postcss
       - supports-color
+      - ts-node
       - vue
     dev: false
 

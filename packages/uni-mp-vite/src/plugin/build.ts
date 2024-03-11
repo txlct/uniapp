@@ -127,7 +127,7 @@ function createMoveToVendorChunkFn(
   const inputDir = normalizePath(process.env.UNI_INPUT_DIR);
   const {
     vendorConfig = {},
-    chunk: { include = [], exclude = [], excludeSubPackages = ['modules'] } = {}
+    chunk: { include = [], exclude = [], excludeSubPackages = [] } = {}
   } = mp || {};
 
   const subPackages = parseSubpackagesRootOnce(
