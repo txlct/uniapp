@@ -1,7 +1,7 @@
-import fs from 'fs'
-import path from 'path'
-import debug from 'debug'
-import type { BuildOptions, FilterPattern, UserConfig } from 'vite'
+import fs from 'fs';
+import path from 'path';
+import debug from 'debug';
+import type { BuildOptions, UserConfig } from 'vite';
 
 import {
   emptyDir,
@@ -18,28 +18,28 @@ import {
   dynamicImportPolyfill,
   DEFAULT_ASSETS_RE,
   parseSubpackagesRootOnce,
-} from '@dcloudio/uni-cli-shared'
-import { GetManualChunk, GetModuleInfo, PreRenderedChunk } from 'rollup'
+} from '@dcloudio/uni-cli-shared';
+import { GetManualChunk, GetModuleInfo, PreRenderedChunk } from 'rollup';
 import {
   isUniComponentUrl,
   isUniPageUrl,
   parseVirtualComponentPath,
   parseVirtualPagePath,
-} from '../plugins/entry'
-import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni'
+} from '../plugins/entry';
+import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni';
 
 const debugChunk = debug('uni:chunk');
 export function buildOptions(
   mp: Required<VitePluginUniOptions>['mp']
 ): UserConfig['build'] {
-  const platform = process.env.UNI_PLATFORM
-  const inputDir = process.env.UNI_INPUT_DIR
-  const outputDir = process.env.UNI_OUTPUT_DIR
+  const platform = process.env.UNI_PLATFORM;
+  const inputDir = process.env.UNI_INPUT_DIR;
+  const outputDir = process.env.UNI_OUTPUT_DIR;
   // 开始编译时，清空输出目录
   if (fs.existsSync(outputDir)) {
-    emptyDir(outputDir, ['project.config.json', 'project.private.config.json'])
+    emptyDir(outputDir, ['project.config.json', 'project.private.config.json']);
   }
-  return createBuildOptions(inputDir, platform, mp)
+  return createBuildOptions(inputDir, platform, mp);
 }
 
 export function createBuildOptions(
@@ -47,7 +47,7 @@ export function createBuildOptions(
   platform: UniApp.PLATFORM,
   mp: Required<VitePluginUniOptions>['mp'],
 ): BuildOptions {
-  const { renderDynamicImport } = dynamicImportPolyfill()
+  const { renderDynamicImport } = dynamicImportPolyfill();
 
   return {
     // sourcemap: 'inline', // TODO
@@ -64,9 +64,9 @@ export function createBuildOptions(
       output: {
         entryFileNames(chunk) {
           if (chunk.name === 'main') {
-            return 'app.js'
+            return 'app.js';
           }
-          return chunk.name + '.js'
+          return chunk.name + '.js';
         },
         format: 'cjs',
         manualChunks: createMoveToVendorChunkFn(mp),
@@ -75,54 +75,50 @@ export function createBuildOptions(
           {
             name: 'dynamic-import-polyfill',
             renderDynamicImport(options) {
-              const { targetModuleId } = options
+              const { targetModuleId } = options;
               if (targetModuleId && isMiniProgramAssetFile(targetModuleId)) {
                 return {
                   left: 'Promise.resolve(require(',
                   right: '))',
-                }
+                };
               }
-              return (renderDynamicImport as Function).call(this, options)
+              return (renderDynamicImport as Function).call(this, options);
             },
           },
         ],
       },
     },
-  }
+  };
 }
 
 function parseRollupInput(inputDir: string, platform: UniApp.PLATFORM) {
   const inputOptions: Record<string, string> = {
     app: resolveMainPathOnce(inputDir),
-  }
+  };
   if (process.env.UNI_MP_PLUGIN) {
-    return inputOptions
+    return inputOptions;
   }
-  const manifestJson = parseManifestJsonOnce(inputDir)
-  const plugins = manifestJson[platform]?.plugins || {}
+  const manifestJson = parseManifestJsonOnce(inputDir);
+  const plugins = manifestJson[platform]?.plugins || {};
   Object.keys(plugins).forEach((name) => {
-    const pluginExport = plugins[name].export
+    const pluginExport = plugins[name].export;
     if (!pluginExport) {
-      return
+      return;
     }
-    const pluginExportFile = path.resolve(inputDir, pluginExport)
+    const pluginExportFile = path.resolve(inputDir, pluginExport);
     if (!fs.existsSync(pluginExportFile)) {
-      notFound(pluginExportFile)
+      notFound(pluginExportFile);
     }
-    inputOptions[removeExt(pluginExport)] = pluginExportFile
-  })
-  return inputOptions
+    inputOptions[removeExt(pluginExport)] = pluginExportFile;
+  });
+  return inputOptions;
 }
 
 function isVueJs(id: string) {
-  return id.includes('\0plugin-vue:export-helper')
+  return id.includes('\0plugin-vue:export-helper');
 }
 
-const chunkFileNameBlackList = ['main', 'pages.json', 'manifest.json']
-
-const checkIsInList = (list: FilterPattern, filename: string): boolean => (
-  Array.isArray(list) && list.some((item => new RegExp(item).test(filename)))
-);
+const chunkFileNameBlackList = ['main', 'pages.json', 'manifest.json'];
 
 function createMoveToVendorChunkFn(
   mp: Required<VitePluginUniOptions>['mp'],
@@ -131,7 +127,7 @@ function createMoveToVendorChunkFn(
   const inputDir = normalizePath(process.env.UNI_INPUT_DIR);
   const {
     vendorConfig = {},
-    chunk: { include = [], exclude = [], excludeSubPackages = [] } = {}
+    chunk: { include = [], exclude = [], excludeSubPackages = ['modules'] } = {}
   } = mp || {};
 
   const subPackages = parseSubpackagesRootOnce(
@@ -166,7 +162,9 @@ function createMoveToVendorChunkFn(
     }
 
     // 是否过滤的包
-    const isBlackList = importers.some((importer: string) => Array.isArray(exclude) && exclude.some(item => new RegExp(item).test(importer)));
+    const isBlackList = Array.isArray(exclude)
+      && exclude.length
+      && importers.some((importer: string) => exclude.some(item => new RegExp(item).test(importer)));
 
     if (isBlackList) {
       console.log("🚀 ~ isMatchSubPackageRoot ~ isExclude : >>>", isBlackList);
@@ -182,27 +180,40 @@ function createMoveToVendorChunkFn(
   };
 
   return (id, { getModuleInfo }) => {
-    const normalizedId = normalizePath(id)
-    const filename = normalizedId.split('?')[0]
+    const normalizedId = normalizePath(id);
+    const filename = normalizedId.split('?')[0];
     // 处理资源文件
     if (DEFAULT_ASSETS_RE.test(filename)) {
-      debugChunk('common/assets', normalizedId)
-      return 'common/assets'
+      debugChunk('common/assets', normalizedId);
+      return 'common/assets';
     }
 
     for (const key in vendorConfig) {
-      const element = vendorConfig[key]
+      const element = vendorConfig[key];
       if (element.test(filename)) {
-        debugChunk(key, normalizedId)
-        return key
+        debugChunk(key, normalizedId);
+        return key;
       }
     }
     // 处理项目内的js,ts文件
     if (EXTNAME_JS_RE.test(filename)) {
+
+      if (subPackages.length) {
+        const { importers = [] } = getModuleInfo(id) || {};
+        const match = isMatchSubPackageRoot(importers);
+
+        if (match) {
+          // console.log("🚀 ~ return ~ match : >>>", match);
+          debugChunk(match, normalizedId);
+          // 有分包的情况下，放入分包common/vendor中
+          return `${match}/common/vendor`;
+        }
+      }
+
       if (filename.startsWith(inputDir) && !filename.includes('node_modules')) {
         const chunkFileName = removeExt(
           normalizePath(path.relative(inputDir, filename))
-        )
+        );
         if (
           !chunkFileNameBlackList.includes(chunkFileName) &&
           !hasJsonFile(chunkFileName) // 无同名的page,component
@@ -214,22 +225,9 @@ function createMoveToVendorChunkFn(
         return;
       }
 
-      const isInclude = checkIsInList(include, filename); 
-
-      if (isInclude && subPackages.length) {
-        const { importers = [] } = getModuleInfo(id) || {};
-        const match = isMatchSubPackageRoot(importers);
-
-        if (match) {
-          console.log("🚀 ~ return ~ match : >>>", match);
-          return `${match}/common/vendor`;
-        }
-        // 有分包的情况下，放入分包common/vendor中
-      }
-
       // 非项目内的 js 资源，均打包到 vendor
-      debugChunk('common/vendor', normalizedId)
-      return 'common/vendor'
+      debugChunk('common/vendor', normalizedId);
+      return 'common/vendor';
     }
     if (
       isVueJs(normalizedId) ||
@@ -238,10 +236,10 @@ function createMoveToVendorChunkFn(
         // 使用原始路径，格式化的可能找不到模块信息 https://github.com/dcloudio/uni-app/issues/3425
         staticImportedByEntry(id, getModuleInfo, cache))
     ) {
-      debugChunk('common/vendor', id)
-      return 'common/vendor'
+      debugChunk('common/vendor', id);
+      return 'common/vendor';
     }
-  }
+  };
 }
 
 function staticImportedByEntry(
@@ -251,22 +249,22 @@ function staticImportedByEntry(
   importStack: string[] = []
 ): boolean {
   if (cache.has(id)) {
-    return cache.get(id) as boolean
+    return cache.get(id) as boolean;
   }
   if (importStack.includes(id)) {
     // circular deps!
-    cache.set(id, false)
-    return false
+    cache.set(id, false);
+    return false;
   }
-  const mod = getModuleInfo(id)
+  const mod = getModuleInfo(id);
   if (!mod) {
-    cache.set(id, false)
-    return false
+    cache.set(id, false);
+    return false;
   }
 
   if (mod.isEntry) {
-    cache.set(id, true)
-    return true
+    cache.set(id, true);
+    return true;
   }
   const someImporterIs = mod.importers.some((importer) =>
     staticImportedByEntry(
@@ -275,9 +273,9 @@ function staticImportedByEntry(
       cache,
       importStack.concat(id)
     )
-  )
-  cache.set(id, someImporterIs)
-  return someImporterIs
+  );
+  cache.set(id, someImporterIs);
+  return someImporterIs;
 }
 
 function createChunkFileNames(
@@ -285,16 +283,16 @@ function createChunkFileNames(
 ): (chunkInfo: PreRenderedChunk) => string {
   return function chunkFileNames(chunk) {
     if (chunk.isDynamicEntry && chunk.facadeModuleId) {
-      let id = chunk.facadeModuleId
+      let id = chunk.facadeModuleId;
       if (isUniPageUrl(id)) {
-        id = path.resolve(process.env.UNI_INPUT_DIR, parseVirtualPagePath(id))
+        id = path.resolve(process.env.UNI_INPUT_DIR, parseVirtualPagePath(id));
       } else if (isUniComponentUrl(id)) {
         id = path.resolve(
           process.env.UNI_INPUT_DIR,
           parseVirtualComponentPath(id)
-        )
+        );
       }
-      return removeExt(normalizeMiniProgramFilename(id, inputDir)) + '.js'
+      return removeExt(normalizeMiniProgramFilename(id, inputDir)) + '.js';
     }
     // const matchinclude = checkIsinclude(vendorConfig, chunk.facadeModuleId);
     // if (matchinclude) {
@@ -305,13 +303,13 @@ function createChunkFileNames(
     //     return removeExt(matchPath) + '.js';
     //   }
     // }
-    return '[name].js'
-  }
+    return '[name].js';
+  };
 }
 
 export function notFound(filename: string): never {
-  console.log()
-  console.error(M['file.notfound'].replace('{file}', filename))
-  console.log()
-  process.exit(0)
+  console.log();
+  console.error(M['file.notfound'].replace('{file}', filename));
+  console.log();
+  process.exit(0);
 }

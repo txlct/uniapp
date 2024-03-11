@@ -10,6 +10,7 @@ const { targets: packageTargets, fuzzyMatchTarget } = require('./utils')
 const { remove, ensureDir } = require('fs-extra');
 
 const remoteRepoUrlPrefix = 'https://xqh-1257029999.cos.ap-guangzhou.myqcloud.com/'
+const branchRepoUrlPrefix = 'https://gitpkg.vercel.app/txlct/uniapp/packages/'
 // 参数
 const targetsArgs = args._ || [];
 const targets = targetsArgs.length ? targetsArgs : packageTargets;
@@ -50,8 +51,9 @@ const setTargetMap = ({ tag, repo }) => {
     const name = getPackageName(target);
     const slash = repo.endsWith('/') ? '' : '/';
 
+    const postfix =  isNeedTag ? `-${tag}.tgz` : `?${tag}`;
     const value = repo
-      ? `${repo}${slash}${name}${tag ? `-${tag}.tgz` : ''}`
+      ? `${repo}${slash}${name}${tag ? postfix : ''}`
       : tag;
 
     targetMap.set(target, value)
@@ -96,7 +98,7 @@ async function main() {
         type: 'input',
         name: 'repo',
         message: 'Input target repository',
-        initial: remoteRepoUrlPrefix,
+        initial: isNeedTag ? remoteRepoUrlPrefix : branchRepoUrlPrefix,
       })
     ));
   } 

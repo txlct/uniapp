@@ -27,7 +27,8 @@
     "release:mp": "node scripts/release.js uni-cli-shared vite-plugin-uni uni-mp-vue uni-mp-vite uni-mp-compiler uni-mp-weixin --skipTests --skipBuild",
     "release:h5": "node scripts/release.js uni-app uni-cli-shared uni-h5 uni-h5-vite vite-plugin-uni --skipTests --skipBuild --dry",
     "release:version": "pnpm release --skipTests --dry --tag",
-    "release:dev": "pnpm release --local --skipTests --dry"
+    "release:dev": "pnpm release --local --skipTests --dry",
+    "release:branch": "pnpm release --skipTests --dry"
   },
   "types": "test-dts/index.d.ts",
   "tsd": {
@@ -51,7 +52,7 @@
     "@babel/preset-env": "^7.20.2",
     "@dcloudio/types": "3.2.11",
     "@dcloudio/uni-api": "workspace:*",
-    "@dcloudio/uni-app": "workspace:*",
+    "@dcloudio/uni-app": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-app?feature/mp-chunk",
     "@jest/types": "^29.5.0",
     "@microsoft/api-extractor": "^7.34.4",
     "@rollup/plugin-alias": "^4.0.3",

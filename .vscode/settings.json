@@ -1,17 +1,25 @@
 {
     "typescript.tsdk": "node_modules/typescript/lib",
     "files.exclude": {
+        "**/playground/nvue": true,
+        "**/playground/ssr": true,
+        "**/playground/uts": true,
+        "**/uni-app-plus": true,
+        "**/uni-app-vite": true,
+        "**/uni-app-vue": true,
+        "**/uni-cloud": true,
         "**/uni-mp-alipay": true,
         "**/uni-mp-baidu": true,
         "**/uni-mp-kuaishou": true,
         "**/uni-mp-lark": true,
-        "**/uni-mp-toutiao": true,
         "**/uni-mp-nvue-styler": true,
+        "**/uni-mp-qq": true,
+        "**/uni-mp-toutiao": true,
         "**/uni-nvue-styler": true,
         "**/uni-quickapp-webview": true,
-        "**/uni-cloud": true,
-        "**/playground/nvue": true,
-        "**/playground/ssr": true,
-        "**/playground/uts": true,
+        "**/uni-stacktracey": true,
+        "**/uni-stat": true,
+        "**/uni-uts-v1": true,
+        "**/uts": true
     }
 }
