@@ -12,7 +12,7 @@ export interface VitePluginUniOptions {
     vueJsxOptions?: (VueJSXPluginOptions & { babelPlugins?: any[] }) | boolean
     viteLegacyOptions?: ViteLegacyOptions | false
     mp?: {
-      vendorConfig?: Record<string, string | RegExp[]>;
+      vendorConfig?: Record<string, RegExp>;
       chunk?: {
         include?: FilterPattern;
         exclude?: FilterPattern;

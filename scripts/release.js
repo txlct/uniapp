@@ -9,8 +9,9 @@ const execa = require('execa')
 const { targets: packageTargets, fuzzyMatchTarget } = require('./utils')
 const { remove, ensureDir } = require('fs-extra');
 
-const remoteRepoUrlPrefix = 'https://xqh-1257029999.cos.ap-guangzhou.myqcloud.com/'
-const branchRepoUrlPrefix = 'https://gitpkg.vercel.app/txlct/uniapp/packages/'
+const remoteRepoUrlPrefix = 'https://github.com/txlct/uniapp/releases/download/v3.0.23-alpha/'
+const branchRepoUrlPrefix = 'https://gitpkg.vercel.app/txlct/uniapp/packages/';
+
 // 参数
 const targetsArgs = args._ || [];
 const targets = targetsArgs.length ? targetsArgs : packageTargets;
@@ -53,7 +54,7 @@ const setTargetMap = ({ tag, repo }) => {
 
     const postfix =  isNeedTag ? `-${tag}.tgz` : `?${tag}`;
     const value = repo
-      ? `${repo}${slash}${name}${tag ? postfix : ''}`
+      ? `${repo}${slash}dcloudio-${name}${tag ? postfix : ''}`
       : tag;
 
     targetMap.set(target, value)
@@ -138,7 +139,7 @@ async function main() {
     throw new Error(`invalid target version: ${targetVersion}`)
   }
 
-  setTargetMap({ tag, repo });
+  setTargetMap({ tag: targetVersion,  repo });
 
   const { yes } = await prompt({
     type: 'confirm',

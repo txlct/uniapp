@@ -1,6 +1,6 @@
 {
   "name": "@dcloudio/uni-mp-weixin",
-  "version": "3.0.0-3070320230222002-v3.0.22",
+  "version": "3.0.0-3070320230222002-v3.0.23",
   "description": "uni-app mp-weixin",
   "main": "dist/uni.compiler.js",
   "files": [
@@ -30,10 +30,10 @@
     "@vue/compiler-core": "3.2.47"
   },
   "dependencies": {
-    "@dcloudio/uni-cli-shared": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-cli-shared?feature/mp-chunk",
-    "@dcloudio/uni-mp-vite": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-vite?feature/mp-chunk",
-    "@dcloudio/uni-mp-vue": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-mp-vue?feature/mp-chunk",
-    "@dcloudio/uni-shared": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-shared?feature/mp-chunk",
+    "@dcloudio/uni-cli-shared": "https://github.com/txlct/uniapp/releases/download/v3.0.23-alpha/dcloudio-uni-cli-shared-3.0.0-3070320230222002-v3.0.23.tgz",
+    "@dcloudio/uni-mp-vite": "https://github.com/txlct/uniapp/releases/download/v3.0.23-alpha/dcloudio-uni-mp-vite-3.0.0-3070320230222002-v3.0.23.tgz",
+    "@dcloudio/uni-mp-vue": "https://github.com/txlct/uniapp/releases/download/v3.0.23-alpha/dcloudio-uni-mp-vue-3.0.0-3070320230222002-v3.0.23.tgz",
+    "@dcloudio/uni-shared": "https://github.com/txlct/uniapp/releases/download/v3.0.23-alpha/dcloudio-uni-shared-3.0.0-3070320230222002-v3.0.23.tgz",
     "@vue/shared": "3.2.47",
     "jimp": "^0.10.1",
     "licia": "^1.29.0",

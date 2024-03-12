@@ -1,6 +1,6 @@
 {
   "private": true,
-  "version": "3.0.0-3070320230222002-v3.0.22",
+  "version": "3.0.0-3070320230222002-v3.0.23",
   "workspaces": [
     "packages/*"
   ],
@@ -52,7 +52,7 @@
     "@babel/preset-env": "^7.20.2",
     "@dcloudio/types": "3.2.11",
     "@dcloudio/uni-api": "workspace:*",
-    "@dcloudio/uni-app": "https://gitpkg.vercel.app/txlct/uniapp/packages/uni-app?feature/mp-chunk",
+    "@dcloudio/uni-app": "https://github.com/txlct/uniapp/releases/download/v3.0.23-alpha/dcloudio-uni-app-3.0.0-3070320230222002-v3.0.23.tgz",
     "@jest/types": "^29.5.0",
     "@microsoft/api-extractor": "^7.34.4",
     "@rollup/plugin-alias": "^4.0.3",
