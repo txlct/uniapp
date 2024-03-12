@@ -18,6 +18,7 @@ import {
   dynamicImportPolyfill,
   DEFAULT_ASSETS_RE,
   parseSubpackagesRootOnce,
+  VitePluginUniOptions,
 } from '@dcloudio/uni-cli-shared';
 import { GetManualChunk, GetModuleInfo, PreRenderedChunk } from 'rollup';
 import {
@@ -26,7 +27,6 @@ import {
   parseVirtualComponentPath,
   parseVirtualPagePath,
 } from '../plugins/entry';
-import { VitePluginUniOptions } from '@dcloudio/vite-plugin-uni';
 
 const debugChunk = debug('uni:chunk');
 export function buildOptions(
@@ -127,7 +127,7 @@ function createMoveToVendorChunkFn(
   const inputDir = normalizePath(process.env.UNI_INPUT_DIR);
   const {
     vendorConfig = {},
-    chunk: { include = [], exclude = [], excludeSubPackages = [] } = {}
+    chunk: { exclude = [], excludeSubPackages = [] } = {}
   } = mp || {};
 
   const subPackages = parseSubpackagesRootOnce(
